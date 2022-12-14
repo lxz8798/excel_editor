@@ -103,7 +103,6 @@ export const useUserStore = defineStore({
         const { ...loginParams } = params;
         const data = await loginApi(loginParams);
         const { token } = data;
-
         // save token
         this.setToken(token);
         return this.afterLoginAction(true, params['goHome']);
@@ -115,7 +114,7 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null;
       // get user info
       const userInfo = await this.getUserInfoAction();
-
+      const formStore = useFormStore();
       const sessionTimeout = this.sessionTimeout;
       if (sessionTimeout) {
         this.setSessionTimeout(false);
@@ -129,6 +128,8 @@ export const useUserStore = defineStore({
           router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw);
           permissionStore.setDynamicAddedRoute(true);
         }
+        // 获得所有的表单信息
+        formStore.setInputItems({ templateId: this.gotoDocId });
         // 临时改变服务端返回的hotPath
         userInfo['homePath'] = path;
         goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME));

@@ -68,7 +68,7 @@
     },
     setup() {
       const state = reactive({
-        server: 'ws://xiaoshu.gz2vip.91tunnel.com/socket/connection/2',
+        server: 'ws://43.142.155.174:8100/socket/connection/1601254436653510657',
         sendValue: '',
         recordList: [] as { id: number; time: number; res: string }[],
       });

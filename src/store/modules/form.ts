@@ -7,6 +7,8 @@ interface formState {
   // Page loading status
   currTemp: object;
   inputItems: [];
+  defaultValues: object;
+  saveMsg: string;
 }
 const { createMessage } = useMessage();
 export const useFormStore = defineStore({
@@ -15,6 +17,8 @@ export const useFormStore = defineStore({
     tempList: [],
     currTemp: {},
     inputItems: [],
+    defaultValues: {},
+    saveMsg: '',
   }),
   getters: {
     getTempList(): any[] {
@@ -26,6 +30,12 @@ export const useFormStore = defineStore({
     getInputItems(): any[] {
       return this.inputItems;
     },
+    getDefaultValues(): object {
+      return this.defaultValues;
+    },
+    getSaveMsg(): string {
+      return this.saveMsg;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -34,12 +44,14 @@ export const useFormStore = defineStore({
     setCurrTemp(id: string) {
       this.currTemp = this.tempList.filter((i) => i['id'] === id)[0];
     },
+    setDefaultValues(obj: object) {
+      this.defaultValues = obj;
+    },
     async setInputItems(id) {
       this.inputItems = await getTempItems(id);
     },
     async saveForm(list: []) {
-      const datas = await addInputItem(list);
-      console.log(datas);
+      this.saveMsg = await addInputItem(list);
     },
   },
 });
