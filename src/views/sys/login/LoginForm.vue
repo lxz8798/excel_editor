@@ -52,18 +52,18 @@
         {{ t('sys.login.registerButton') }}
       </Button> -->
     </FormItem>
-    <ARow class="enter-x">
-      <ACol :md="8" :xs="24">
+    <ARow class="enter-x justify-between">
+      <ACol :md="12" :xs="24">
         <Button block @click="setLoginState(LoginStateEnum.MOBILE)">
           {{ t('sys.login.mobileSignInFormTitle') }}
         </Button>
       </ACol>
-      <ACol :md="8" :xs="24" class="!my-2 !md:my-0 xs:mx-0 md:mx-2">
+      <!--<ACol :md="8" :xs="24" class="!my-2 !md:my-0 xs:mx-0 md:mx-2">
         <Button block @click="setLoginState(LoginStateEnum.QR_CODE)">
           {{ t('sys.login.qrSignInFormTitle') }}
         </Button>
-      </ACol>
-      <ACol :md="6" :xs="24">
+      </ACol>-->
+      <ACol :md="11" :xs="24">
         <Button block @click="setLoginState(LoginStateEnum.REGISTER)">
           {{ t('sys.login.registerButton') }}
         </Button>
@@ -85,6 +85,7 @@
   import { reactive, ref, unref, computed } from 'vue';
   // 被注释的其他组件可能会用到 Divider
   import { Checkbox, Form, Input, Row, Col, Button } from 'ant-design-vue';
+  import type { AppRouteModule } from '/@/router/types';
   // import {
   //   GithubFilled,
   //   WechatFilled,
@@ -111,7 +112,9 @@
   const { notification, createErrorModal } = useMessage();
   const { prefixCls } = useDesign('login');
   const userStore = useUserStore();
-
+  import { useRouter } from 'vue-router';
+  import { useFormStore } from "/@/store/modules/form";
+  import { LAYOUT } from "/@/router/constant";
   const { setLoginState, getLoginState } = useLoginState();
   const { getFormRules } = useFormRules();
 
@@ -125,6 +128,8 @@
   });
 
   const { validForm } = useFormValid(formRef);
+  const router = useRouter();
+  const formStore = useFormStore();
 
   //onKeyStroke('Enter', handleLogin);
 
@@ -136,11 +141,37 @@
     try {
       loading.value = true;
       const userInfo = await userStore.login({
-        goHome: '/form/form1/' + userStore.getGotoDocID,
+        goHome: '/form/template/' + userStore.getGotoDocID,
         password: data.password,
         username: data.account,
       });
       if (userInfo) {
+        // const formParentRouter = {
+        //   path: '/form',
+        //   name: 'Form',
+        //   component: LAYOUT,
+        //   meta: {
+        //     orderNo: 2000,
+        //     icon: 'ion:menu-outline',
+        //     title: t('routes.demo.level.level'),
+        //   },
+        //   redirect: 'template',
+        //   children: [],
+        // };
+        // formStore.getTempList.forEach((template) => {
+        //   const { id, templateTitle } = template;
+        //   const routerObj = {
+        //     path: 'template/' + id,
+        //     name: templateTitle,
+        //     component: () => import('/@/views/catalogue/form/template.vue'),
+        //     meta: {
+        //       id: id,
+        //       title: templateTitle,
+        //     },
+        //   };
+        //   formParentRouter['children'].push(routerObj);
+        // });
+        // router.addRoute('Form', formParentRouter);
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realName}`,

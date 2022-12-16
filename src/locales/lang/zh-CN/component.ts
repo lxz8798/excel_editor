@@ -130,5 +130,6 @@ export default {
 
     dragText: '请按住滑块拖动',
     successText: '验证通过',
+    loginFail: '您可能没登录，请先登录!',
   },
 };

@@ -87,7 +87,6 @@ export async function getShallowMenus(): Promise<Menu[]> {
   }
   return shallowMenuList;
 }
-
 // Get the children of the menu
 export async function getChildrenMenus(parentPath: string) {
   const menus = await getMenus();

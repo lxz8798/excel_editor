@@ -10,6 +10,14 @@
           :placeholder="t('sys.login.userName')"
         />
       </FormItem>
+      <FormItem name="realName" class="enter-x">
+        <Input
+          class="fix-auto-fill"
+          size="large"
+          v-model:value="formData.realName"
+          :placeholder="t('sys.login.realName')"
+        />
+      </FormItem>
       <FormItem name="mobile" class="enter-x">
         <Input
           size="large"
@@ -73,6 +81,7 @@
   import { CountdownInput } from '/@/components/CountDown';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useLoginState, useFormRules, useFormValid, LoginStateEnum } from './useLogin';
+  import { useUserStore } from "/@/store/modules/user";
 
   const FormItem = Form.Item;
   const InputPassword = Input.Password;
@@ -84,6 +93,7 @@
 
   const formData = reactive({
     account: '',
+    realName: '',
     password: '',
     confirmPassword: '',
     mobile: '',
@@ -93,12 +103,23 @@
 
   const { getFormRules } = useFormRules(formData);
   const { validForm } = useFormValid(formRef);
+  const userStore = useUserStore();
 
   const getShow = computed(() => unref(getLoginState) === LoginStateEnum.REGISTER);
 
   async function handleRegister() {
     const data = await validForm();
+    console.log(data, 'data');
+    const { account, mobile, password, policy, realName, sms } = data;
+    // formData.account = account;
+    // formData.realName = realName;
+    // formData.password = password;
+    // formData.confirmPassword = password;
+    // formData.mobile = mobile;
+    // formData.sms = sms;
+    // formData.policy = policy;
+    const result = userStore.regUser(data);
+    console.log(result);
     if (!data) return;
-    console.log(data);
   }
 </script>

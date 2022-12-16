@@ -9,14 +9,14 @@
       />
     </div>
 
-    <span class="-enter-x xl:hidden">
+    <!--<span class="-enter-x xl:hidden">
       <AppLogo :alwaysShowTitle="true" />
-    </span>
+    </span>-->
 
     <div class="container relative h-full py-2 mx-auto sm:px-10">
       <div class="flex h-full">
         <!-- 登录页面左侧AD -->
-        <div class="hidden min-h-full pl-4 mr-4 xl:flex xl:flex-col xl:w-6/12" :class="!isLogin && 'not-login-l'">
+        <div class="hidden min-h-full pl-4 mr-4 xl:flex xl:flex-col xl:w-6/12">
           <!--<AppLogo class="-enter-x" />
           <div class="my-auto">
             <img
@@ -33,16 +33,29 @@
           </div>
           <Satellite />-->
           <div class="plant_wrap -enter-x">
+            <div class="circle box1 animate-pulse">
+              <p>封堵</p>
+            </div>
+            <div class="circle box2 animate-pulse">
+              <p>理论</p>
+            </div>
+            <div class="circle box3 animate-pulse">
+              <p>方法</p>
+            </div>
+            <div class="circle box4 animate-pulse">
+              <p>工艺</p>
+            </div>
             <div class="plant">
-              <div class="ball" @click="toEditDocHandler('1601254436653510657')">文档1</div>
-              <div class="ball second" @click="toEditDocHandler('1601254436653510657')">文档2</div>
-              <div class="ball third" @click="toEditDocHandler('1601254436653510657')">文档3</div>
-              <div class="ball four" @click="toEditDocHandler('1601254436653510657')">文档4</div>
+              <div class="ball"></div>
+              <div class="ball second"></div>
+              <div class="ball third"></div>
+              <div class="ball fourth"></div>
+              <div class="ball fifth"></div>
             </div>
           </div>
         </div>
         <!-- 登录栏 -->
-        <div class="flex w-full h-full py-5 xl:h-auto xl:py-0 xl:my-0 xl:w-6/12" v-if="isLogin">
+        <div class="flex w-full h-full py-5 xl:h-auto xl:py-0 xl:my-0 xl:w-6/12">
           <div
             :class="`${prefixCls}-form`"
             class="relative w-full px-5 py-8 mx-auto my-auto rounded-md shadow-md xl:ml-16 xl:bg-transparent sm:px-8 xl:p-4 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-auto enter-x"
@@ -69,33 +82,48 @@
   import MobileForm from './MobileForm.vue';
   import QrCodeForm from './QrCodeForm.vue';
   import { useGlobSetting } from '/@/hooks/setting';
-  import { useI18n } from '/@/hooks/web/useI18n';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useLocaleStore } from '/@/store/modules/locale';
-  import { useRouter } from 'vue-router';
   import { useUserStore } from '/@/store/modules/user';
-  const router = useRouter();
+  import { getFromTemplateList } from '/@/api/demo/form';
+  import { useFormStore } from '/@/store/modules/form';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { useI18n } from '/@/hooks/web/useI18n';
+  // const router = useRouter();
   defineProps({
     sessionTimeout: {
       type: Boolean,
     },
   });
-  const isLogin = ref(false);
   const globSetting = useGlobSetting();
   const { prefixCls } = useDesign('login');
   const { t } = useI18n();
   const localeStore = useLocaleStore();
   const userStore = useUserStore();
-  function toEditDocHandler(id) {
-    isLogin.value = true;
-    const $loginLeft: Element | null = document.querySelector('.not-login');
-    $loginLeft.setAttribute('class', 'vben-login');
-    userStore.setGotoDocID(id);
-  }
-  onMounted(() => {
-    const $loginLeft: Element | null = document.querySelector('.vben-login');
-    $loginLeft.setAttribute('class', 'not-login');
+  const formStore = useFormStore();
+  const { createMessage } = useMessage();
+  // 点击小球把ID存起来
+  getFromTemplateList().then((template) => {
+    if (template.length) {
+      formStore.setTempList(template);
+      const $balls = document.querySelectorAll('.ball');
+      template.forEach((temp, key) => {
+        const $p = document.createElement('p');
+        $p.innerText = temp.templateTitle.replace('检测报告单', '报告').replace('天然气', ' ');
+        // $p.dataset.templateId = t.id;
+        $balls[key].appendChild($p);
+        $balls[key].addEventListener('click', () => {
+          userStore.setGotoDocID(temp.id);
+          if (!Object.keys(userStore.getUserInfo).length) {
+            createMessage.warning(t('component.verify.loginFail'));
+          }
+        });
+      });
+    }
   });
+  // function toEditDocHandler(e) {
+  //   userStore.setGotoDocID(e);
+  // }
   const showLocale = localeStore.getShowPicker;
   const title = computed(() => globSetting?.title ?? '');
 </script>
@@ -104,27 +132,6 @@
   @logo-prefix-cls: ~'@{namespace}-app-logo';
   @countdown-prefix-cls: ~'@{namespace}-countdown-input';
   @dark-bg: #293146;
-
-  .not-login-l {
-    transform: translateX(35%);
-  }
-
-  .not-login {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 110%;
-    height: 100%;
-    margin-left: 0;
-    background-image: url(/@/assets/svg/login-bg.svg);
-    background-position: 100%;
-    background-repeat: no-repeat;
-    background-size: auto 100%;
-    content: '';
-    @media (max-width: @screen-xl) {
-      display: none;
-    }
-  }
 
   html[data-theme='dark'] {
     .@{prefix-cls} {
@@ -284,14 +291,70 @@
   .plant_wrap {
     width: 100%;
     height: 100%;
-    background: url(/@/assets/images/plane.png) no-repeat center center / 25%;
+    //background: url(/@/assets/images/plane.png) no-repeat center center / 25%;
     display: flex;
     justify-content: center;
     align-items: center;
 
+    .circle,
+    .plant {
+      border: 2px solid #13c2c2;
+    }
+
+    .circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+
+      position: absolute;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      > p {
+        font-size: 16px;
+        writing-mode: vertical-lr;
+        color: white;
+        letter-spacing: 8px;
+      }
+    }
+
+    .circle.box1 {
+      width: 200px;
+      height: 200px;
+      background: rgba(164, 140, 85, 0.3);
+    }
+
+    .circle.box2 {
+      width: 250px;
+      height: 250px;
+      background: rgba(46, 186, 45, 0.3);
+      > p {
+        transform: translateX(108px);
+      }
+    }
+
+    .circle.box3 {
+      width: 300px;
+      height: 300px;
+      background: rgba(16, 193, 149, 0.3);
+      > p {
+        transform: translateX(135px);
+      }
+    }
+
+    .circle.box4 {
+      width: 350px;
+      height: 350px;
+      background: rgba(4, 152, 207, 0.3);
+      > p {
+        transform: translateX(160px);
+      }
+    }
+
     .plant {
       position: absolute;
-      border: 2px solid #13c2c2;
 
       width: 550px;
       height: 550px;
@@ -303,11 +366,11 @@
     }
 
     .ball {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       position: absolute;
       border-radius: 50%;
-      background-color: rgba(20, 12, 33, .5);
+      background-color: rgba(20, 12, 33, 0.5);
       left: calc(50% - 135px);
       top: -15px;
       text-align: center;
@@ -316,27 +379,37 @@
 
       transform: rotateZ(-30deg) scaleY(2);
       animation: self-rotate 16s linear infinite;
+
       //animation-name: self-rotate, ping;
       //animation-duration: 16s, 1s;
       //animation-timing-function: linear, cubic-bezier(0, 0, 0.2, 1);
       //animation-iteration-count: infinite;
       cursor: pointer;
+      > p {
+        padding: 15px;
+        font-size: 12px;
+        line-height: 18px;
+      }
       &:hover {
-        transition: .3s;
-        background-color: rgba(60, 32, 53, .5);
+        transition: 0.3s;
+        background-color: rgba(60, 32, 53, 0.5);
       }
     }
     .second {
-      left: calc(50% + 75px);
-      top: 485px;
+      left: 30%;
+      top: 495px;
     }
     .third {
-      left: calc(50% - 285px);
-      top: 325px;
+      left: -10%;
+      top: 230px;
     }
-    .four {
-      left: 85%;
+    .fourth {
+      left: 83%;
       top: 80px;
+    }
+    .fifth {
+      left: 88%;
+      top: 380px;
     }
   }
 </style>

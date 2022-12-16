@@ -91,6 +91,7 @@ export default {
     diffPwd: '两次输入密码不一致',
 
     userName: '账号',
+    realName: '真实名称',
     password: '密码',
     confirmPassword: '确认密码',
     email: '邮箱',

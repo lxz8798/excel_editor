@@ -1,6 +1,15 @@
 /**
  * @description: Login interface parameters
  */
+export interface registerModel {
+  account: string;
+  realName: string;
+  password: string;
+  confirmPassword: string;
+  mobile: string;
+  sms: string;
+  policy?: boolean;
+}
 export interface LoginParams {
   username: string;
   password: string;

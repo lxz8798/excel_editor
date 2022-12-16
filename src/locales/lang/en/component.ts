@@ -125,5 +125,6 @@ export default {
     redoTip: 'Click the picture to refresh',
     dragText: 'Hold down the slider and drag',
     successText: 'Verified',
+    loginFail: 'You may not have logged in, please log in first!',
   },
 };

@@ -6,8 +6,8 @@ import { RoleEnum } from '/@/enums/roleEnum';
 import { PageEnum } from '/@/enums/pageEnum';
 import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
-import { GetUserInfoModel, LoginParams } from '/@/api/sys/model/userModel';
-import { doLogout, getUserInfo, loginApi } from '/@/api/sys/user';
+import { GetUserInfoModel, LoginParams, registerModel } from '/@/api/sys/model/userModel';
+import { doLogout, getUserInfo, loginApi, regUser } from '/@/api/sys/user';
 import { getFromTemplateList } from '/@/api/demo/form';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -121,10 +121,6 @@ export const useUserStore = defineStore({
       } else {
         const permissionStore = usePermissionStore();
         if (!permissionStore.isDynamicAddedRoute) {
-          const routes = await permissionStore.buildRoutesAction();
-          routes.forEach((route) => {
-            router.addRoute(route as unknown as RouteRecordRaw);
-          });
           router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw);
           permissionStore.setDynamicAddedRoute(true);
         }
@@ -138,11 +134,12 @@ export const useUserStore = defineStore({
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null;
+      // const userStore = useUserStore();
       const userInfo = await getUserInfo();
       const tempList = await getFromTemplateList();
       const formStore = useFormStore();
       if (formStore) {
-        formStore.setTempList(tempList['records']);
+        formStore.setTempList(tempList);
         // formStore.getTempList.forEach((t) => {
         //   formStore.setInputItems({ templateId: formStore.getCurrTemp[t['id']] });
         // });
@@ -174,7 +171,10 @@ export const useUserStore = defineStore({
       this.setUserInfo(null);
       goLogin && router.push(PageEnum.BASE_LOGIN);
     },
-
+    async regUser(params: registerModel) {
+      const res = await regUser(params);
+      console.log(res, 'res');
+    },
     /**
      * @description: Confirm before logging out
      */

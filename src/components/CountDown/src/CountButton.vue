@@ -23,7 +23,7 @@
     name: 'CountButton',
     components: { Button },
     props,
-    setup(props) {
+    setup(props, { emit }) {
       const loading = ref(false);
 
       const { currentCount, isStart, start, reset } = useCountdown(props.count);
@@ -44,6 +44,7 @@
        */
       async function handleStart() {
         const { beforeStartFunc } = props;
+        emit('setCount', Math.floor(Math.random() * 1000000));
         if (beforeStartFunc && isFunction(beforeStartFunc)) {
           loading.value = true;
           try {

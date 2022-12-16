@@ -4,6 +4,8 @@ import { defineStore } from 'pinia';
 import { store } from '/@/store';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useUserStore } from './user';
+import { useFormStore } from './form';
+
 import { useAppStoreWithOut } from './app';
 import { toRaw } from 'vue';
 import { transformObjToRoute, flatMultiLevelRoutes } from '/@/router/helper/routeHelper';
@@ -117,7 +119,6 @@ export const usePermissionStore = defineStore({
       let routes: AppRouteRecordRaw[] = [];
       const roleList = toRaw(userStore.getRoleList) || [];
       const { permissionMode = projectSetting.permissionMode } = appStore.getProjectConfig;
-
       // 路由过滤器 在 函数filter 作为回调传入遍历使用
       const routeFilter = (route: AppRouteRecordRaw) => {
         const { meta } = route;
@@ -142,7 +143,6 @@ export const usePermissionStore = defineStore({
       const patchHomeAffix = (routes: AppRouteRecordRaw[]) => {
         if (!routes || routes.length === 0) return;
         let homePath: string = userStore.getUserInfo.homePath || PageEnum.BASE_HOME;
-
         function patcher(routes: AppRouteRecordRaw[], parentPath = '') {
           if (parentPath) parentPath = parentPath + '/';
           routes.forEach((route: AppRouteRecordRaw) => {
@@ -167,7 +167,6 @@ export const usePermissionStore = defineStore({
         }
         return;
       };
-
       switch (permissionMode) {
         // 角色权限
         case PermissionModeEnum.ROLE:
@@ -184,6 +183,21 @@ export const usePermissionStore = defineStore({
         case PermissionModeEnum.ROUTE_MAPPING:
           // 对非一级路由进行过滤
           routes = filter(asyncRoutes, routeFilter);
+          const formStore = useFormStore();
+          const formRoutes = routes.filter((m) => m.name === 'Form')[0];
+          toRaw(formStore.getTempList).forEach((template) => {
+            const { id, templateTitle } = template;
+            const routerObj = {
+              path: 'template/' + id,
+              name: templateTitle,
+              component: () => import('/@/views/catalogue/form/template.vue'),
+              meta: {
+                id: id,
+                title: templateTitle,
+              },
+            };
+            formRoutes.children.push(routerObj);
+          });
           // 对一级路由再次根据角色权限过滤
           routes = routes.filter(routeFilter);
           // 将路由转换成菜单
@@ -196,7 +210,6 @@ export const usePermissionStore = defineStore({
           menuList.sort((a, b) => {
             return (a.meta?.orderNo || 0) - (b.meta?.orderNo || 0);
           });
-
           // 设置菜单列表
           this.setFrontMenuList(menuList);
 

@@ -1,7 +1,7 @@
 <template>
   <a-input v-bind="$attrs" :class="prefixCls" :size="size" :value="state">
     <template #addonAfter>
-      <CountButton :size="size" :count="count" :value="state" :beforeStartFunc="sendCodeApi" />
+      <CountButton :size="size" :count="count" :value="state" @setCount="setCount" :beforeStartFunc="sendCodeApi" />
     </template>
     <template #[item]="data" v-for="item in Object.keys($slots).filter((k) => k !== 'addonAfter')">
       <slot :name="item" v-bind="data || {}"></slot>
@@ -32,8 +32,10 @@
     setup(props) {
       const { prefixCls } = useDesign('countdown-input');
       const [state] = useRuleFormItem(props);
-
-      return { prefixCls, state };
+      function setCount(code) {
+        state.value = code;
+      }
+      return { prefixCls, state, setCount };
     },
   });
 </script>

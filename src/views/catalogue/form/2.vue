@@ -1,6 +1,8 @@
 <template>
   <PageWrapper :title="currTempDetail['templateTitle']" contentFullHeight>
-    <CollapseContainer :title="`${currTempDetail['templateTitle']}-${currTempDetail['templateDesc']}`">
+    <CollapseContainer
+      :title="`${currTempDetail['templateTitle']}-${currTempDetail['templateDesc']}`"
+    >
       <!--autoFocusFirstItem-->
       <!--@reset="handleReset"-->
       <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas">
@@ -13,16 +15,16 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  ref,
-  reactive,
-  toRefs,
-  toRaw,
-  watchEffect
-} from "vue";
+  import {
+    computed,
+    defineComponent,
+    onMounted,
+    ref,
+    reactive,
+    toRefs,
+    toRaw,
+    watchEffect,
+  } from 'vue';
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -34,7 +36,7 @@ import {
   // import { downloadEXCEL } from "/@/api/demo/form";
   import { useUserStore } from '/@/store/modules/user';
   // import { useGlobSetting } from "/@/hooks/setting";
-import { useWebSocket } from "@vueuse/core";
+  import { useWebSocket } from '@vueuse/core';
 
   const formStore = useFormStore();
   const userStore = useUserStore();
@@ -67,7 +69,7 @@ import { useWebSocket } from "@vueuse/core";
         defaultValues: null,
       });
       // 表单相关业务
-      const [register, { appendSchemaByField, setFieldsValue }] = useForm({
+      const [register, { appendSchemaByField, setFieldsValue }] = useForm ({
         showResetButton: false,
         labelWidth: 200,
         actionColOptions: { span: 24 },
@@ -109,7 +111,9 @@ import { useWebSocket } from "@vueuse/core";
         }
       }
 
-      state.currTempDetail = formStore.getCurrTemp;
+      state.currTempDetail = formStore.getCurrTemp
+        ? formStore.getCurrTemp
+        : { templateTitle: '暂无信息', templateDesc: '暂无描述' };
       // 获得所有的表单项
       formStore.setInputItems({ templateId: route.meta.id });
       const n = ref(1);
@@ -159,7 +163,9 @@ import { useWebSocket } from "@vueuse/core";
               return {
                 placeholder: '自定义placeholder',
                 onChange: (e: any) => {
-                  state.sendParams.msg = state.schemas.filter((i) => i['templateId'] === route.meta.id)[0];
+                  state.sendParams.msg = state.schemas.filter(
+                    (i) => i['templateId'] === route.meta.id,
+                  )[0];
                   state.sendParams.fromId = userStore.userInfo.userId;
                   console.log(state.sendParams);
                   send(JSON.stringify(state.sendParams));
@@ -197,16 +203,12 @@ import { useWebSocket } from "@vueuse/core";
           console.log(isSave);
           createMessage.success('保存成功!');
         },
-        // onSearch: useDebounceFn(onSearch, 300),
-        // searchParams,
         handleSubmit: async (values: any) => {
           const a = document.createElement('a');
-          a.href = `http://xiaoshu.gz2vip.91tunnel.com/excel/downLoadExcel?templateId=${state.currTempDetail['id']}`;
+          a.href = `http://xiaoshu.gz2vip.91tunnel.com/excel/downLoadExcel?templateId=${userStore.setGotoDocID}`;
           document.body.appendChild(a);
-          a.click();//触发下载
+          a.click(); //触发下载
           document.body.removeChild(a);
-          // downloadEXCEL({ templateId: state.currTempDetail['id'] })
-          // createMessage.success('click search,values:' + JSON.stringify(values));
         },
         getList,
         toggle,

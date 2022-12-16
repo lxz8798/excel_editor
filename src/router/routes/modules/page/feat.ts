@@ -15,14 +15,14 @@ const feat: AppRouteModule = {
   },
 
   children: [
-    // {
-    //   path: 'icon',
-    //   name: 'IconDemo',
-    //   component: () => import('/@/views/demo/feat/icon/index.vue'),
-    //   meta: {
-    //     title: t('routes.demo.feat.icon'),
-    //   },
-    // },
+    {
+      path: 'icon',
+      name: 'IconDemo',
+      component: () => import('/@/views/demo/feat/icon/index.vue'),
+      meta: {
+        title: t('routes.demo.feat.icon'),
+      },
+    },
     {
       path: 'ws',
       name: 'WebSocket',

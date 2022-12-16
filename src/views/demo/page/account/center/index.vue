@@ -29,6 +29,9 @@
               {{ tag }}
             </Tag>
           </template>
+          <template #action>
+            <Icon icon="ant-design:plus-square-filled" style="cursor: pointer" />
+          </template>
         </CollapseContainer>
       </a-col>
       <a-col :span="8" :class="`${prefixCls}-col`">
@@ -64,6 +67,7 @@
   import headerImg from '/@/assets/images/header.jpg';
   import { tags, teams, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
+  import { useLoginState } from "/@/views/sys/login/useLogin";
   //import { tokenExpiredApi } from "/@/api/demo/account";
   // import { accountInfoApi } from "/@/api/demo/account";
   export default defineComponent({

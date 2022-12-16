@@ -108,7 +108,7 @@ export const applicationList = (() => {
   const result: any[] = [];
   for (let i = 0; i < 8; i++) {
     result.push({
-      title: 'TEST REPORT SYSTEM',
+      title: '绒囊报告系统',
       icon: 'emojione-monotone:letter-a',
       color: '#1890ff',
       active: '100',

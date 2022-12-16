@@ -96,6 +96,7 @@
   import { SIDE_BAR_MINI_WIDTH, SIDE_BAR_SHOW_TIT_MINI_WIDTH } from '/@/enums/appEnum';
   import clickOutside from '/@/directives/clickOutside';
   import { getChildrenMenus, getCurrentParentPath, getShallowMenus } from '/@/router/menus';
+  import { useFormStore } from '/@/store/modules/form';
   import { listenerRouteChange } from '/@/logics/mitt/routeChange';
   import LayoutTrigger from '../trigger/index.vue';
 
@@ -220,7 +221,6 @@
           flex: `0 0 ${width}`,
         };
       }
-
       // Process module menu click
       async function handleModuleClick(path: string, hover = false) {
         const children = await getChildrenMenus(path);
