@@ -1,6 +1,6 @@
 import type { AppRouteRecordRaw, AppRouteModule } from '/@/router/types';
 
-import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE } from '/@/router/routes/basic';
+import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE, BLACK_PAGE_ROUTE } from '/@/router/routes/basic';
 
 import { mainOutRoutes } from './mainOut';
 import { PageEnum } from '/@/enums/pageEnum';
@@ -14,8 +14,8 @@ Object.keys(modules).forEach((key) => {
   const modList = Array.isArray(mod) ? [...mod] : [mod];
   routeModuleList.push(...modList);
 });
-
-export const asyncRoutes = [PAGE_NOT_FOUND_ROUTE, ...routeModuleList];
+// 这里临时修改 PAGE_NOT_FOUND_ROUTE
+export const asyncRoutes = [...routeModuleList];
 
 // 根路由
 export const RootRoute: AppRouteRecordRaw = {

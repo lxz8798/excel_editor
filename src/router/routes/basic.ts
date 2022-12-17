@@ -5,8 +5,20 @@ import {
   LAYOUT,
   EXCEPTION_COMPONENT,
   PAGE_NOT_FOUND_NAME,
+  BLACK_PAGE_NAME,
 } from '/@/router/constant';
 
+export const BLACK_PAGE_ROUTE: AppRouteRecordRaw = {
+  path: '/balck',
+  name: BLACK_PAGE_NAME,
+  component: () => import('/@/views/sys/black/index.vue'),
+  meta: {
+    title: 'ErrorPage',
+    hideBreadcrumb: true,
+    hideMenu: true,
+  },
+  children: []
+}
 // 404 on a page
 export const PAGE_NOT_FOUND_ROUTE: AppRouteRecordRaw = {
   path: '/:path(.*)*',

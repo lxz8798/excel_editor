@@ -99,7 +99,7 @@
   import { useFormStore } from '/@/store/modules/form';
   import { listenerRouteChange } from '/@/logics/mitt/routeChange';
   import LayoutTrigger from '../trigger/index.vue';
-
+  import { useUserStore } from "/@/store/modules/user";
   export default defineComponent({
     name: 'LayoutMixSider',
     components: {
@@ -121,7 +121,8 @@
       const dragBarRef = ref<ElRef>(null);
       const sideRef = ref<ElRef>(null);
       const currentRoute = ref<Nullable<RouteLocationNormalized>>(null);
-
+      const userStore = useUserStore();
+      const formStore = useFormStore();
       const { prefixCls } = useDesign('layout-mix-sider');
       const go = useGo();
       const { t } = useI18n();
@@ -243,6 +244,9 @@
           openMenu.value = true;
           activePath.value = path;
         }
+
+        const _id = currentRoute.value.meta.id;
+        userStore.setGotoDocID(_id as 'string | number');
 
         if (!children || children.length === 0) {
           if (!hover) go(path);

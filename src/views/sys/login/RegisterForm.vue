@@ -109,17 +109,15 @@
 
   async function handleRegister() {
     const data = await validForm();
-    console.log(data, 'data');
     const { account, mobile, password, policy, realName, sms } = data;
-    // formData.account = account;
-    // formData.realName = realName;
-    // formData.password = password;
-    // formData.confirmPassword = password;
-    // formData.mobile = mobile;
-    // formData.sms = sms;
-    // formData.policy = policy;
-    const result = userStore.regUser(data);
-    console.log(result);
+    formData.account = account;
+    formData.realName = realName;
+    formData.password = password;
+    formData.confirmPassword = password;
+    formData.mobile = mobile;
+    formData.sms = sms;
+    formData.policy = policy;
+    userStore.regUser(data);
     if (!data) return;
   }
 </script>

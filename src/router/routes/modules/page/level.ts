@@ -2,12 +2,10 @@ import type { AppRouteModule } from '/@/router/types';
 // 其他被注释的地方可能会用到的getParentLayout
 import { LAYOUT } from '/@/router/constant';
 import { t } from '/@/hooks/web/useI18n';
-
 const permission: AppRouteModule = {
   path: '/form',
   name: 'Form',
   component: LAYOUT,
-  redirect: '/form/template',
   meta: {
     orderNo: 2000,
     icon: 'ion:menu-outline',
@@ -16,110 +14,48 @@ const permission: AppRouteModule = {
 
   children: [
     // {
-    //   path: 'formTest1',
-    //   name: 'FormTest1',
-    //   // component: getParentLayout('form1'),
-    //   component: () => import('/@/views/catalogue/form/form1.vue'),
-    //   meta: {
-    //     title: '表单1',
-    //   },
-    //   children: [
-    //     // {
-    //     //   path: 'menu1-1',
-    //     //   name: 'Menu11Demo',
-    //     //   component: getParentLayout('Menu11Demo'),
-    //     //   meta: {
-    //     //     title: 'Menu1-1',
-    //     //   },
-    //     //   redirect: '/level/menu1/menu1-1/menu1-1-1',
-    //     //   children: [
-    //     //     {
-    //     //       path: 'menu1-1-1',
-    //     //       name: 'Menu111Demo',
-    //     //       component: () => import('/@/views/demo/level/Menu111.vue'),
-    //     //       meta: {
-    //     //         title: 'Menu111',
-    //     //       },
-    //     //     },
-    //     //   ],
-    //     // },
-    //     // {
-    //     //   path: 'menu1-2',
-    //     //   name: 'Menu12Demo',
-    //     //   component: () => import('/@/views/demo/level/Menu12.vue'),
-    //     //   meta: {
-    //     //     title: 'Menu1-2',
-    //     //   },
-    //     // },
-    //   ],
-    // },
-    // {
-    //   path: 'formTest2',
-    //   name: 'FormTest2',
-    //   component: () => import('/@/views/catalogue/form/form2.vue'),
-    //   meta: {
-    //     title: '表单2',
-    //     // ignoreKeepAlive: true,
-    //   },
-    // },
-    // {
-    //   path: 'form1/:id',
-    //   name: '天然气井修井用囊层剂室内检测报告单',
-    //   component: () => import('/@/views/catalogue/form/1.vue'),
-    //   meta: {
-    //     id: '1',
-    //     title: '天然气井修井用囊层剂室内检测报告单',
-    //     // ignoreKeepAlive: true,
-    //   },
-    // },
-    // {
-    //   path: 'tempalte',
+    //   path: 'template/1',
     //   name: '天然气井修井用囊层剂室内检测报告单',
     //   component: () => import('/@/views/catalogue/form/template.vue'),
     //   meta: {
-    //     id: '1',
+    //     id: 1,
     //     title: '天然气井修井用囊层剂室内检测报告单',
-    //     // ignoreKeepAlive: true,
     //   },
     // },
     // {
-    //   path: 'form2/:id',
+    //   path: 'template/2',
     //   name: '天然气井修井用绒毛剂室内检测报告单',
-    //   component: () => import('/@/views/catalogue/form/2.vue'),
+    //   component: () => import('/@/views/catalogue/form/template.vue'),
     //   meta: {
-    //     id: '2',
+    //     id: 2,
     //     title: '天然气井修井用绒毛剂室内检测报告单',
-    //     // ignoreKeepAlive: true,
     //   },
     // },
     // {
-    //   path: 'form3/:id',
+    //   path: 'template/3',
     //   name: '天然气修井用囊核剂室内检测报告单',
-    //   component: () => import('/@/views/catalogue/form/3.vue'),
+    //   component: () => import('/@/views/catalogue/form/template.vue'),
     //   meta: {
-    //     id: '3',
+    //     id: 3,
     //     title: '天然气修井用囊核剂室内检测报告单',
-    //     // ignoreKeepAlive: true,
     //   },
     // },
     // {
-    //   path: 'form4/:id',
+    //   path: 'template/4',
     //   name: '天然气修井用囊膜剂室内检测报告单',
-    //   component: () => import('/@/views/catalogue/form/4.vue'),
+    //   component: () => import('/@/views/catalogue/form/template.vue'),
     //   meta: {
-    //     id: '4',
+    //     id: 4,
     //     title: '天然气修井用囊膜剂室内检测报告单',
-    //     // ignoreKeepAlive: true,
     //   },
     // },
     // {
-    //   path: 'form5/:id',
+    //   path: 'template/5',
     //   name: '天然气井绒囊修井液室内检测报告单',
-    //   component: () => import('/@/views/catalogue/form/5.vue'),
+    //   component: () => import('/@/views/catalogue/form/template.vue'),
     //   meta: {
-    //     id: '5',
+    //     id: 5,
     //     title: '天然气井绒囊修井液室内检测报告单',
-    //     // ignoreKeepAlive: true,
     //   },
     // },
   ],

@@ -55,5 +55,5 @@ export function testRetry() {
   );
 }
 export function regUser(params) {
-  return defHttp.post({ url: Api.register }, params);
+  return defHttp.post({ url: Api.register, params });
 }

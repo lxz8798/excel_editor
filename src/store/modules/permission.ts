@@ -183,20 +183,24 @@ export const usePermissionStore = defineStore({
         case PermissionModeEnum.ROUTE_MAPPING:
           // 对非一级路由进行过滤
           routes = filter(asyncRoutes, routeFilter);
-          const formStore = useFormStore();
-          const formRoutes = routes.filter((m) => m.name === 'Form')[0];
-          toRaw(formStore.getTempList).forEach((template) => {
-            const { id, templateTitle } = template;
-            const routerObj = {
-              path: 'template/' + id,
-              name: templateTitle,
-              component: () => import('/@/views/catalogue/form/template.vue'),
-              meta: {
-                id: id,
-                title: templateTitle,
-              },
-            };
-            formRoutes.children.push(routerObj);
+          routes.forEach((r) => {
+            if (r.name === 'Form') {
+              const formStore = useFormStore();
+              const formRoutes = routes.filter((m) => m.name === 'Form')[0];
+              toRaw(formStore.getTempList).forEach((template) => {
+                const { id, templateTitle } = template;
+                const routerObj = {
+                  path: 'template/' + id,
+                  name: templateTitle,
+                  component: () => import('/@/views/catalogue/form/template.vue'),
+                  meta: {
+                    id: id,
+                    title: templateTitle,
+                  },
+                };
+                formRoutes.children.push(routerObj);
+              });
+            }
           });
           // 对一级路由再次根据角色权限过滤
           routes = routes.filter(routeFilter);

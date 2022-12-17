@@ -56,8 +56,8 @@
       });
 
       onMounted(async () => {
-        const data = await accountInfoApi();
-        setFieldsValue(data);
+        // const data = await accountInfoApi();
+        // setFieldsValue(data);
       });
 
       const avatar = computed(() => {

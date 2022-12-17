@@ -23,7 +23,7 @@ if (isDevMode()) {
 
 async function bootstrap() {
   const app = createApp(App);
-
+  app.config.silent = true;
   // Configure store
   // 配置 store
   setupStore(app);

@@ -161,7 +161,7 @@ export const useUserStore = defineStore({
     async logout(goLogin = false) {
       if (this.getToken) {
         try {
-          await doLogout();
+          // await doLogout();
         } catch {
           console.log('注销Token失败');
         }
@@ -172,8 +172,12 @@ export const useUserStore = defineStore({
       goLogin && router.push(PageEnum.BASE_LOGIN);
     },
     async regUser(params: registerModel) {
+      const { createMessage } = useMessage();
+      params['name'] = params.account;
+      delete params['account'];
+      console.log(params);
       const res = await regUser(params);
-      console.log(res, 'res');
+      createMessage.info(res);
     },
     /**
      * @description: Confirm before logging out

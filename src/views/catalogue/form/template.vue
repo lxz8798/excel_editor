@@ -3,10 +3,38 @@
     <CollapseContainer
       :title="`${currTempDetail['templateTitle']}-${currTempDetail['templateDesc']}`"
     >
-      <!--autoFocusFirstItem-->
-      <!--@reset="handleReset"-->
+      <div class="form">
+        <div
+          class="form_item"
+          v-for="(form, index) in [...basicFormHeader, ...dynamicFormHeader]"
+          :key="index"
+        >
+          <div class="row">{{ form.label }}</div>
+          <div
+            class="column"
+            v-for="(input, key) in form.inputs"
+            :key="key"
+            :class="input.type === 'add' && 'add_icon'"
+            @click="clickInputItem($event, input, form)"
+          >
+            <Input
+              size="large"
+              v-model:value="input.value"
+              :item="input"
+              v-if="input.type === 'input'"
+              @change="changeInputeValue($event, input)"
+            />
+            <PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />
+          </div>
+        </div>
+      </div>
       <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas">
         <template #add="{ field }">
+          <!--<div class="roll">
+            <ul>
+              <li v-for="msg in recordList">{{msg.value}}</li>
+            </ul>
+          </div>-->
           <Button v-if="Number(field) === 0" @click="add">+</Button>
           <Button v-if="field > 0" @click="del(field)">-</Button>
         </template>
@@ -24,6 +52,7 @@
     toRefs,
     toRaw,
     watchEffect,
+    nextTick,
   } from 'vue';
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
@@ -31,12 +60,14 @@
   import { PageWrapper } from '/@/components/Page';
 
   import { Select } from 'ant-design-vue';
+  import { PlusSquareOutlined } from '@ant-design/icons-vue';
   import { useFormStore } from '/@/store/modules/form';
   import { useRoute } from 'vue-router';
   // import { downloadEXCEL } from "/@/api/demo/form";
   import { useUserStore } from '/@/store/modules/user';
   // import { useGlobSetting } from "/@/hooks/setting";
   import { useWebSocket } from '@vueuse/core';
+  import { getTempEcho, getTempItems } from '/@/api/demo/form';
 
   const formStore = useFormStore();
   const userStore = useUserStore();
@@ -44,7 +75,14 @@
   // const schemas: FormSchema[] = [];
 
   export default defineComponent({
-    components: { BasicForm, CollapseContainer, PageWrapper, ApiSelect, ASelect: Select },
+    components: {
+      BasicForm,
+      CollapseContainer,
+      PageWrapper,
+      ApiSelect,
+      ASelect: Select,
+      PlusSquareOutlined,
+    },
     setup() {
       // 使用消息
       const { createMessage } = useMessage();
@@ -52,7 +90,7 @@
       const route = useRoute();
       // 获得当前模板的详情
       formStore.setCurrTemp(route.meta.id as string);
-
+      // STATE
       const state = reactive({
         server: 'ws://43.142.155.174:8100/socket/connection/' + userStore.userInfo.userId,
         sendValue: '',
@@ -64,12 +102,56 @@
           toId: '',
           boradFlag: '',
         },
+        basicFormHeader: [
+          {
+            templateId: route.meta.id,
+            label: '检测项目',
+            inputs: [
+              {
+                type: 'add',
+                value: '',
+              },
+            ],
+          },
+          {
+            templateId: route.meta.id,
+            label: '性能指标',
+            inputs: [
+              {
+                type: 'add',
+                value: '',
+              },
+            ],
+          },
+          {
+            templateId: route.meta.id,
+            label: '检测数据',
+            inputs: [
+              {
+                type: 'add',
+                value: '',
+              },
+            ],
+          },
+        ],
+        dynamicFormHeader: [
+          {
+            templateId: route.meta.id,
+            label: '是否合格',
+            inputs: [
+              {
+                type: 'add',
+                value: '',
+              },
+            ],
+          },
+        ],
         currTempDetail: {},
         schemas: [] as FormSchema[],
         defaultValues: null,
       });
       // 表单相关业务
-      const [register, { appendSchemaByField, setFieldsValue }] = useForm ({
+      const [register, { appendSchemaByField, setFieldsValue }] = useForm({
         showResetButton: false,
         labelWidth: 200,
         actionColOptions: { span: 24 },
@@ -109,6 +191,26 @@
         } else {
           open();
         }
+      }
+
+      function changeInputeValue(e, input) {
+        input.value = e.target.value;
+        let msgObj = {
+          type: '5',
+          fromId: userStore.userInfo.userId,
+          toId: '',
+          boradFlag: '',
+          msg: input,
+        };
+        send(JSON.stringify(msgObj));
+      }
+
+      function clickInputItem(e, input, form) {
+        if (input.type !== 'add') return;
+        form.inputs.splice(form.inputs.length - 1, 0, {
+          type: 'input',
+          value: '',
+        });
       }
 
       state.currTempDetail = formStore.getCurrTemp
@@ -181,6 +283,58 @@
       }
       onMounted(() => {
         Object.keys(inputItemsValues).length && setFieldsValue(inputItemsValues);
+        formStore.setTemplateEcho(route.meta.id).then((res) => {
+          const defaultFormHeader = [
+            {
+              templateId: route.meta.id,
+              label: '检测项目',
+              inputs: [
+                {
+                  type: 'add',
+                  value: '',
+                },
+              ],
+            },
+            {
+              templateId: route.meta.id,
+              label: '性能指标',
+              inputs: [
+                {
+                  type: 'add',
+                  value: '',
+                },
+              ],
+            },
+            {
+              templateId: route.meta.id,
+              label: '检测数据',
+              inputs: [],
+            },
+          ];
+          if (!formStore.getTemplateEcho.length) {
+            state.basicFormHeader = defaultFormHeader;
+            state.dynamicFormHeader = [];
+          } else {
+            state.basicFormHeader = formStore.getTemplateEcho.slice(0, 3);
+            state.dynamicFormHeader = formStore.getTemplateEcho.slice(3, formStore.getTemplateEcho.length);
+
+            state.basicFormHeader.map((item) => {
+              item.inputs.push({
+                type: 'add',
+                value: '',
+              });
+              return item;
+            });
+            console.log(state.basicFormHeader);
+            state.dynamicFormHeader.map((item) => {
+              item.inputs.push({
+                type: 'add',
+                value: '',
+              });
+              return item;
+            });
+          }
+        });
       });
       return {
         ...toRefs(state),
@@ -188,24 +342,20 @@
         del,
         register,
         saveFormDatas: (inputs: any) => {
-          // state.schemas.map((i) => {
-          //   Object.keys(inputs).forEach((k) => {
-          //     if(i['field'] === k) {
-          //       i['inputValue'] = inputs[k];
-          //     }
-          //   });
-          //   return i;
-          // });
-          delete inputs['0'];
           // setFieldsValue(inputs);
-          const isSave = formStore.setDefaultValues(inputs);
-          formStore.saveForm(state.schemas);
-          console.log(isSave);
+          // formStore.setDefaultValues(schama);
+          const _schama = [...state.basicFormHeader, ...state.dynamicFormHeader];
+          formStore.saveForm(_schama).then((res) => {
+            formStore.setTemplateEcho(route.meta.id);
+            state.basicFormHeader = formStore.getTemplateEcho(0, 3);
+            state.dynamicFormHeader = formStore.getTemplateEcho(3, formStore.getTemplateEcho.length);
+          });
           createMessage.success('保存成功!');
         },
         handleSubmit: async (values: any) => {
           const a = document.createElement('a');
-          a.href = `http://xiaoshu.gz2vip.91tunnel.com/excel/downLoadExcel?templateId=${userStore.setGotoDocID}`;
+          a.target = '_blank';
+          a.href = `http://43.142.155.174:8100/excel/downLoadExcelVertical?templateId=` + route.meta.id;
           document.body.appendChild(a);
           a.click(); //触发下载
           document.body.removeChild(a);
@@ -214,7 +364,62 @@
         toggle,
         getIsOpen,
         getTagColor,
+        changeInputeValue,
+        clickInputItem,
       };
     },
   });
 </script>
+<style lang="less">
+  .form_wrap {
+    display: flex;
+    flex-direction: column;
+    .form {
+      margin-bottom: 30px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      .form_item {
+        flex: 1;
+        border: 1px solid #ddd;
+        .row {
+          padding: 8px 0;
+          text-align: center;
+          border-bottom: 1px solid #ddd;
+          background: #4dc6cb;
+          color: #085053;
+          font-weight: bold;
+          font-size: 16px;
+        }
+        .column {
+          input {
+            color: #626262;
+            font-size: 14px;
+            width: 100%;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding-left: 8px;
+          }
+        }
+        .column:nth-child(odd) {
+          input {
+            background: #eee;
+          }
+        }
+        .column.add_icon {
+          width: 100%;
+          height: 24px;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          &:hover {
+            background: #eee;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+</style>

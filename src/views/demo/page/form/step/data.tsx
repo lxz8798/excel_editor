@@ -24,7 +24,7 @@ export const step1Schemas: FormSchema[] = [
     component: 'InputGroup',
     label: '收款账户',
     required: true,
-    defaultValue: 'test@example.com',
+    defaultValue: 'admin@example.com',
     slot: 'fac',
     colProps: {
       span: 24,
@@ -70,7 +70,7 @@ export const step2Schemas: FormSchema[] = [
     component: 'InputPassword',
     label: '支付密码',
     required: true,
-    defaultValue: '123456',
+    defaultValue: 'admin123',
     colProps: {
       span: 24,
     },

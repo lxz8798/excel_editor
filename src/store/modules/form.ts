@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { addInputItem, getTempItems, downloadEXCEL } from "/@/api/demo/form";
+import { addInputItem, getTempItems, downloadEXCEL, templateEcho } from "/@/api/demo/form";
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {
@@ -19,6 +19,7 @@ export const useFormStore = defineStore({
     inputItems: [],
     defaultValues: {},
     saveMsg: '',
+    templateEcho: [],
   }),
   getters: {
     getTempList(): any[] {
@@ -36,6 +37,9 @@ export const useFormStore = defineStore({
     getSaveMsg(): string {
       return this.saveMsg;
     },
+    getTemplateEcho(): any[] {
+      return this.templateEcho;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -52,6 +56,9 @@ export const useFormStore = defineStore({
     },
     async saveForm(list: []) {
       this.saveMsg = await addInputItem(list);
+    },
+    async setTemplateEcho(id) {
+      this.templateEcho = await templateEcho({ templateId: id });
     },
   },
 });

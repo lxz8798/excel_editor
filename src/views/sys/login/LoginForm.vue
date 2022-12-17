@@ -101,7 +101,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
-  import { PageEnum } from "/@/enums/pageEnum";
+  import { PageEnum } from '/@/enums/pageEnum';
   //import { onKeyStroke } from '@vueuse/core';
 
   const ACol = Col;
@@ -113,8 +113,7 @@
   const { prefixCls } = useDesign('login');
   const userStore = useUserStore();
   import { useRouter } from 'vue-router';
-  import { useFormStore } from "/@/store/modules/form";
-  import { LAYOUT } from "/@/router/constant";
+  import { useFormStore } from '/@/store/modules/form';
   const { setLoginState, getLoginState } = useLoginState();
   const { getFormRules } = useFormRules();
 
@@ -123,8 +122,8 @@
   const rememberMe = ref(false);
 
   const formData = reactive({
-    account: 'test',
-    password: '123456',
+    account: 'admin',
+    password: 'admin123',
   });
 
   const { validForm } = useFormValid(formRef);
@@ -141,42 +140,19 @@
     try {
       loading.value = true;
       const userInfo = await userStore.login({
-        goHome: '/form/template/' + userStore.getGotoDocID,
+        goHome: !userStore.getGotoDocID ? '/account/center' : '/form/template/' + userStore.getGotoDocID,
         password: data.password,
-        username: data.account,
+        account: data.account,
+        mode: 'none', //不要默认的错误提示
       });
       if (userInfo) {
-        // const formParentRouter = {
-        //   path: '/form',
-        //   name: 'Form',
-        //   component: LAYOUT,
-        //   meta: {
-        //     orderNo: 2000,
-        //     icon: 'ion:menu-outline',
-        //     title: t('routes.demo.level.level'),
-        //   },
-        //   redirect: 'template',
-        //   children: [],
-        // };
-        // formStore.getTempList.forEach((template) => {
-        //   const { id, templateTitle } = template;
-        //   const routerObj = {
-        //     path: 'template/' + id,
-        //     name: templateTitle,
-        //     component: () => import('/@/views/catalogue/form/template.vue'),
-        //     meta: {
-        //       id: id,
-        //       title: templateTitle,
-        //     },
-        //   };
-        //   formParentRouter['children'].push(routerObj);
-        // });
-        // router.addRoute('Form', formParentRouter);
+        console.log(userInfo, 'userInfo');
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realName}`,
           duration: 3,
         });
+        location.reload();
       }
     } catch (error) {
       createErrorModal({
