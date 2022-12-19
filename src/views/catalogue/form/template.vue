@@ -1,6 +1,7 @@
 <template>
   <PageWrapper :title="currTempDetail['templateTitle']" contentFullHeight>
     <CollapseContainer
+      class="form_wrap"
       :title="`${currTempDetail['templateTitle']}-${currTempDetail['templateDesc']}`"
     >
       <div class="form">
@@ -52,7 +53,6 @@
     toRefs,
     toRaw,
     watchEffect,
-    nextTick,
   } from 'vue';
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
@@ -63,16 +63,13 @@
   import { PlusSquareOutlined } from '@ant-design/icons-vue';
   import { useFormStore } from '/@/store/modules/form';
   import { useRoute } from 'vue-router';
-  // import { downloadEXCEL } from "/@/api/demo/form";
   import { useUserStore } from '/@/store/modules/user';
-  // import { useGlobSetting } from "/@/hooks/setting";
   import { useWebSocket } from '@vueuse/core';
-  import { getTempEcho, getTempItems } from '/@/api/demo/form';
+  import { useGlobSetting } from '/@/hooks/setting';
 
   const formStore = useFormStore();
   const userStore = useUserStore();
-  // const { wsUrl } = useGlobSetting();
-  // const schemas: FormSchema[] = [];
+  const { wsUrl, apiUrl } = useGlobSetting();
 
   export default defineComponent({
     components: {
@@ -92,7 +89,7 @@
       formStore.setCurrTemp(route.meta.id as string);
       // STATE
       const state = reactive({
-        server: 'ws://43.142.155.174:8100/socket/connection/' + userStore.userInfo.userId,
+        server: wsUrl + userStore.userInfo.userId,
         sendValue: '',
         recordList: [] as { id: number; time: number; res: string }[],
         sendParams: {
@@ -225,16 +222,6 @@
         inputItemsValues[i['field']] = i['inputValue'];
       });
 
-      const addSlotSChema: FormSchema = {
-        field: '0',
-        component: 'Input',
-        label: ' ',
-        colProps: {
-          span: 8,
-        },
-        slot: 'add',
-      };
-
       function add() {
         const _id = Math.floor(Math.random() * 1000000) + '';
         n.value = state.schemas.length++;
@@ -250,37 +237,9 @@
 
       function del(field) {
         console.log(field);
-        // removeSchemaByField([`k${field}`, `k${field}`, `${field}`]);
         n.value--;
       }
 
-      if (formStore.getInputItems.length) {
-        formStore.getInputItems.forEach((input) => {
-          if (!state.schemas.some((i) => input['id'] === i['id'])) {
-            input.required = false;
-            input.colProps = { span: 11 };
-            input['componentProps'] = ({ schema, formModel }) => {
-              // console.log('form:', schema);
-              // console.log('formModel:', formModel);
-              return {
-                placeholder: '自定义placeholder',
-                onChange: (e: any) => {
-                  state.sendParams.msg = state.schemas.filter(
-                    (i) => i['templateId'] === route.meta.id,
-                  )[0];
-                  state.sendParams.fromId = userStore.userInfo.userId;
-                  console.log(state.sendParams);
-                  send(JSON.stringify(state.sendParams));
-                },
-              };
-            };
-            state.schemas.push(input);
-          }
-        });
-        if (!state.schemas.some((i) => i['field'] === '0')) {
-          state.schemas.push(addSlotSChema as any);
-        }
-      }
       onMounted(() => {
         Object.keys(inputItemsValues).length && setFieldsValue(inputItemsValues);
         formStore.setTemplateEcho(route.meta.id).then((res) => {
@@ -308,7 +267,12 @@
             {
               templateId: route.meta.id,
               label: '检测数据',
-              inputs: [],
+              inputs: [
+                {
+                  type: 'add',
+                  value: '',
+                },
+              ],
             },
           ];
           if (!formStore.getTemplateEcho.length) {
@@ -325,7 +289,6 @@
               });
               return item;
             });
-            console.log(state.basicFormHeader);
             state.dynamicFormHeader.map((item) => {
               item.inputs.push({
                 type: 'add',
@@ -355,7 +318,7 @@
         handleSubmit: async (values: any) => {
           const a = document.createElement('a');
           a.target = '_blank';
-          a.href = `http://43.142.155.174:8100/excel/downLoadExcelVertical?templateId=` + route.meta.id;
+          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + route.meta.id;
           document.body.appendChild(a);
           a.click(); //触发下载
           document.body.removeChild(a);

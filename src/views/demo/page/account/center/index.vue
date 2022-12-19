@@ -6,7 +6,7 @@
           <a-col :span="8">
             <div :class="`${prefixCls}-top__avatar`">
               <img width="70" :src="avatar" />
-              <span>用户****</span>
+              <span>{{ realName }}</span>
               <div>海纳百川，有容乃大</div>
             </div>
           </a-col>
@@ -57,7 +57,7 @@
 
 <script lang="ts">
   import { Tag, Tabs, Row, Col } from 'ant-design-vue';
-  import { defineComponent, computed, onMounted } from "vue";
+  import { defineComponent, computed } from 'vue';
   import { CollapseContainer } from '/@/components/Container/index';
   import Icon from '/@/components/Icon/index';
   import Article from './Article.vue';
@@ -67,9 +67,7 @@
   import headerImg from '/@/assets/images/header.jpg';
   import { tags, teams, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
-  import { useLoginState } from "/@/views/sys/login/useLogin";
-  //import { tokenExpiredApi } from "/@/api/demo/account";
-  // import { accountInfoApi } from "/@/api/demo/account";
+
   export default defineComponent({
     components: {
       CollapseContainer,
@@ -86,9 +84,11 @@
     setup() {
       const userStore = useUserStore();
       const avatar = computed(() => userStore.getUserInfo.avatar || headerImg);
+      const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
       return {
         prefixCls: 'account-center',
         avatar,
+        realName,
         tags,
         teams,
         details,

@@ -12,7 +12,7 @@
     <div class="p-2">
       <CollapseTransition :enable="canExpan">
         <Skeleton v-if="loading" :active="loading" />
-        <div :class="`${prefixCls}__body`" class="form_wrap" v-else v-show="show">
+        <div :class="`${prefixCls}__body`" v-else v-show="show">
           <slot></slot>
         </div>
       </CollapseTransition>

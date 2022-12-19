@@ -113,7 +113,6 @@
   const { prefixCls } = useDesign('login');
   const userStore = useUserStore();
   import { useRouter } from 'vue-router';
-  import { useFormStore } from '/@/store/modules/form';
   const { setLoginState, getLoginState } = useLoginState();
   const { getFormRules } = useFormRules();
 
@@ -128,9 +127,6 @@
 
   const { validForm } = useFormValid(formRef);
   const router = useRouter();
-  const formStore = useFormStore();
-
-  //onKeyStroke('Enter', handleLogin);
 
   const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN);
 
@@ -146,7 +142,6 @@
         mode: 'none', //不要默认的错误提示
       });
       if (userInfo) {
-        console.log(userInfo, 'userInfo');
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realName}`,
