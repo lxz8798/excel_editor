@@ -26,6 +26,7 @@ interface UserState {
   sessionTimeout?: boolean;
   lastUpdateTime: number;
   gotoDocId: string | number;
+  templateUpDate: number;
 }
 
 export const useUserStore = defineStore({
@@ -42,6 +43,7 @@ export const useUserStore = defineStore({
     // Last fetch time
     lastUpdateTime: 0,
     gotoDocId: 0,
+    templateUpDate: 0,
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -61,6 +63,9 @@ export const useUserStore = defineStore({
     },
     getLastUpdateTime(): number {
       return this.lastUpdateTime;
+    },
+    getTemplateUpdate(): number {
+      return this.templateUpDate;
     },
   },
   actions: {
@@ -88,6 +93,9 @@ export const useUserStore = defineStore({
       this.token = '';
       this.roleList = [];
       this.sessionTimeout = false;
+    },
+    setTemplateUpdate(number: number) {
+      this.templateUpDate = number;
     },
     /**
      * @description: login

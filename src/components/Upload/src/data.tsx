@@ -8,9 +8,11 @@ import { Progress, Tag } from 'ant-design-vue';
 import TableAction from '/@/components/Table/src/components/TableAction.vue';
 import ThumbUrl from './ThumbUrl.vue';
 import { useI18n } from '/@/hooks/web/useI18n';
-
+import { useFormStore } from '/@/store/modules/form';
+import { useUserStore } from '/@/store/modules/user';
+const userStore = useUserStore();
 const { t } = useI18n();
-
+let updateNum = 1;
 // 文件上传列表
 export function createTableColumns(): BasicColumn[] {
   return [
@@ -66,6 +68,7 @@ export function createTableColumns(): BasicColumn[] {
       width: 100,
       customRender: ({ text }) => {
         if (text === UploadResultStatus.SUCCESS) {
+          userStore.setTemplateUpdate(updateNum++);
           return <Tag color="green">{() => t('component.upload.uploadSuccess')}</Tag>;
         } else if (text === UploadResultStatus.ERROR) {
           return <Tag color="red">{() => t('component.upload.uploadError')}</Tag>;

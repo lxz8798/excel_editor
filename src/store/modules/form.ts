@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { addInputItem, getTempItems, getBasicTemplate, templateEcho, uploadExcel, getMenuChildren } from '/@/api/demo/form';
+import { addInputItem, getTempItems, getBasicTemplate, templateEcho, uploadExcel, getMenuChildren, getColumn } from '/@/api/demo/form';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {
@@ -12,6 +12,8 @@ interface formState {
   saveMsg: string;
   basicTemplate: [];
   templateEcho: [];
+  columnList: [];
+  columnDetail: {};
 }
 const { createMessage } = useMessage();
 export const useFormStore = defineStore({
@@ -25,6 +27,8 @@ export const useFormStore = defineStore({
     saveMsg: '',
     basicTemplate: [],
     templateEcho: [],
+    columnList: [],
+    columnDetail: {},
   }),
   getters: {
     getTempList(): any[] {
@@ -51,19 +55,31 @@ export const useFormStore = defineStore({
     getBasicTemplate(): any[] {
       return this.basicTemplate;
     },
+    getColumnList(): any[] {
+      return this.columnList;
+    },
+    getColumnDetail(obj: object) {
+      return this.columnDetail;
+    },
   },
   actions: {
     setTempList(list: []) {
       this.tempList = list;
     },
     setCurrTemp(id: string) {
-      this.currTemp = this.tempList.filter((i) => i['id'] === id)[0];
+      this.currTemp = this.menuChildren.filter((i) => i['menuId'] === id)[0];
     },
     setDefaultValues(obj: object) {
       this.defaultValues = obj;
     },
+    setColumnDetail(obj: object) {
+      this.columnDetail = obj;
+    },
     async setMenuChildren(menuId: number) {
       this.menuChildren = await getMenuChildren(menuId);
+    },
+    async setColumnList(params: object) {
+      this.columnList = await getColumn(params);
     },
     async setInputItems(id) {
       this.inputItems = await getTempItems(id);

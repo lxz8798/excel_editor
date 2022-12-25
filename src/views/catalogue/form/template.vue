@@ -1,10 +1,10 @@
 <template>
-  <PageWrapper :title="currTempDetail['templateTitle']" contentFullHeight>
+  <PageWrapper :title="''" contentFullHeight>
     <!--<a-button type="primary" :size="size" style="margin-bottom: 20px;">上传EXCEL</a-button>-->
     <BasicUpload :maxSize="20" :maxNumber="1" style="margin-bottom: 20px;" :api="uploadApi" :accept="['.xlsx']" :uploadParams="uploadParams" @change="handleChange" />
     <CollapseContainer
       class="form_wrap"
-      :title="`${currTempDetail['templateTitle']}-${currTempDetail['templateDesc']}`"
+      :title="''"
     >
       <div class="form">
         <div
@@ -33,31 +33,35 @@
         </div>
       </div>
       <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" />
-      <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas">
-        <template #add="{ field }">
-          <!--<div class="roll">
+      <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas" style="margin-top: 25px;">
+        <!--<template #add="{ field }">
+          <div class="roll">
             <ul>
               <li v-for="msg in recordList">{{msg.value}}</li>
             </ul>
-          </div>-->
+          </div>
           <Button v-if="Number(field) === 0" @click="add">+</Button>
           <Button v-if="field > 0" @click="del(field)">-</Button>
-        </template>
+        </template>-->
       </BasicForm>
     </CollapseContainer>
+    <!--弹窗-->
+    <Modal1 @register="registerModal" :minHeight="100" :options="modalOptions" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  ref,
-  reactive,
-  toRefs,
-  toRaw,
-  watchEffect, h
-} from "vue";
+  import {
+    computed,
+    defineComponent,
+    onMounted,
+    ref,
+    reactive,
+    toRefs,
+    toRaw,
+    watchEffect,
+    watch,
+    h,
+  } from 'vue';
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -71,12 +75,16 @@ import {
   import { useWebSocket } from '@vueuse/core';
   import { useGlobSetting } from '/@/hooks/setting';
   import { uploadApi } from '/@/api/sys/upload';
+  import { useModal } from '/@/components/Modal';
+  import Modal1 from './Modal1.vue';
   import { t } from '/@/hooks/web/useI18n';
+  import { templateEcho } from "/@/api/demo/form";
   const formStore = useFormStore();
   const userStore = useUserStore();
   const { wsUrl, apiUrl, uploadUrl } = useGlobSetting();
   export default defineComponent({
     components: {
+      Modal1,
       BasicForm,
       CollapseContainer,
       PageWrapper,
@@ -92,7 +100,7 @@ import {
       // 使用路由
       const route = useRoute();
       // 获得当前模板的详情
-      formStore.setCurrTemp(route.meta.id as string);
+      // formStore.setCurrTemp(route.meta.id as string);
       // STATE
       const state = reactive({
         server: wsUrl + userStore.userInfo.userId,
@@ -112,7 +120,9 @@ import {
         defaultValues: null,
         uploadParams: { templateId: route.meta.id },
         no: 0,
+        modalOptions: {},
       });
+      const [registerModal, { openModal: openModal1 }] = useModal();
       // 表单相关业务
       const [register, { appendSchemaByField, setFieldsValue }] = useForm({
         showResetButton: false,
@@ -126,6 +136,10 @@ import {
         heartbeat: true,
       });
 
+      const uplpdaNum = computed(() => userStore.getTemplateUpdate);
+      watch(uplpdaNum, (newVal) => {
+        fillForm();
+      }, { immediate: true, deep: true })
       watchEffect(() => {
         if (data.value) {
           try {
@@ -184,6 +198,17 @@ import {
             },
           });
         }
+
+        if (e.target.tagName === 'INPUT' && e.target.value !== '') {
+          openModal1(true);
+          const params = {
+            columnIndex: key + 1,
+            templateId: form.templateId,
+          };
+          formStore.setColumnDetail(input);
+          formStore.setColumnList(params);
+        }
+
         if (input.type !== 'add') return;
         form.inputs.splice(form.inputs.length - 1, 0, {
           type: 'input',
@@ -202,15 +227,9 @@ import {
         state.basicFormHeader[0].inputs[state.no].value = state.no++;
       }
 
-      function uploadExcel() {
-        // const formData = new FormData({
-        //   templateId: route.meta.id,
-        // })
-      }
-
-      state.currTempDetail = formStore.getCurrTemp
-        ? formStore.getCurrTemp
-        : { templateTitle: '暂无信息', templateDesc: '暂无描述' };
+      // state.currTempDetail = formStore.getCurrTemp
+      //   ? formStore.getCurrTemp
+      //   : { templateTitle: '暂无信息', templateDesc: '暂无描述' };
       // 获得所有的表单项
       formStore.setInputItems({ templateId: route.meta.id });
       formStore.setBasicTemplate(route.meta.id);
@@ -239,45 +258,38 @@ import {
         n.value--;
       }
 
-      onMounted(() => {
-        // Object.keys(inputItemsValues).length && setFieldsValue(inputItemsValues);
-        formStore.setTemplateEcho(route.meta.id).then((res) => {
+      function fillForm() {
+        const _id = route.meta.id;
+        userStore.setGotoDocID(_id);
+        formStore.setTemplateEcho(_id).then((res) => {
+          const _no = {id: '0', label: '序号', sort: 0,inputs: [], templateId: _id};
+          if (Object.keys(formStore.getTemplateEcho).length && formStore.getTemplateEcho[0].inputs.length) {
+            for (let i = 0; i < formStore.getTemplateEcho[0].inputs.length; i++) {
+              _no.inputs.push({
+                type: 'input',
+                value: i + '',
+              });
+            }
+          }
           if (!formStore.getTemplateEcho.length) {
             state.basicFormHeader = formStore.getBasicTemplate;
-            // state.basicFormHeader = formStore.getBasicTemplate.map((t) => {
-            //   t.inputs = [
-            //     {
-            //       type: 'add',
-            //       value: '',
-            //     },
-            //   ];
-            //   return t;
-            // });
             state.dynamicFormHeader = [];
           } else {
-            state.basicFormHeader = formStore.getTemplateEcho.slice(0, 3);
-            state.dynamicFormHeader = formStore.getTemplateEcho.slice(3, formStore.getTemplateEcho.length);
-            // state.basicFormHeader.map((item) => {
-            //   item.inputs.push({
-            //     type: 'add',
-            //     value: '',
-            //   });
-            //   return item;
-            // });
-            // state.dynamicFormHeader.map((item) => {
-            //   item.inputs.push({
-            //     type: 'add',
-            //     value: '',
-            //   });
-            //   return item;
-            // });
+            state.basicFormHeader = [_no].concat(formStore.getTemplateEcho.slice(0,4));
+            state.dynamicFormHeader = formStore.getTemplateEcho.slice(4, formStore.getTemplateEcho.length);
           }
         });
+      }
+
+      onMounted(() => {
+        fillForm();
       });
       return {
         ...toRefs(state),
         add,
         del,
+        registerModal,
+        openModal1,
         register,
         saveFormDatas: (inputs: any) => {
           // setFieldsValue(inputs);
@@ -309,7 +321,6 @@ import {
           createMessage.info(`已上传文件${JSON.stringify(list)}`);
         },
         addInputRow,
-        uploadExcel,
       };
     },
   });
