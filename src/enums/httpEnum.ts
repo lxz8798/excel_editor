@@ -3,6 +3,7 @@
  */
 export enum ResultEnum {
   SUCCESS = 0,
+  WRONG_TOKEN = 1,
   ERROR = -1,
   TIMEOUT = 401,
   TYPE = 'success',

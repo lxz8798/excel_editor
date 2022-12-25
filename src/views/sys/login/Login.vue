@@ -46,11 +46,11 @@
               <p>工艺</p>
             </div>
             <div class="plant">
-              <div class="ball"></div>
-              <div class="ball second"></div>
-              <div class="ball third"></div>
-              <div class="ball fourth"></div>
-              <div class="ball fifth"></div>
+              <div class="ball"><p>石油工程</p></div>
+              <div class="ball second"><p>建筑工程</p></div>
+              <div class="ball third"><p>医学工程</p></div>
+              <div class="ball fourth"><p>矿业工程</p></div>
+              <div class="ball fifth"><p>...</p></div>
             </div>
           </div>
         </div>
@@ -103,24 +103,24 @@
   const formStore = useFormStore();
   const { createMessage } = useMessage();
   // 点击小球把ID存起来
-  getFromTemplateList().then((template) => {
-    if (template.length) {
-      formStore.setTempList(template);
-      const $balls = document.querySelectorAll('.ball');
-      template.forEach((temp, key) => {
-        const $p = document.createElement('p');
-        $p.innerText = temp.templateTitle.replace('检测报告单', '报告').replace('天然气', ' ');
-        // $p.dataset.templateId = t.id;
-        $balls[key].appendChild($p);
-        $balls[key].addEventListener('click', () => {
-          userStore.setGotoDocID(temp.id);
-          if (!Object.keys(userStore.getUserInfo).length) {
-            createMessage.warning(t('component.verify.loginFail'));
-          }
-        });
-      });
-    }
-  });
+  // getFromTemplateList().then((template) => {
+  //   if (template.length) {
+  //     formStore.setTempList(template);
+  //     const $balls = document.querySelectorAll('.ball');
+  //     template.forEach((temp, key) => {
+  //       const $p = document.createElement('p');
+  //       $p.innerText = temp.templateTitle.replace('检测报告单', '报告').replace('天然气', ' ');
+  //       // $p.dataset.templateId = t.id;
+  //       $balls[key].appendChild($p);
+  //       $balls[key].addEventListener('click', () => {
+  //         userStore.setGotoDocID(temp.id);
+  //         if (!Object.keys(userStore.getUserInfo).length) {
+  //           createMessage.warning(t('component.verify.loginFail'));
+  //         }
+  //       });
+  //     });
+  //   }
+  // });
   // function toEditDocHandler(e) {
   //   userStore.setGotoDocID(e);
   // }
@@ -317,30 +317,32 @@
         writing-mode: vertical-lr;
         color: white;
         letter-spacing: 8px;
+
+        transform: translateY(10px);
       }
     }
 
     .circle.box1 {
-      width: 200px;
-      height: 200px;
+      width: 120px;
+      height: 120px;
       background: rgba(164, 140, 85, 0.3);
     }
 
     .circle.box2 {
-      width: 250px;
-      height: 250px;
+      width: 220px;
+      height: 220px;
       background: rgba(46, 186, 45, 0.3);
       > p {
-        transform: translateX(108px);
+        transform: translate(82px, 10px);
       }
     }
 
     .circle.box3 {
-      width: 300px;
-      height: 300px;
+      width: 290px;
+      height: 290px;
       background: rgba(16, 193, 149, 0.3);
       > p {
-        transform: translateX(135px);
+        transform: translate(125px, 10px);
       }
     }
 
@@ -349,7 +351,7 @@
       height: 350px;
       background: rgba(4, 152, 207, 0.3);
       > p {
-        transform: translateX(160px);
+        transform: translate(158px, 10px);
       }
     }
 
@@ -377,6 +379,10 @@
       line-height: 50px;
       color: #13c2c2;
 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
       transform: rotateZ(-30deg) scaleY(2);
       animation: self-rotate 16s linear infinite;
 
@@ -389,6 +395,7 @@
         padding: 15px;
         font-size: 12px;
         line-height: 18px;
+        transform: translateY(5px);
       }
       &:hover {
         transition: 0.3s;

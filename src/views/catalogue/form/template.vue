@@ -1,5 +1,7 @@
 <template>
   <PageWrapper :title="currTempDetail['templateTitle']" contentFullHeight>
+    <!--<a-button type="primary" :size="size" style="margin-bottom: 20px;">上传EXCEL</a-button>-->
+    <BasicUpload :maxSize="20" :maxNumber="1" style="margin-bottom: 20px;" :api="uploadApi" :accept="['.xlsx']" :uploadParams="uploadParams" @change="handleChange" />
     <CollapseContainer
       class="form_wrap"
       :title="`${currTempDetail['templateTitle']}-${currTempDetail['templateDesc']}`"
@@ -16,7 +18,8 @@
             v-for="(input, key) in form.inputs"
             :key="key"
             :class="input.type === 'add' && 'add_icon'"
-            @click="clickInputItem($event, input, form)"
+            :data-input="JSON.stringify(input)"
+            @click="clickInputItem($event, input, form, key)"
           >
             <Input
               size="large"
@@ -25,10 +28,11 @@
               v-if="input.type === 'input'"
               @change="changeInputeValue($event, input)"
             />
-            <PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />
+            <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
           </div>
         </div>
       </div>
+      <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" />
       <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas">
         <template #add="{ field }">
           <!--<div class="roll">
@@ -44,33 +48,33 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    onMounted,
-    ref,
-    reactive,
-    toRefs,
-    toRaw,
-    watchEffect,
-  } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  reactive,
+  toRefs,
+  toRaw,
+  watchEffect, h
+} from "vue";
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { PageWrapper } from '/@/components/Page';
-
+  import { BasicUpload } from '/@/components/Upload';
   import { Select } from 'ant-design-vue';
-  import { PlusSquareOutlined } from '@ant-design/icons-vue';
+  import { PlusSquareOutlined, DownloadOutlined } from '@ant-design/icons-vue';
   import { useFormStore } from '/@/store/modules/form';
   import { useRoute } from 'vue-router';
   import { useUserStore } from '/@/store/modules/user';
   import { useWebSocket } from '@vueuse/core';
   import { useGlobSetting } from '/@/hooks/setting';
-
+  import { uploadApi } from '/@/api/sys/upload';
+  import { t } from '/@/hooks/web/useI18n';
   const formStore = useFormStore();
   const userStore = useUserStore();
-  const { wsUrl, apiUrl } = useGlobSetting();
-
+  const { wsUrl, apiUrl, uploadUrl } = useGlobSetting();
   export default defineComponent({
     components: {
       BasicForm,
@@ -79,6 +83,8 @@
       ApiSelect,
       ASelect: Select,
       PlusSquareOutlined,
+      DownloadOutlined,
+      BasicUpload,
     },
     setup() {
       // 使用消息
@@ -99,53 +105,13 @@
           toId: '',
           boradFlag: '',
         },
-        basicFormHeader: [
-          {
-            templateId: route.meta.id,
-            label: '检测项目',
-            inputs: [
-              {
-                type: 'add',
-                value: '',
-              },
-            ],
-          },
-          {
-            templateId: route.meta.id,
-            label: '性能指标',
-            inputs: [
-              {
-                type: 'add',
-                value: '',
-              },
-            ],
-          },
-          {
-            templateId: route.meta.id,
-            label: '检测数据',
-            inputs: [
-              {
-                type: 'add',
-                value: '',
-              },
-            ],
-          },
-        ],
-        dynamicFormHeader: [
-          {
-            templateId: route.meta.id,
-            label: '是否合格',
-            inputs: [
-              {
-                type: 'add',
-                value: '',
-              },
-            ],
-          },
-        ],
+        basicFormHeader: [],
+        dynamicFormHeader: [],
         currTempDetail: {},
         schemas: [] as FormSchema[],
         defaultValues: null,
+        uploadParams: { templateId: route.meta.id },
+        no: 0,
       });
       // 表单相关业务
       const [register, { appendSchemaByField, setFieldsValue }] = useForm({
@@ -202,7 +168,22 @@
         send(JSON.stringify(msgObj));
       }
 
-      function clickInputItem(e, input, form) {
+
+      function clickInputItem(e, input, form, key) {
+        if (e.target.tagName === 'DIV' && e.target.className === 'column') {
+          const { createConfirm } = useMessage();
+          createConfirm({
+            iconType: 'warning',
+            title: () => h('span', '删除有风险!'),
+            content: () => h('span', '是否确认删除？'),
+            onOk: async () => {
+              [...state.basicFormHeader, ...state.dynamicFormHeader].map((i) => {
+                i.inputs.splice(key, 1);
+                return i;
+              });
+            },
+          });
+        }
         if (input.type !== 'add') return;
         form.inputs.splice(form.inputs.length - 1, 0, {
           type: 'input',
@@ -210,17 +191,35 @@
         });
       }
 
+      function addInputRow() {
+        [...state.basicFormHeader, ...state.dynamicFormHeader].map((i) => {
+          i.inputs.push({
+            type: 'input',
+            value: '',
+          });
+          return i;
+        });
+        state.basicFormHeader[0].inputs[state.no].value = state.no++;
+      }
+
+      function uploadExcel() {
+        // const formData = new FormData({
+        //   templateId: route.meta.id,
+        // })
+      }
+
       state.currTempDetail = formStore.getCurrTemp
         ? formStore.getCurrTemp
         : { templateTitle: '暂无信息', templateDesc: '暂无描述' };
       // 获得所有的表单项
       formStore.setInputItems({ templateId: route.meta.id });
+      formStore.setBasicTemplate(route.meta.id);
       const n = ref(1);
       // 进入页面获得回显的数据
-      let inputItemsValues = {};
-      formStore.getInputItems.map((i) => {
-        inputItemsValues[i['field']] = i['inputValue'];
-      });
+      // let inputItemsValues = {};
+      // formStore.getInputItems.map((i) => {
+      //   inputItemsValues[i['field']] = i['inputValue'];
+      // });
 
       function add() {
         const _id = Math.floor(Math.random() * 1000000) + '';
@@ -241,61 +240,37 @@
       }
 
       onMounted(() => {
-        Object.keys(inputItemsValues).length && setFieldsValue(inputItemsValues);
+        // Object.keys(inputItemsValues).length && setFieldsValue(inputItemsValues);
         formStore.setTemplateEcho(route.meta.id).then((res) => {
-          const defaultFormHeader = [
-            {
-              templateId: route.meta.id,
-              label: '检测项目',
-              inputs: [
-                {
-                  type: 'add',
-                  value: '',
-                },
-              ],
-            },
-            {
-              templateId: route.meta.id,
-              label: '性能指标',
-              inputs: [
-                {
-                  type: 'add',
-                  value: '',
-                },
-              ],
-            },
-            {
-              templateId: route.meta.id,
-              label: '检测数据',
-              inputs: [
-                {
-                  type: 'add',
-                  value: '',
-                },
-              ],
-            },
-          ];
           if (!formStore.getTemplateEcho.length) {
-            state.basicFormHeader = defaultFormHeader;
+            state.basicFormHeader = formStore.getBasicTemplate;
+            // state.basicFormHeader = formStore.getBasicTemplate.map((t) => {
+            //   t.inputs = [
+            //     {
+            //       type: 'add',
+            //       value: '',
+            //     },
+            //   ];
+            //   return t;
+            // });
             state.dynamicFormHeader = [];
           } else {
             state.basicFormHeader = formStore.getTemplateEcho.slice(0, 3);
             state.dynamicFormHeader = formStore.getTemplateEcho.slice(3, formStore.getTemplateEcho.length);
-
-            state.basicFormHeader.map((item) => {
-              item.inputs.push({
-                type: 'add',
-                value: '',
-              });
-              return item;
-            });
-            state.dynamicFormHeader.map((item) => {
-              item.inputs.push({
-                type: 'add',
-                value: '',
-              });
-              return item;
-            });
+            // state.basicFormHeader.map((item) => {
+            //   item.inputs.push({
+            //     type: 'add',
+            //     value: '',
+            //   });
+            //   return item;
+            // });
+            // state.dynamicFormHeader.map((item) => {
+            //   item.inputs.push({
+            //     type: 'add',
+            //     value: '',
+            //   });
+            //   return item;
+            // });
           }
         });
       });
@@ -329,6 +304,12 @@
         getTagColor,
         changeInputeValue,
         clickInputItem,
+        uploadApi,
+        handleChange: (list: string[]) => {
+          createMessage.info(`已上传文件${JSON.stringify(list)}`);
+        },
+        addInputRow,
+        uploadExcel,
       };
     },
   });
@@ -338,12 +319,12 @@
     display: flex;
     flex-direction: column;
     .form {
-      margin-bottom: 30px;
+      //margin-bottom: 30px;
       width: 100%;
       display: flex;
       flex-direction: row;
       .form_item {
-        flex: 1;
+        flex: 3;
         border: 1px solid #ddd;
         .row {
           padding: 8px 0;
@@ -355,6 +336,7 @@
           font-size: 16px;
         }
         .column {
+          position: relative;
           input {
             color: #626262;
             font-size: 14px;
@@ -362,6 +344,28 @@
             border-top: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
             padding-left: 8px;
+            cursor: pointer;
+            transition: .3s;
+            &:hover {
+              background: #eee;
+            }
+          }
+
+          &:hover {
+            &:before {
+              position: absolute;
+              top: 0;
+              right: 0;
+              content: '删除这一行';
+              width: 80px;
+              height: 100%;
+              line-height: 24px;
+              cursor: pointer;
+              text-align: center;
+              color: rgba(255, 0, 0, 0.86);
+              font-size: 12px;
+              transition: .3s;
+            }
           }
         }
         .column:nth-child(odd) {
@@ -382,6 +386,27 @@
             cursor: pointer;
           }
         }
+      }
+      .form_item:nth-child(1) {
+        flex: 1;
+        .column {
+          input {
+            text-align: center;
+          }
+        }
+      }
+    }
+    .add_icon {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      padding: 8px 0;
+      border: 1px solid #ddd;
+      transition: .3s;
+      &:hover {
+        background: rgba(0, 0, 0, .1);
       }
     }
   }

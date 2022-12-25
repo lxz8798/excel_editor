@@ -80,7 +80,7 @@
 <script lang="ts">
   import type { Menu } from '/@/router/types';
   import type { CSSProperties } from 'vue';
-  import { computed, defineComponent, onMounted, ref, unref, watch } from 'vue';
+  import { computed, defineComponent, onMounted, ref, toRaw, unref, watch } from 'vue';
   import type { RouteLocationNormalized } from 'vue-router';
   import { ScrollContainer } from '/@/components/Container';
   import { SimpleMenu, SimpleMenuTag } from '/@/components/SimpleMenu';
@@ -97,9 +97,12 @@
   import clickOutside from '/@/directives/clickOutside';
   import { getChildrenMenus, getCurrentParentPath, getShallowMenus } from '/@/router/menus';
   import { useFormStore } from '/@/store/modules/form';
+  import { getMenuChildren } from '/@/api/demo/form';
   import { listenerRouteChange } from '/@/logics/mitt/routeChange';
   import LayoutTrigger from '../trigger/index.vue';
-  import { useUserStore } from "/@/store/modules/user";
+  import { useUserStore } from '/@/store/modules/user';
+  import { useRouter } from 'vue-router';
+  import { LAYOUT } from '/@/router/constant';
   export default defineComponent({
     name: 'LayoutMixSider',
     components: {
@@ -123,6 +126,8 @@
       const currentRoute = ref<Nullable<RouteLocationNormalized>>(null);
       const userStore = useUserStore();
       const formStore = useFormStore();
+      // 使用路由
+      const route = useRouter();
       const { prefixCls } = useDesign('layout-mix-sider');
       const go = useGo();
       const { t } = useI18n();
@@ -223,8 +228,44 @@
         };
       }
       // Process module menu click
-      async function handleModuleClick(path: string, hover = false) {
-        const children = await getChildrenMenus(path);
+      async function handleModuleClick(path: string, hover = false, menu?) {
+        const range = ['/medicalm', '/architecture', '/mineral', '/petroleum'];
+        let children = [];
+        if (range.includes(path)) {
+          const { menuId } = menu;
+          menu.children = await getMenuChildren({ menuId: menuId });
+          menu.component = LAYOUT;
+          if (menu.children.length) {
+            menu.children.map((m) => {
+              let _obj = {
+                path: path + '/template/' + m.id,
+                name: m.templateTitle,
+                meta: {
+                  id: m.id,
+                  title: m.templateTitle,
+                },
+                component: () => import('/@/views/catalogue/form/template.vue'),
+              };
+              let _menu = Object.assign(m, _obj);
+              return _menu;
+            });
+          } else {
+            let _obj = {
+              path: path + '/template/' + 0,
+              name: '空白数据',
+              meta: {
+                id: 10,
+                title: '空白数据',
+              },
+              component: () => import('/@/views/catalogue/form/template.vue'),
+            };
+            menu.children = [_obj];
+          }
+          route.addRoute(menu);
+          children = menu.children;
+        } else {
+          children = await getChildrenMenus(path);
+        }
         if (unref(activePath) === path) {
           if (!hover) {
             if (!unref(openMenu)) {
@@ -245,9 +286,7 @@
           activePath.value = path;
         }
 
-        const _id = currentRoute.value.meta.id;
-        userStore.setGotoDocID(_id as 'string | number');
-
+        // userStore.setGotoDocID(_id as 'string | number');
         if (!children || children.length === 0) {
           if (!hover) go(path);
           childrenMenus.value = [];
@@ -302,7 +341,7 @@
           };
         }
         return {
-          onClick: () => handleModuleClick(item.path),
+          onClick: () => handleModuleClick(item.path, false, item),
         };
       }
 

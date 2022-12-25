@@ -10,6 +10,7 @@ enum Api {
   GetPermCode = '/getPermCode',
   TestRetry = '/testRetry',
   register = '/user/add',
+  editUserInfo = '/user/editPwd',
 }
 
 /**
@@ -56,4 +57,8 @@ export function testRetry() {
 }
 export function regUser(params) {
   return defHttp.post({ url: Api.register, params });
+}
+
+export function editUser(params) {
+  return defHttp.post({ url: Api.editUserInfo, params });
 }

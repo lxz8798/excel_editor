@@ -28,7 +28,6 @@ export function createParamMenuGuard(router: Router) {
       menus = permissionStore.getFrontMenuList;
     }
     menus.forEach((item) => configureDynamicParamsMenu(item, to.params));
-
     next();
   });
 }

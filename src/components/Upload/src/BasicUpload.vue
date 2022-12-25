@@ -52,7 +52,6 @@
     components: { UploadModal, Space, UploadPreviewModal, Icon, Tooltip },
     props: uploadContainerProps,
     emits: ['change', 'delete', 'preview-delete', 'update:value'],
-
     setup(props, { emit, attrs }) {
       const { t } = useI18n();
       // 上传modal

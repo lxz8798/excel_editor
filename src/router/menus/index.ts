@@ -98,6 +98,7 @@ export async function getChildrenMenus(parentPath: string) {
     const routes = router.getRoutes();
     return filter(parent.children, basicFilter(routes));
   }
+  console.log(parent, 'parent');
   return parent.children;
 }
 

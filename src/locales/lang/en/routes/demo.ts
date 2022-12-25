@@ -199,4 +199,10 @@ export default {
     authColumn: 'Auth column',
     resizeParentHeightTable: 'resizeParentHeightTable',
   },
+  menu: {
+    petroleum: 'petroleum engineering',
+    architecture: 'architectural engineering',
+    medicalm: 'medical engineering',
+    mineral: 'mineral engineering',
+  },
 };

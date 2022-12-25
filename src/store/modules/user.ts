@@ -8,7 +8,7 @@ import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import { GetUserInfoModel, LoginParams, registerModel } from '/@/api/sys/model/userModel';
 import { doLogout, getUserInfo, loginApi, regUser } from '/@/api/sys/user';
-import { getFromTemplateList } from '/@/api/demo/form';
+import { getFromTemplateList, getMenuChildren } from "/@/api/demo/form";
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { router } from '/@/router';
@@ -140,6 +140,8 @@ export const useUserStore = defineStore({
       const formStore = useFormStore();
       if (formStore) {
         formStore.setTempList(tempList);
+        // formStore.setMenuChildren();
+
         // formStore.getTempList.forEach((t) => {
         //   formStore.setInputItems({ templateId: formStore.getCurrTemp[t['id']] });
         // });
@@ -175,9 +177,7 @@ export const useUserStore = defineStore({
       const { createMessage } = useMessage();
       params['name'] = params.account;
       delete params['account'];
-      console.log(params);
       const res = await regUser(params);
-      createMessage.info(res);
     },
     /**
      * @description: Confirm before logging out

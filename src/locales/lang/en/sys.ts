@@ -28,6 +28,8 @@ export default {
     logoutTip: 'Reminder',
     logoutMessage: 'Confirm to exit the system?',
     menuLoading: 'Menu loading...',
+    deleteTip: 'delete at risk!',
+    confirmDelete: 'are you sure to delete?',
   },
   errorLog: {
     tableTitle: 'Error log list',

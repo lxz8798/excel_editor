@@ -190,4 +190,10 @@ export default {
     authColumn: '权限列',
     resizeParentHeightTable: '继承父元素高度',
   },
+  menu: {
+    petroleum: '石油工程',
+    architecture: '建筑工程',
+    medicalm: '医学工程',
+    mineral: '矿业工程',
+  },
 };
