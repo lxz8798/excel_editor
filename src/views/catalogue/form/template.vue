@@ -8,8 +8,9 @@
     >
       <div class="form">
         <div
+          v-if="mergeForm.length"
           class="form_item"
-          v-for="(form, index) in [...basicFormHeader, ...dynamicFormHeader]"
+          v-for="(form, index) in mergeForm"
           :key="index"
         >
           <div class="row">{{ form.label }}</div>
@@ -157,6 +158,7 @@
 
       const getIsOpen = computed(() => status.value === 'OPEN');
       const getTagColor = computed(() => (getIsOpen.value ? 'success' : 'red'));
+      const mergeForm = computed(() => [...state.basicFormHeader, ...state.dynamicFormHeader]);
 
       const getList = computed(() => {
         return [...state.recordList].reverse();
@@ -191,7 +193,7 @@
             title: () => h('span', '删除有风险!'),
             content: () => h('span', '是否确认删除？'),
             onOk: async () => {
-              [...state.basicFormHeader, ...state.dynamicFormHeader].map((i) => {
+              mergeForm.value.map((i) => {
                 i.inputs.splice(key, 1);
                 return i;
               });
@@ -217,7 +219,7 @@
       }
 
       function addInputRow() {
-        [...state.basicFormHeader, ...state.dynamicFormHeader].map((i) => {
+        mergeForm.value.map((i) => {
           i.inputs.push({
             type: 'input',
             value: '',
@@ -258,24 +260,28 @@
         n.value--;
       }
 
+      function noHandler() {
+        const _no = { id: '0', label: '序号', sort: 0, inputs: [], templateId: route.meta.id };
+        if (Object.keys(formStore.getTemplateEcho).length && formStore.getTemplateEcho[0].inputs.length) {
+          for (let i = 0; i < formStore.getTemplateEcho[0].inputs.length; i++) {
+            _no.inputs.push({
+              type: 'input',
+              value: i + '',
+            });
+          }
+        }
+        return _no;
+      }
+
       function fillForm() {
         const _id = route.meta.id;
-        userStore.setGotoDocID(_id);
+        userStore.setGotoDocID(_id as number | string);
         formStore.setTemplateEcho(_id).then((res) => {
-          const _no = {id: '0', label: '序号', sort: 0,inputs: [], templateId: _id};
-          if (Object.keys(formStore.getTemplateEcho).length && formStore.getTemplateEcho[0].inputs.length) {
-            for (let i = 0; i < formStore.getTemplateEcho[0].inputs.length; i++) {
-              _no.inputs.push({
-                type: 'input',
-                value: i + '',
-              });
-            }
-          }
           if (!formStore.getTemplateEcho.length) {
             state.basicFormHeader = formStore.getBasicTemplate;
             state.dynamicFormHeader = [];
           } else {
-            state.basicFormHeader = [_no].concat(formStore.getTemplateEcho.slice(0,4));
+            state.basicFormHeader = [noHandler()].concat(formStore.getTemplateEcho.slice(0,4));
             state.dynamicFormHeader = formStore.getTemplateEcho.slice(4, formStore.getTemplateEcho.length);
           }
         });
@@ -294,13 +300,10 @@
         saveFormDatas: (inputs: any) => {
           // setFieldsValue(inputs);
           // formStore.setDefaultValues(schama);
-          const _schama = [...state.basicFormHeader, ...state.dynamicFormHeader];
-          formStore.saveForm(_schama).then((res) => {
-            formStore.setTemplateEcho(route.meta.id);
-            state.basicFormHeader = formStore.getTemplateEcho(0, 3);
-            state.dynamicFormHeader = formStore.getTemplateEcho(3, formStore.getTemplateEcho.length);
+          formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => {
+            fillForm();
+            createMessage.success('保存成功!');
           });
-          createMessage.success('保存成功!');
         },
         handleSubmit: async (values: any) => {
           const a = document.createElement('a');
@@ -314,6 +317,7 @@
         toggle,
         getIsOpen,
         getTagColor,
+        mergeForm,
         changeInputeValue,
         clickInputItem,
         uploadApi,
