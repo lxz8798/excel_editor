@@ -27,7 +27,7 @@
               v-model:value="input.value"
               :item="input"
               v-if="input.type === 'input'"
-              @change="changeInputeValue($event, input)"
+              @change="changeInputeValue($event, input, key)"
             />
             <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
           </div>
@@ -78,8 +78,7 @@
   import { uploadApi } from '/@/api/sys/upload';
   import { useModal } from '/@/components/Modal';
   import Modal1 from './Modal1.vue';
-  import { t } from '/@/hooks/web/useI18n';
-  import { templateEcho } from "/@/api/demo/form";
+  import { changeInputValueApi } from '/@/api/demo/form';
   const formStore = useFormStore();
   const userStore = useUserStore();
   const { wsUrl, apiUrl, uploadUrl } = useGlobSetting();
@@ -172,18 +171,27 @@
         }
       }
 
-      function changeInputeValue(e, input) {
+      function changeInputeValue(e, input, index) {
+        // input.value = e.target.value;
+        // let msgObj = {
+        //   type: '5',
+        //   fromId: userStore.userInfo.userId,
+        //   toId: '',
+        //   boradFlag: '',
+        //   msg: input,
+        // };
+        // send(JSON.stringify(msgObj));
         input.value = e.target.value;
-        let msgObj = {
-          type: '5',
-          fromId: userStore.userInfo.userId,
-          toId: '',
-          boradFlag: '',
-          msg: input,
+        const params = {
+          columnIndex: index + 1,
+          templateId: input.templateId,
+          value:e.target.value,
         };
-        send(JSON.stringify(msgObj));
+        changeInputValueApi(params).then((res) => {
+          formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => fillForm());
+          createMessage.success(res);
+        });
       }
-
 
       function clickInputItem(e, input, form, key) {
         if (e.target.tagName === 'DIV' && e.target.className === 'column') {

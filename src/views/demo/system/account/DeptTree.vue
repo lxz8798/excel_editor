@@ -27,7 +27,8 @@
       const treeData = ref<TreeItem[]>([]);
 
       async function fetch() {
-        treeData.value = (await getDeptList()) as unknown as TreeItem[];
+        // 暂时隐藏部门列表
+        // treeData.value = (await getDeptList()) as unknown as TreeItem[];
       }
 
       function handleSelect(keys) {

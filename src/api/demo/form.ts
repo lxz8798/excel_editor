@@ -11,6 +11,10 @@ enum Api {
   DOWN_EXCEL = '/excel/downLoadExcel', // 保存表单
   BASIC_TEMPLATE = '/dymcBaseLable/getByTemplate',
   UPLOAD_EXCEL = '/template/importRebortVertical',
+  CHANGE_INPUT_VALUE = '/template/editRebortHead',
+  CHANGE_INFO_INPUT_VALUE = '/template/editReportInfoColumn',
+  SAVE_ADD_INPUTS = '/template/addReportInfoColumn',
+  DELETE_INPUT_ITEM = '/template/delReportInfoColumn',
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -21,6 +25,9 @@ export const templateEcho = (params?) => defHttp.get({ url: Api.GET_TEMPLATE_ECH
 export const getColumn = (params?) => defHttp.get({ url: Api.GET_TEMPLAYTE_COLUMN, params, timeout: 1000 * 60 * 30 });
 export const addInputItem = (params?) => defHttp.post({ url: Api.ADD_INPUT_ITEM, params });
 export const uploadExcel = (params?) => defHttp.post({ url: Api.UPLOAD_EXCEL, params });
-
+export const changeInputValueApi = (params?) => defHttp.post({ url: Api.CHANGE_INPUT_VALUE, params });
+export const changeInfoInputVlaueApi = (params?) => defHttp.post({ url: Api.CHANGE_INFO_INPUT_VALUE, params });
+export const saveAddInputs = (params?) => defHttp.post({ url: Api.SAVE_ADD_INPUTS, params });
+export const deleteInputItemApi = (params?) => defHttp.post({ url: Api.DELETE_INPUT_ITEM, params });
 export const saveFormData = (params) => defHttp.get({ url: Api.SAVE_FORM_DATA, params });
 export const downloadEXCEL = (params) => defHttp.get({ url: Api.DOWN_EXCEL, params });

@@ -40,17 +40,17 @@
           });
         }
 
-        const treeData = await getDeptList();
-        updateSchema([
-          {
-            field: 'pwd',
-            show: !unref(isUpdate),
-          },
-          {
-            field: 'dept',
-            componentProps: { treeData },
-          },
-        ]);
+        // const treeData = await getDeptList();
+        // updateSchema([
+        //   {
+        //     field: 'pwd',
+        //     show: !unref(isUpdate),
+        //   },
+        //   {
+        //     field: 'dept',
+        //     componentProps: { treeData },
+        //   },
+        // ]);
       });
 
       const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));

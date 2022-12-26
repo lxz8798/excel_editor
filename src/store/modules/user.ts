@@ -8,7 +8,7 @@ import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import { GetUserInfoModel, LoginParams, registerModel } from '/@/api/sys/model/userModel';
 import { doLogout, getUserInfo, loginApi, regUser } from '/@/api/sys/user';
-import { getFromTemplateList, getMenuChildren } from "/@/api/demo/form";
+import { getFromTemplateList, getMenuChildren } from '/@/api/demo/form';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { router } from '/@/router';
@@ -27,6 +27,7 @@ interface UserState {
   lastUpdateTime: number;
   gotoDocId: string | number;
   templateUpDate: number;
+  userList: [];
 }
 
 export const useUserStore = defineStore({
@@ -44,6 +45,7 @@ export const useUserStore = defineStore({
     lastUpdateTime: 0,
     gotoDocId: 0,
     templateUpDate: 0,
+    userList: [],
   }),
   getters: {
     getGotoDocID(): string | number {

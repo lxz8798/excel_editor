@@ -38,7 +38,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive } from 'vue';
+  import { defineComponent, reactive, onMounted } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getAccountList } from '/@/api/demo/system';
@@ -58,29 +58,39 @@
       const go = useGo();
       const [registerModal, { openModal }] = useModal();
       const searchInfo = reactive<Recordable>({});
-      const [registerTable, { reload, updateTableDataRecord }] = useTable({
-        title: '账号列表',
-        api: getAccountList,
-        rowKey: 'id',
-        columns,
-        formConfig: {
-          labelWidth: 120,
-          schemas: searchFormSchema,
-          autoSubmitOnEnter: true,
-        },
-        useSearchForm: true,
-        showTableSetting: true,
-        bordered: true,
-        handleSearchInfoFn(info) {
-          console.log('handleSearchInfoFn', info);
-          return info;
-        },
-        actionColumn: {
-          width: 120,
-          title: '操作',
-          dataIndex: 'action',
-          // slots: { customRender: 'action' },
-        },
+      const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
+        useTable({
+          title: '账号列表',
+          api: getAccountList,
+          rowKey: 'id',
+          columns,
+          formConfig: {
+            labelWidth: 120,
+            schemas: searchFormSchema,
+            autoSubmitOnEnter: true,
+          },
+          useSearchForm: true,
+          showTableSetting: true,
+          bordered: true,
+          handleSearchInfoFn(info) {
+            console.log('handleSearchInfoFn', info);
+            return info;
+          },
+          actionColumn: {
+            width: 120,
+            title: '操作',
+            dataIndex: 'action',
+            // slots: { customRender: 'action' },
+          },
+        });
+
+      let timer = null;
+      onMounted(() => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          const data = getRawDataSource();
+          setTableData(data.records);
+        }, 300);
       });
 
       function handleCreate() {

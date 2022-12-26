@@ -1,5 +1,14 @@
 import { defineStore } from 'pinia';
-import { addInputItem, getTempItems, getBasicTemplate, templateEcho, uploadExcel, getMenuChildren, getColumn } from '/@/api/demo/form';
+import {
+  addInputItem,
+  getTempItems,
+  getBasicTemplate,
+  templateEcho,
+  uploadExcel,
+  getMenuChildren,
+  getColumn,
+  changeInputValue
+} from '/@/api/demo/form';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {

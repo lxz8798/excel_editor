@@ -5,32 +5,18 @@ import { FormSchema } from '/@/components/Table';
 export const columns: BasicColumn[] = [
   {
     title: '用户名',
-    dataIndex: 'account',
+    dataIndex: 'name',
     width: 120,
   },
   {
-    title: '昵称',
-    dataIndex: 'nickname',
-    width: 120,
-  },
-  {
-    title: '邮箱',
-    dataIndex: 'email',
+    title: '真实名字',
+    dataIndex: 'realName',
     width: 120,
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     width: 180,
-  },
-  {
-    title: '角色',
-    dataIndex: 'role',
-    width: 200,
-  },
-  {
-    title: '备注',
-    dataIndex: 'remark',
   },
 ];
 
@@ -80,31 +66,31 @@ export const accountFormSchema: FormSchema[] = [
     required: true,
     ifShow: false,
   },
-  {
-    label: '角色',
-    field: 'role',
-    component: 'ApiSelect',
-    componentProps: {
-      api: getAllRoleList,
-      labelField: 'roleName',
-      valueField: 'roleValue',
-    },
-    required: true,
-  },
-  {
-    field: 'dept',
-    label: '所属部门',
-    component: 'TreeSelect',
-    componentProps: {
-      fieldNames: {
-        label: 'deptName',
-        key: 'id',
-        value: 'id',
-      },
-      getPopupContainer: () => document.body,
-    },
-    required: true,
-  },
+  // {
+  //   label: '角色',
+  //   field: 'role',
+  //   component: 'ApiSelect',
+  //   componentProps: {
+  //     api: getAllRoleList,
+  //     labelField: 'roleName',
+  //     valueField: 'roleValue',
+  //   },
+  //   required: true,
+  // },
+  // {
+  //   field: 'dept',
+  //   label: '所属部门',
+  //   component: 'TreeSelect',
+  //   componentProps: {
+  //     fieldNames: {
+  //       label: 'deptName',
+  //       key: 'id',
+  //       value: 'id',
+  //     },
+  //     getPopupContainer: () => document.body,
+  //   },
+  //   required: true,
+  // },
   {
     field: 'nickname',
     label: '昵称',
