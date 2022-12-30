@@ -3,7 +3,7 @@ import { Result } from '../utils';
 const fakeUserInfo = {
   userId: '1',
   username: 'vben',
-  realName: '绒囊报告系统',
+  realName: '表单管理',
   desc: 'manager',
   password: '123456',
   token: 'fakeToken1',

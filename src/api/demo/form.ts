@@ -15,6 +15,7 @@ enum Api {
   CHANGE_INFO_INPUT_VALUE = '/template/editReportInfoColumn',
   SAVE_ADD_INPUTS = '/template/addReportInfoColumn',
   DELETE_INPUT_ITEM = '/template/delReportInfoColumn',
+  EDIT_TEMPLATE_TITLE = '/template',
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -29,5 +30,6 @@ export const changeInputValueApi = (params?) => defHttp.post({ url: Api.CHANGE_I
 export const changeInfoInputVlaueApi = (params?) => defHttp.post({ url: Api.CHANGE_INFO_INPUT_VALUE, params });
 export const saveAddInputs = (params?) => defHttp.post({ url: Api.SAVE_ADD_INPUTS, params });
 export const deleteInputItemApi = (params?) => defHttp.post({ url: Api.DELETE_INPUT_ITEM, params });
+export const editTemplateTitle = (params?) => defHttp.put({ url: Api.EDIT_TEMPLATE_TITLE, params });
 export const saveFormData = (params) => defHttp.get({ url: Api.SAVE_FORM_DATA, params });
 export const downloadEXCEL = (params) => defHttp.get({ url: Api.DOWN_EXCEL, params });

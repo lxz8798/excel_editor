@@ -193,7 +193,10 @@ export default {
   menu: {
     petroleum: '石油工程',
     architecture: '建筑工程',
-    medicalm: '医学工程',
+    medical: '医学工程',
     mineral: '矿业工程',
+    category: '类别',
+    technology: '技术',
+    form: '表单',
   },
 };

@@ -29,7 +29,7 @@
 <script lang="ts">
   import type { RouteLocationNormalized, RouteMeta } from 'vue-router';
 
-  import { defineComponent, computed, unref, ref } from 'vue';
+  import { defineComponent, computed, unref, ref, toRaw } from 'vue';
 
   import { Tabs } from 'ant-design-vue';
   import TabContent from './components/TabContent.vue';

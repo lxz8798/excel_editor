@@ -21,7 +21,7 @@
   import type { MenuState } from './types';
   import type { Menu as MenuType } from '/@/router/types';
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
-  import { defineComponent, computed, ref, unref, reactive, toRefs, watch } from 'vue';
+  import { defineComponent, computed, ref, unref, reactive, toRefs, watch, toRaw } from 'vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import Menu from './components/Menu.vue';
   import SimpleSubMenu from './SimpleSubMenu.vue';
@@ -33,6 +33,9 @@
   import { openWindow } from '/@/utils';
 
   import { useOpenKeys } from './useOpenKeys';
+  import { useFormStore } from '/@/store/modules/form';
+
+  const formStore = useFormStore();
   export default defineComponent({
     name: 'SimpleMenu',
     components: {
@@ -137,9 +140,12 @@
           const flag = await beforeClickFn(key);
           if (!flag) return;
         }
-
+        const children = toRaw(items.value).filter((i) => i.name === 'routes.demo.menu.form')[0];
+        if (children) {
+          const item = children.children.filter((i) => i.path === key)[0];
+          formStore.setCurrTemp(item);
+        }
         emit('menuClick', key);
-
         isClickGo.value = true;
         setOpenKeys(key);
         menuState.activeName = key;

@@ -21,7 +21,7 @@ export const asyncRoutes = [...routeModuleList];
 export const RootRoute: AppRouteRecordRaw = {
   path: '/',
   name: 'Root',
-  redirect: PageEnum.BASE_HOME,
+  redirect: PageEnum.BASE_LOGIN,
   meta: {
     title: 'Root',
   },

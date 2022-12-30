@@ -78,7 +78,7 @@
   import { Popover } from 'ant-design-vue';
   import { isBoolean, isObject } from '/@/utils/is';
   import mitt from '/@/utils/mitt';
-
+  import { useRouter } from 'vue-router';
   const DELAY = 200;
   export default defineComponent({
     name: 'SubMenu',
@@ -97,7 +97,7 @@
     },
     setup(props) {
       const instance = getCurrentInstance();
-
+      const { currentRoute } = useRouter();
       const state = reactive({
         active: false,
         opened: false,
@@ -187,7 +187,6 @@
         const { disabled } = props;
         if (disabled || unref(getCollapse)) return;
         const opened = state.opened;
-
         if (unref(getAccordion)) {
           const { uidList } = getParentList();
           rootMenuEmitter.emit('on-update-opened', {

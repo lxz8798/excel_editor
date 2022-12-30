@@ -46,10 +46,10 @@
               <p>工艺</p>
             </div>
             <div class="plant">
-              <div class="ball"><p>石油工程</p></div>
-              <div class="ball second"><p>建筑工程</p></div>
-              <div class="ball third"><p>医学工程</p></div>
-              <div class="ball fourth"><p>矿业工程</p></div>
+              <div class="ball" @click="enterMenu('petroleum')"><p>石油工程</p></div>
+              <div class="ball second" @click="enterMenu('architecture')"><p>建筑工程</p></div>
+              <div class="ball third" @click="enterMenu('medical')"><p>医学工程</p></div>
+              <div class="ball fourth" @click="enterMenu('mineral')"><p>矿业工程</p></div>
               <div class="ball fifth"><p>...</p></div>
             </div>
           </div>
@@ -89,7 +89,7 @@
   import { useFormStore } from '/@/store/modules/form';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useI18n } from '/@/hooks/web/useI18n';
-  // const router = useRouter();
+  import { useRouter } from 'vue-router';
   defineProps({
     sessionTimeout: {
       type: Boolean,
@@ -102,6 +102,7 @@
   const userStore = useUserStore();
   const formStore = useFormStore();
   const { createMessage } = useMessage();
+  const router = useRouter();
   // 点击小球把ID存起来
   // getFromTemplateList().then((template) => {
   //   if (template.length) {
@@ -126,6 +127,12 @@
   // }
   const showLocale = localeStore.getShowPicker;
   const title = computed(() => globSetting?.title ?? '');
+
+  function enterMenu(type) {
+    if (!userStore.getToken) {
+      createMessage.info(t('component.verify.loginFail'));
+    }
+  }
 </script>
 <style lang="less">
   @prefix-cls: ~'@{namespace}-login';

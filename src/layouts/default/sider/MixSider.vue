@@ -97,12 +97,12 @@
   import clickOutside from '/@/directives/clickOutside';
   import { getChildrenMenus, getCurrentParentPath, getShallowMenus } from '/@/router/menus';
   import { useFormStore } from '/@/store/modules/form';
-  import { getMenuChildren } from '/@/api/demo/form';
+  // import { getMenuChildren } from '/@/api/demo/form';
   import { listenerRouteChange } from '/@/logics/mitt/routeChange';
   import LayoutTrigger from '../trigger/index.vue';
   import { useUserStore } from '/@/store/modules/user';
   import { useRouter } from 'vue-router';
-  import { LAYOUT } from '/@/router/constant';
+  // import { LAYOUT } from '/@/router/constant';
   export default defineComponent({
     name: 'LayoutMixSider',
     components: {
@@ -229,43 +229,7 @@
       }
       // Process module menu click
       async function handleModuleClick(path: string, hover = false, menu?) {
-        const range = ['/medicalm', '/architecture', '/mineral', '/petroleum'];
-        let children = [];
-        if (range.includes(path)) {
-          const { menuId } = menu;
-          menu.children = await getMenuChildren({ menuId: menuId });
-          menu.component = LAYOUT;
-          if (menu.children.length) {
-            menu.children.map((m) => {
-              let _obj = {
-                path: path + '/template/' + m.id,
-                name: m.templateTitle,
-                meta: {
-                  id: m.id,
-                  title: m.templateTitle,
-                },
-                component: () => import('/@/views/catalogue/form/template.vue'),
-              };
-              let _menu = Object.assign(m, _obj);
-              return _menu;
-            });
-          } else {
-            let _obj = {
-              path: path + '/template/' + 0,
-              name: '空白数据',
-              meta: {
-                id: 10,
-                title: '空白数据',
-              },
-              component: () => import('/@/views/catalogue/form/template.vue'),
-            };
-            menu.children = [_obj];
-          }
-          route.addRoute(menu);
-          children = menu.children;
-        } else {
-          children = await getChildrenMenus(path);
-        }
+        const children = await getChildrenMenus(path);
         if (unref(activePath) === path) {
           if (!hover) {
             if (!unref(openMenu)) {

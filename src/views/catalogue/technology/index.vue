@@ -1,14 +1,11 @@
 <template>
-  <PageWrapper :title="currTempDetail.name" contentFullHeight>
+  <PageWrapper :title="''" contentFullHeight>
     <!--<a-button type="primary" :size="size" style="margin-bottom: 20px;">上传EXCEL</a-button>-->
     <BasicUpload :maxSize="20" :maxNumber="1" style="margin-bottom: 20px;" :api="uploadApi" :accept="['.xlsx']" :uploadParams="uploadParams" @change="handleChange" />
-    <CollapseContainer class="form_wrap">
-      <template #title>
-        <div class="form_title">
-          <a-input v-if="currTempDetail && Object.keys(currTempDetail).length" size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[1]" style="padding-left: 5px;"></a-input>
-          <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />
-        </div>
-      </template>
+    <CollapseContainer
+      class="form_wrap"
+      :title="''"
+    >
       <div class="form">
         <div
           v-if="mergeForm.length"
@@ -57,6 +54,7 @@
   import {
     computed,
     defineComponent,
+    onMounted,
     ref,
     reactive,
     toRefs,
@@ -81,7 +79,6 @@
   import { useModal } from '/@/components/Modal';
   import Modal1 from './Modal1.vue';
   import { changeInputValueApi } from '/@/api/demo/form';
-  import Icon from '/@/components/Icon';
   const formStore = useFormStore();
   const userStore = useUserStore();
   const { wsUrl, apiUrl, uploadUrl } = useGlobSetting();
@@ -96,15 +93,14 @@
       PlusSquareOutlined,
       DownloadOutlined,
       BasicUpload,
-      Icon,
     },
     setup() {
       // 使用消息
-      const { createMessage, createConfirm } = useMessage();
+      const { createMessage } = useMessage();
       // 使用路由
       const route = useRoute();
       // 获得当前模板的详情
-      // formStore.setCurrTemp(state.currTempDetail.id as string);
+      // formStore.setCurrTemp(route.meta.id as string);
       // STATE
       const state = reactive({
         server: wsUrl + userStore.userInfo.userId,
@@ -122,11 +118,9 @@
         currTempDetail: {},
         schemas: [] as FormSchema[],
         defaultValues: null,
-        uploadParams: {},
+        uploadParams: { templateId: route.meta.id },
         no: 0,
         modalOptions: {},
-        editTitleFlag: true,
-        titleValue: '',
       });
       const [registerModal, { openModal: openModal1 }] = useModal();
       // 表单相关业务
@@ -143,11 +137,9 @@
       });
 
       const uplpdaNum = computed(() => userStore.getTemplateUpdate);
-      watch(
-        uplpdaNum,
-        () => fillForm(),
-        { immediate: true, deep: true },
-      );
+      watch(uplpdaNum, (newVal) => {
+        fillForm();
+      }, { immediate: true, deep: true })
       watchEffect(() => {
         if (data.value) {
           try {
@@ -180,18 +172,25 @@
       }
 
       function changeInputeValue(e, input, index) {
+        // input.value = e.target.value;
+        // let msgObj = {
+        //   type: '5',
+        //   fromId: userStore.userInfo.userId,
+        //   toId: '',
+        //   boradFlag: '',
+        //   msg: input,
+        // };
+        // send(JSON.stringify(msgObj));
         input.value = e.target.value;
-        if (e.target.value !== '') {
-          const params = {
-            columnIndex: index + 1,
-            templateId: input.templateId,
-            value: e.target.value,
-          };
-          changeInputValueApi(params).then((res) => {
-            formStore.saveForm(mergeForm.value.slice(1, 5)).then(() => fillForm());
-            createMessage.success(res);
-          });
-        }
+        const params = {
+          columnIndex: index + 1,
+          templateId: input.templateId,
+          value:e.target.value,
+        };
+        changeInputValueApi(params).then((res) => {
+          formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => fillForm());
+          createMessage.success(res);
+        });
       }
 
       function clickInputItem(e, input, form, key) {
@@ -238,6 +237,12 @@
         state.basicFormHeader[0].inputs[state.no].value = state.no++;
       }
 
+      // state.currTempDetail = formStore.getCurrTemp
+      //   ? formStore.getCurrTemp
+      //   : { templateTitle: '暂无信息', templateDesc: '暂无描述' };
+      // 获得所有的表单项
+      formStore.setInputItems({ templateId: route.meta.id });
+      formStore.setBasicTemplate(route.meta.id);
       const n = ref(1);
       // 进入页面获得回显的数据
       // let inputItemsValues = {};
@@ -264,86 +269,37 @@
       }
 
       function noHandler() {
-        const _no = { id: '0', label: '序号', sort: 0, inputs: [], templateId: state.currTempDetail.id };
-        if (formStore.getTemplateEcho.length) {
-          // 从接口返回的数据如果有值的情况下
-          let _filter = formStore.getTemplateEcho.filter(((i) => i.label !== '序号'));
-          if (_filter[0].inputs.length) {
-            for (let i = 0; i < _filter[0].inputs.length; i++) {
-              _no.inputs.push({
-                type: 'input',
-                value: i + '',
-              });
-            }
+        const _no = { id: '0', label: '序号', sort: 0, inputs: [], templateId: route.meta.id };
+        let _filter = formStore.getTemplateEcho.filter(((i) => i.label !== '序号'));
+        if (_filter[0].inputs.length) {
+          for (let i = 0; i < _filter[0].inputs.length; i++) {
+            _no.inputs.push({
+              type: 'input',
+              value: i + '',
+            });
           }
-          return _no;
-        } else {
-          // 没值前端就给默认
-          return _no;
         }
+        return _no;
       }
 
       function fillForm() {
-        // 获得所有的表单项
-        state.currTempDetail = toRaw(formStore.getCurrTemp);
-        if (state.currTempDetail && Object.keys(state.currTempDetail).length) {
-          state.uploadParams = { templateId:  state.currTempDetail.id};
-          const _id = state.currTempDetail.id;
-          formStore.setBasicTemplate(_id);
-          userStore.setGotoDocID(_id as number | string);
-          formStore.setTemplateEcho(_id).then(() => {
-            if (!formStore.getTemplateEcho.length) {
-              // 没值的情况下前端给默认
-              const defaultBasicTemplate = [
-                {
-                  templateId: _id,
-                  label: '组份名称',
-                  inputs: [],
-                },
-                {
-                  templateId: _id,
-                  label: '计量单位',
-                  inputs: [],
-                },
-                {
-                  templateId: _id,
-                  label: '计量数量',
-                  inputs: [],
-                },
-                {
-                  templateId: _id,
-                  label: '测量方法',
-                  inputs: [],
-                },
-              ];
-              state.basicFormHeader = [noHandler()].concat(defaultBasicTemplate);
-              state.dynamicFormHeader = [];
-            } else {
-              const _filter = formStore.getTemplateEcho.filter((i) => i.label !== '序号');
-              state.basicFormHeader = [noHandler()].concat(_filter.slice(0,4));
-              state.dynamicFormHeader = _filter.slice(4, _filter.length);
-            }
-          });
-        }
-      }
-      function editTemplateTitle() {
-        state.editTitleFlag = !state.editTitleFlag;
-        const params = {
-          id: state.currTempDetail.id,
-          templateTitle: state.titleValue,
-        };
-        createConfirm({
-          iconType: 'warning',
-          title: () => h('span', '修改模板标题'),
-          content: () => h('span', `是否把模板标题修改为${state.titleValue}`),
-          onOk: () => {
-            formStore.setTemplateTitle(params);
-          },
+        const _id = route.meta.id;
+        userStore.setGotoDocID(_id as number | string);
+        formStore.setTemplateEcho(_id).then((res) => {
+          if (!formStore.getTemplateEcho.length) {
+            state.basicFormHeader = formStore.getBasicTemplate;
+            state.dynamicFormHeader = [];
+          } else {
+            const _filter = formStore.getTemplateEcho.filter((i) => i.label !== '序号');
+            state.basicFormHeader = [noHandler()].concat(_filter.slice(0,4));
+            state.dynamicFormHeader = _filter.slice(4, _filter.length);
+          }
         });
       }
-      // onMounted(() => {
-      //   fillForm();
-      // });
+
+      onMounted(() => {
+        fillForm();
+      });
       return {
         ...toRefs(state),
         add,
@@ -362,7 +318,7 @@
         handleSubmit: async (values: any) => {
           const a = document.createElement('a');
           a.target = '_blank';
-          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + state.currTempDetail.id;
+          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + route.meta.id;
           document.body.appendChild(a);
           a.click(); //触发下载
           document.body.removeChild(a);
@@ -379,7 +335,6 @@
           createMessage.info(`已上传文件${JSON.stringify(list)}`);
         },
         addInputRow,
-        editTemplateTitle,
       };
     },
   });
@@ -477,19 +432,6 @@
       transition: .3s;
       &:hover {
         background: rgba(0, 0, 0, .1);
-      }
-    }
-    .form_title {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      height: 28px;
-      > .ant-input-lg {
-        border: none;
-        background: none;
-        outline: none;
-        height: 100%;
       }
     }
   }

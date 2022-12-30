@@ -136,7 +136,7 @@
     try {
       loading.value = true;
       const userInfo = await userStore.login({
-        goHome: !userStore.getGotoDocID ? '/account/center' : '/form/template/' + userStore.getGotoDocID,
+        goHome: '/account/center',
         password: data.password,
         account: data.account,
         mode: 'none', //不要默认的错误提示

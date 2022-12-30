@@ -2,7 +2,7 @@ export const cardList = (() => {
   const result: any[] = [];
   for (let i = 0; i < 12; i++) {
     result.push({
-      title: '绒囊报告系统',
+      title: '表单管理',
       icon: 'logos:vue',
       color: '#1890ff',
       active: '100',

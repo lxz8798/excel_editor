@@ -55,9 +55,6 @@
   import { propTypes } from '/@/utils/propTypes';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
-  import { getMenuChildren } from "/@/api/demo/form";
-  import { LAYOUT } from "/@/router/constant";
-  import { getChildrenMenus } from "/@/router/menus";
 
   export default defineComponent({
     name: 'SimpleSubMenu',
@@ -101,24 +98,6 @@
           menuTreeItem.children.length > 0
         );
       }
-      function addChildren(item) {
-        console.log(item);
-        return;
-        const range = ['/medicalm', '/architecture', '/mineral', '/petroleum'];
-        const { path, meta } = props.item;
-        if (range.includes(path)) {
-          const { menuId } = meta;
-          getMenuChildren({ menuId: menuId }).then((res) => {
-            console.log(res, 'res');
-            res.map((m) => {
-              m.name = m.templateTitle;
-              return m;
-            });
-            props.item.children = res;
-          });
-          // props.item.component = LAYOUT;
-        }
-      }
       return {
         prefixCls,
         menuHasChildren,
@@ -128,7 +107,6 @@
         getShowSubTitle,
         getLevelClass,
         getIsCollapseParent,
-        addChildren,
       };
     },
   });

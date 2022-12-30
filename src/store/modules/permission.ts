@@ -5,6 +5,8 @@ import { store } from '/@/store';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useUserStore } from './user';
 import { useFormStore } from './form';
+import { router } from '/@/router';
+import { getMenuChildren } from '/@/api/demo/form';
 
 import { useAppStoreWithOut } from './app';
 import { toRaw } from 'vue';
@@ -191,13 +193,39 @@ export const usePermissionStore = defineStore({
           routes = filter(routes, routeRemoveIgnoreFilter);
           // 移除掉 ignoreRoute: true 的路由 一级路由；
           routes = routes.filter(routeRemoveIgnoreFilter);
+          const range = ['/medical', '/architecture', '/mineral', '/petroleum'];
+          menuList.forEach((r) => {
+            if (range.includes(r.path)) {
+              r.children?.map((i) => {
+                if (i.name === 'routes.demo.menu.form') {
+                  getMenuChildren({ menuId: i.meta.menuId }).then((res) => {
+                    const _first = res[0];
+                    if (i.menuId == _first.menuId) {
+                      for (let _index = 0; _index < i.children.length; _index++) {
+                        let _id = res[_index].id, _title = i.children[_index].title.split('-')[0] + '-' + res[_index].templateTitle;
+
+                        i.children[_index]['id'] = _id;
+                        i.children[_index]['name'] = _title;
+                        i.children[_index]['title'] = _title;
+
+                        i.children[_index]['meta'].id = _id;
+                        i.children[_index]['meta'].title = _title;
+                        i.children[_index]['meta']._index = _index;
+                        // i.children[_index]['path'] = i.children[_index]['path'].replace(/\d/, _id);
+                      }
+                    }
+                  });
+                  return i;
+                }
+              });
+            }
+          });
           // 对菜单进行排序
           menuList.sort((a, b) => {
             return (a.meta?.orderNo || 0) - (b.meta?.orderNo || 0);
           });
           // 设置菜单列表
           this.setFrontMenuList(menuList);
-
           // Convert multi-level routing to level 2 routing
           // 将多级路由转换为 2 级路由
           routes = flatMultiLevelRoutes(routes);

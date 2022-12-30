@@ -204,5 +204,8 @@ export default {
     architecture: 'architectural engineering',
     medicalm: 'medical engineering',
     mineral: 'mineral engineering',
+    category: 'category',
+    technology: 'technology',
+    form: 'form',
   },
 };

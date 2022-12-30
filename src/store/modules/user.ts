@@ -146,16 +146,12 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null;
       // const userStore = useUserStore();
       const userInfo = await getUserInfo();
-      const tempList = await getFromTemplateList();
-      const formStore = useFormStore();
-      if (formStore) {
-        formStore.setTempList(tempList);
-        // formStore.setMenuChildren();
-
-        // formStore.getTempList.forEach((t) => {
-        //   formStore.setInputItems({ templateId: formStore.getCurrTemp[t['id']] });
-        // });
-      }
+      // 获得工程菜单列表暂时隐藏
+      // const tempList = await getFromTemplateList();
+      // const formStore = useFormStore();
+      // if (formStore) {
+      //   formStore.setTempList(tempList);
+      // }
       const { roles = [] } = userInfo;
       if (isArray(roles)) {
         const roleList = roles.map((item) => item.value) as RoleEnum[];

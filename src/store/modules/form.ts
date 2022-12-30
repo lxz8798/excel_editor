@@ -7,6 +7,7 @@ import {
   uploadExcel,
   getMenuChildren,
   getColumn,
+  editTemplateTitle,
   changeInputValue
 } from '/@/api/demo/form';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -23,6 +24,7 @@ interface formState {
   templateEcho: [];
   columnList: [];
   columnDetail: {};
+  templateTitle: '';
 }
 const { createMessage } = useMessage();
 export const useFormStore = defineStore({
@@ -38,6 +40,7 @@ export const useFormStore = defineStore({
     templateEcho: [],
     columnList: [],
     columnDetail: {},
+    templateTitle: '',
   }),
   getters: {
     getTempList(): any[] {
@@ -70,19 +73,25 @@ export const useFormStore = defineStore({
     getColumnDetail(obj: object) {
       return this.columnDetail;
     },
+    getTemplateTitle(): string {
+      return this.templateTitle;
+    },
   },
   actions: {
     setTempList(list: []) {
       this.tempList = list;
     },
-    setCurrTemp(id: string) {
-      this.currTemp = this.menuChildren.filter((i) => i['menuId'] === id)[0];
+    setCurrTemp(obj: obj) {
+      this.currTemp = obj;
     },
     setDefaultValues(obj: object) {
       this.defaultValues = obj;
     },
     setColumnDetail(obj: object) {
       this.columnDetail = obj;
+    },
+    async setTemplateTitle(params: object) {
+      this.templateTitle = await editTemplateTitle(params);
     },
     async setMenuChildren(menuId: number) {
       this.menuChildren = await getMenuChildren(menuId);

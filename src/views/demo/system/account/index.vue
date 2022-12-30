@@ -90,7 +90,7 @@
         timer = setTimeout(() => {
           const data = getRawDataSource();
           setTableData(data.records);
-        }, 300);
+        }, 1000);
       });
 
       function handleCreate() {

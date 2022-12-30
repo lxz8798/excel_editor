@@ -8,6 +8,7 @@ import { isFunction } from '/@/utils/is';
 import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum } from '/@/enums/httpEnum';
 import { RequestEnum } from '/@/enums/httpEnum';
+import { PageEnum } from '/@/enums/pageEnum';
 
 export * from './axiosTransform';
 
@@ -104,6 +105,18 @@ export class VAxios {
       res && axiosCanceler.removePending(res.config);
       if (responseInterceptors && isFunction(responseInterceptors)) {
         res = responseInterceptors(res);
+        switch (res.data.code) {
+          // 无效令牌，登录失效
+          case 1:
+            localStorage.clear();
+            sessionStorage.clear();
+            let timer = null;
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+              window.location.href = `http://${window.location.href.split('/')[2]}/#/login`;
+            }, 800);
+          break;
+        }
       }
       return res;
     }, undefined);
