@@ -96,7 +96,13 @@ export const useFormStore = defineStore({
       if (this.templateTitle == '修改成功') {
         const currTemp = JSON.parse(sessionStorage.getItem('currTemp'));
         getMenuChildren({ menuId: currTemp.menuId }).then((menu) => {
-          console.log(menu, 'menu');
+          const filterTemp = menu.filter((i) => i.id === currTemp.id)[0];
+          currTemp.title =
+            currTemp.name =
+            currTemp.meta.title =
+              currTemp.name.split('-')[0] + '-' + filterTemp.templateTitle;
+          sessionStorage.setItem('currTemp', JSON.stringify(Object.assign(currTemp, filterTemp)));
+          window.location.reload();
         });
       }
     },

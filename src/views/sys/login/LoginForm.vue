@@ -101,6 +101,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
+  import AES from '/@/utils/auth/AES';
   import { PageEnum } from '/@/enums/pageEnum';
   //import { onKeyStroke } from '@vueuse/core';
 
@@ -119,10 +120,9 @@
   const formRef = ref();
   const loading = ref(false);
   const rememberMe = ref(false);
-
   const formData = reactive({
     account: 'admin',
-    password: 'exam_repot!QAZ2wsx202212',
+    password: 'admin123',
   });
 
   const { validForm } = useFormValid(formRef);
@@ -137,7 +137,7 @@
       loading.value = true;
       const userInfo = await userStore.login({
         goHome: '/account/center',
-        password: data.password,
+        password: AES.encrypt(data.password, 'exam_repot!QAZ2wsx202212'),
         account: data.account,
         mode: 'none', //不要默认的错误提示
       });
