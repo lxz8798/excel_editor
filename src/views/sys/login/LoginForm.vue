@@ -122,7 +122,7 @@
 
   const formData = reactive({
     account: 'admin',
-    password: 'admin123',
+    password: 'exam_repot!QAZ2wsx202212',
   });
 
   const { validForm } = useFormValid(formRef);

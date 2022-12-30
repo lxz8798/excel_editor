@@ -8,6 +8,7 @@
   >
     <div :class="`${prefixCls}__info`" @contextmenu="handleContext" v-if="getIsTabs">
       <span class="ml-1">{{ getTitle }}</span>
+      <!--<span class="ml-1" v-else>{{ getCurrTempTitle }}</span>-->
     </div>
     <span :class="`${prefixCls}__extra-quick`" v-else @click="handleContext">
       <Icon icon="ion:chevron-down" />
@@ -28,7 +29,9 @@
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useTabDropdown } from '../useTabDropdown';
   import { useFormStore } from '/@/store/modules/form';
+
   const formStore = useFormStore();
+
   export default defineComponent({
     name: 'TabContent',
     components: { Dropdown, Icon },
@@ -40,6 +43,7 @@
       isExtra: Boolean,
     },
     setup(props) {
+      const currTemp = computed(() => JSON.parse(sessionStorage.getItem('currTemp')));
       const { prefixCls } = useDesign('multiple-tabs-content');
       const { t } = useI18n();
 
@@ -48,7 +52,7 @@
         return range.some((i) => window.location.href.includes(i));
       });
 
-      const getCurrTempTitle = computed(() => toRaw(formStore.getCurrTemp).title);
+      const getCurrTempTitle = computed(() => currTemp.value.title);
 
       const getTitle = computed(() => {
         const { tabItem: { meta } = {} } = props;
@@ -80,6 +84,7 @@
         isCurrTemp,
         getTitle,
         getCurrTempTitle,
+        currTemp,
       };
     },
   });

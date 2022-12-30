@@ -73,7 +73,6 @@
   import { Select } from 'ant-design-vue';
   import { PlusSquareOutlined, DownloadOutlined } from '@ant-design/icons-vue';
   import { useFormStore } from '/@/store/modules/form';
-  import { useRoute } from 'vue-router';
   import { useUserStore } from '/@/store/modules/user';
   import { useWebSocket } from '@vueuse/core';
   import { useGlobSetting } from '/@/hooks/setting';
@@ -101,8 +100,6 @@
     setup() {
       // 使用消息
       const { createMessage, createConfirm } = useMessage();
-      // 使用路由
-      const route = useRoute();
       // 获得当前模板的详情
       // formStore.setCurrTemp(state.currTempDetail.id as string);
       // STATE
@@ -127,6 +124,7 @@
         modalOptions: {},
         editTitleFlag: true,
         titleValue: '',
+        currTemp: {},
       });
       const [registerModal, { openModal: openModal1 }] = useModal();
       // 表单相关业务
@@ -145,7 +143,10 @@
       const uplpdaNum = computed(() => userStore.getTemplateUpdate);
       watch(
         uplpdaNum,
-        () => fillForm(),
+        () => {
+          state.currTemp = computed(() => JSON.parse(sessionStorage.getItem('currTemp')));
+          fillForm(state.currTemp);
+        },
         { immediate: true, deep: true },
       );
       watchEffect(() => {
@@ -283,12 +284,13 @@
         }
       }
 
-      function fillForm() {
+      function fillForm(currTemp) {
+        // formStore.setCurrTemp(item);
         // 获得所有的表单项
-        state.currTempDetail = toRaw(formStore.getCurrTemp);
+        state.currTempDetail = currTemp;
         if (state.currTempDetail && Object.keys(state.currTempDetail).length) {
-          state.uploadParams = { templateId:  state.currTempDetail.id};
           const _id = state.currTempDetail.id;
+          state.uploadParams = { templateId:  state.currTempDetail.id};
           formStore.setBasicTemplate(_id);
           userStore.setGotoDocID(_id as number | string);
           formStore.setTemplateEcho(_id).then(() => {
@@ -322,6 +324,7 @@
               const _filter = formStore.getTemplateEcho.filter((i) => i.label !== '序号');
               state.basicFormHeader = [noHandler()].concat(_filter.slice(0,4));
               state.dynamicFormHeader = _filter.slice(4, _filter.length);
+              formStore.saveForm(mergeForm.value.slice(1, 5));
             }
           });
         }

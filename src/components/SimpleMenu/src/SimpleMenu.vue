@@ -143,6 +143,7 @@
         const children = toRaw(items.value).filter((i) => i.name === 'routes.demo.menu.form')[0];
         if (children) {
           const item = children.children.filter((i) => i.path === key)[0];
+          sessionStorage.setItem('currTemp', JSON.stringify(item));
           formStore.setCurrTemp(item);
         }
         emit('menuClick', key);

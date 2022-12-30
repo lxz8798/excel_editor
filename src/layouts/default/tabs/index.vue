@@ -49,6 +49,7 @@
   import { listenerRouteChange } from '/@/logics/mitt/routeChange';
 
   import { useRouter } from 'vue-router';
+  import { usePermissionStore } from '/@/store/modules/permission';
 
   export default defineComponent({
     name: 'MultipleTabs',
@@ -67,6 +68,7 @@
       const tabStore = useMultipleTabStore();
       const userStore = useUserStore();
       const router = useRouter();
+      const permissionStore = usePermissionStore();
 
       const { prefixCls } = useDesign('multiple-tabs');
       const go = useGo();
@@ -112,7 +114,15 @@
         }
       });
 
+      function findHandler() {
+        console.log(this);
+      }
+
       function handleChange(activeKey: any) {
+        // router.getRoutes().find.bind(findHandler);
+        const allMenu = permissionStore.getFrontMenuList.flatMap((item) => item.children.length && item.children?.flatMap((c) => c.children)).filter((i) => i);
+        const currTemp = allMenu.filter((item) => item.path === activeKey)[0];
+        currTemp && sessionStorage.setItem('currTemp', JSON.stringify(currTemp));
         activeKeyRef.value = activeKey;
         go(activeKey, false);
       }

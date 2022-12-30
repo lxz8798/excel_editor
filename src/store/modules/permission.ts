@@ -207,6 +207,7 @@ export const usePermissionStore = defineStore({
                         i.children[_index]['id'] = _id;
                         i.children[_index]['name'] = _title;
                         i.children[_index]['title'] = _title;
+                        i.children[_index]['menuId'] = i.meta.menuId;
 
                         i.children[_index]['meta'].id = _id;
                         i.children[_index]['meta'].title = _title;

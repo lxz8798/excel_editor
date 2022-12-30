@@ -92,6 +92,13 @@ export const useFormStore = defineStore({
     },
     async setTemplateTitle(params: object) {
       this.templateTitle = await editTemplateTitle(params);
+      createMessage.success(this.templateTitle);
+      if (this.templateTitle == '修改成功') {
+        const currTemp = JSON.parse(sessionStorage.getItem('currTemp'));
+        getMenuChildren({ menuId: currTemp.menuId }).then((menu) => {
+          console.log(menu, 'menu');
+        });
+      }
     },
     async setMenuChildren(menuId: number) {
       this.menuChildren = await getMenuChildren(menuId);
