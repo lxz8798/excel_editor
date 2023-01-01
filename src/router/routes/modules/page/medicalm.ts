@@ -8,7 +8,7 @@ const medicalRoutes: AppRouteModule = {
   component: LAYOUT,
   meta: {
     menuId: 3,
-    orderNo: 2000,
+    orderNo: 40,
     icon: 'map:doctor',
     title: t('routes.demo.menu.medical'),
   },
@@ -47,47 +47,47 @@ const medicalRoutes: AppRouteModule = {
       children: [
         {
           path: '1',
-          name: '医学工程-XXX地层性质表单',
+          name: '医学工程-地层性质表单',
           component: () => import('/@/views/catalogue/form/template.vue'),
           meta: {
             id: '0',
-            title: '医学工程-XXX地层性质表单',
+            title: '医学工程-地层性质表单',
           },
         },
         {
           path: '2',
-          name: '医学工程-XXX材料性质表单',
+          name: '医学工程-材料性质表单',
           component: () => import('/@/views/catalogue/form/template.vue'),
           meta: {
             id: '0',
-            title: '医学工程-XXX材料性质表单',
+            title: '医学工程-材料性质表单',
           },
         },
         {
           path: '3',
-          name: '医学工程-XXX体系性能表单',
+          name: '医学工程-体系性能表单',
           component: () => import('/@/views/catalogue/form/template.vue'),
           meta: {
             id: '0',
-            title: '医学工程-XXX体系性能表单',
+            title: '医学工程-体系性能表单',
           },
         },
         {
           path: '4',
-          name: '医学工程-XXX工艺性行表单和应用效果性状表单',
+          name: '医学工程-工艺性行表单和应用效果性状表单',
           component: () => import('/@/views/catalogue/form/template.vue'),
           meta: {
             id: '0',
-            title: '医学工程-XXX工艺性行表单和应用效果性状表单',
+            title: '医学工程-工艺性行表单和应用效果性状表单',
           },
         },
         {
           path: '5',
-          name: '医学工程-XXX评价价格表单',
+          name: '医学工程-评价价格表单',
           component: () => import('/@/views/catalogue/form/template.vue'),
           meta: {
             id: '0',
-            title: '医学工程-XXX评价价格表单',
+            title: '医学工程-评价价格表单',
           },
         },
       ],

@@ -11,45 +11,43 @@ export interface TabItem {
 }
 
 export const tags: string[] = [
+  '石油工程',
   '很有想法的',
   '专注设计',
   '海纳百川',
-  '前端大神',
-  'vue3',
-  'TYPESCRIPT',
 ];
 
 export const teams: ListItem[] = [
   {
-    icon: 'ri:alipay-fill',
-    title: '科学搬砖组',
+    icon: 'material-symbols:oil-barrel-outline',
+    title: '石油工程开发团队',
     color: '#ff4000',
   },
   {
-    icon: 'emojione-monotone:letter-a',
-    title: '中二少年团',
+    icon: 'material-symbols:oil-barrel-outline',
+    title: '石油工程算法团队',
     color: '#7c51b8',
   },
   {
-    icon: 'ri:alipay-fill',
-    title: '高逼格设计',
+    icon: 'ic:twotone-architecture',
+    title: '建筑工程团队',
     color: '#00adf7',
   },
   {
-    icon: 'jam:codepen-circle',
-    title: '程序员日常',
+    icon: 'game-icons:minerals',
+    title: '矿业工程团队',
     color: '#00adf7',
   },
   {
-    icon: 'fa:behance-square',
-    title: '科学搬砖组',
+    icon: 'map:doctor',
+    title: '医学工程团队',
     color: '#7c51b8',
   },
-  {
-    icon: 'jam:codepen-circle',
-    title: '程序员日常',
-    color: '#ff4000',
-  },
+  // {
+  //   icon: 'jam:codepen-circle',
+  //   title: '程序员日常',
+  //   color: '#ff4000',
+  // },
 ];
 
 export const details: ListItem[] = [

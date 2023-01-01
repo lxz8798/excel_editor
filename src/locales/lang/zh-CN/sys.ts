@@ -75,7 +75,7 @@ export default {
 
     signInTitle: '开箱即用的中后台管理系统',
     signInDesc: '输入您的个人详细信息开始使用！',
-    policy: '我同意xxx隐私政策',
+    policy: '我同意《使用表单管理》',
     scanSign: `扫码后点击"确认"，即可完成登录`,
 
     loginButton: '登录',
@@ -102,6 +102,6 @@ export default {
     confirmPassword: '确认密码',
     email: '邮箱',
     smsCode: '短信验证码',
-    mobile: '手机号码',
+    phone: '手机号码',
   },
 };

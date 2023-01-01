@@ -1,4 +1,4 @@
-import { getAllRoleList, isAccountExist } from '/@/api/demo/system';
+import { regUser } from '/@/api/sys/user';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 
@@ -37,34 +37,43 @@ export const searchFormSchema: FormSchema[] = [
 
 export const accountFormSchema: FormSchema[] = [
   {
-    field: 'account',
+    field: 'name',
     label: '用户名',
     component: 'Input',
-    helpMessage: ['本字段演示异步验证', '不能输入带有admin的用户名'],
     rules: [
       {
         required: true,
         message: '请输入用户名',
       },
-      {
-        validator(_, value) {
-          return new Promise((resolve, reject) => {
-            isAccountExist(value)
-              .then(() => resolve())
-              .catch((err) => {
-                reject(err.message || '验证失败');
-              });
-          });
-        },
-      },
+      // {
+      //   validator(_, value) {
+      //     return new Promise((resolve, reject) => {
+      //       isAccountExist(value)
+      //         .then(() => resolve())
+      //         .catch((err) => {
+      //           reject(err.message || '验证失败');
+      //         });
+      //     });
+      //   },
+      // },
     ],
   },
   {
-    field: 'pwd',
+    field: 'password',
     label: '密码',
     component: 'InputPassword',
     required: true,
-    ifShow: false,
+  },
+  {
+    field: 'realName',
+    label: '真实名称',
+    component: 'Input',
+    required: true,
+  },
+  {
+    field: 'phone',
+    label: '手机号',
+    component: 'InputNumber',
   },
   // {
   //   label: '角色',
@@ -92,17 +101,9 @@ export const accountFormSchema: FormSchema[] = [
   //   required: true,
   // },
   {
-    field: 'nickname',
-    label: '昵称',
-    component: 'Input',
-    required: true,
-  },
-
-  {
     label: '邮箱',
     field: 'email',
     component: 'Input',
-    required: true,
   },
 
   {

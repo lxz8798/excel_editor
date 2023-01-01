@@ -14,21 +14,18 @@
       <div class="empty-tips">加载中，请稍等……</div>
     </template>
     <template v-if="!loading">
-      <ul class="row_list">
-        <template v-for="(input, index) in state.datas">
-          <!--<li :key="index" v-if="input.type === 'input'">[no.{{index}}]-<span style="color: #4dc6cb; font-weight: bold; font-size: 16px;">{{ input.value }}</span></li>-->
-          <li :key="index" v-if="input.type === 'input'" @mouseenter="showIocn(input)" @mouseleave="leaveIcon(input)">
-            [no.{{index}}]-<input style="color: #4dc6cb; font-weight: bold; font-size: 16px;" v-model="input.value" @change="changeInfoInputVlaue($event, input)">
-            <CloseCircleOutlined v-show="input.showIconFlag" @click="deleteInputItem(input)" />
-          </li>
-          <li class="add_icon" v-else-if="input.type === 'add'" @click="addInputRow"><PlusSquareOutlined style="cursor: pointer" /></li>
-        </template>
+      <ul class="row_list" v-if="datas.length">
+        <li :key="index" v-for="(input, index) in datas" @mouseenter="showIocn(input)" @mouseleave="leaveIcon(input)">
+          [no.{{index}}]-<input style="color: #4dc6cb; font-weight: bold; font-size: 16px;" v-model="input.value" @change="changeInfoInputVlaue($event, input, index)">
+          <CloseCircleOutlined v-show="input.showIconFlag" @click="deleteInputItem(input)" />
+        </li>
+        <li class="add_icon" @click="addInputRow"><PlusSquareOutlined style="cursor: pointer" /></li>
       </ul>
     </template>
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, computed, h } from "vue";
+import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue";
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { useFormStore } from '/@/store/modules/form';
   import { PlusSquareOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
@@ -47,6 +44,7 @@ import { defineComponent, reactive, ref, computed, h } from "vue";
       const getColumnDetail = computed(() => formStore.getColumnDetail);
       const state = reactive({
         datas: [],
+        copyObj: {},
       });
       function handleShow(visible: boolean) {
         if (visible) {
@@ -55,14 +53,14 @@ import { defineComponent, reactive, ref, computed, h } from "vue";
           setTimeout(() => {
             lines.value = Math.round(Math.random() * 30 + 5);
             loading.value = false;
-            let _result = [];
-            if (formStore.getColumnList[formStore.getColumnList.length - 1].type !== 'add') {
-              _result = formStore.getColumnList.concat([{type:'add', value: ''}]);
-            }
-            state.datas = _result;
+            state.datas = formStore.getColumnList;
             setModalProps({ loading: false, confirmLoading: false });
           }, 1000);
         }
+      }
+
+      function modalCallBack(data) {
+        console.log(data, 'data');
       }
 
       function setLines() {
@@ -70,21 +68,26 @@ import { defineComponent, reactive, ref, computed, h } from "vue";
       }
 
       function addInputRow() {
-        const formIndex = state.datas.length - 1;
-        const _columnIndex = state.datas.length ? state.datas[0]['columnIndex'] : 1;
-        state.datas.splice(formIndex, 0, { columnIndex: _columnIndex, type: 'input', value: '', templateId: userStore.getGotoDocID });
+        const copyDatas = toRaw(formStore.getColumnList[0]);
+        const newItem = {
+          columnIndex: copyDatas.columnIndex,
+          columnType: copyDatas.columnType,
+          templateId: copyDatas.templateId,
+          type: 'input',
+          value: '',
+        };
+        state.datas.splice(formStore.getColumnList.length, 0, newItem);
       }
 
-      function changeInfoInputVlaue(e, input) {
-        if (input.hasOwnProperty('createTime')) {
-          changeInfoInputVlaueApi(input).then((res) => createMessage.success(res));
-        }
+      function changeInfoInputVlaue(e, input, index) {
+        input.headFlag = !index ? true : false;
+        changeInfoInputVlaueApi(input).then((res) => createMessage.success(res));
       }
 
       function okHandler() {
-        const filterList = state.datas.filter((i) => !i.hasOwnProperty('createTime') && i.type !== 'add');
+        const filterList = state.datas.filter((i) => i.type !== 'add');
         if (filterList.length) {
-          saveAddInputs(filterList).then((res) => createMessage.success(res));
+          saveAddInputs(JSON.parse(JSON.stringify(filterList))).then((res) => createMessage.success(res));
         }
         setModalProps({ visible: false });
       }
@@ -106,7 +109,7 @@ import { defineComponent, reactive, ref, computed, h } from "vue";
           },
         });
       }
-      return { register, loading, handleShow, lines, setLines, state, getColumnDetail, addInputRow, changeInfoInputVlaue, okHandler, showIocn, leaveIcon, deleteInputItem };
+      return { register, loading, handleShow, lines, setLines, ...toRefs(state), getColumnDetail, addInputRow, changeInfoInputVlaue, okHandler, showIocn, leaveIcon, deleteInputItem };
     },
   });
 </script>

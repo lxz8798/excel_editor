@@ -47,10 +47,12 @@
 
   import { useModal } from '/@/components/Modal';
   import AccountModal from './AccountModal.vue';
-
   import { columns, searchFormSchema } from './account.data';
   import { useGo } from '/@/hooks/web/usePage';
-
+  import { useUserStore } from '/@/store/modules/user';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  const userStore = useUserStore();
+  const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
     components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
@@ -100,7 +102,6 @@
       }
 
       function handleEdit(record: Recordable) {
-        console.log(record);
         openModal(true, {
           record,
           isUpdate: true,
@@ -108,7 +109,12 @@
       }
 
       function handleDelete(record: Recordable) {
-        console.log(record);
+        userStore.deleteUser({ userId: record.id }).then((res) => {
+          getAccountList({page:1 , pageSize: 30}).then((result) => {
+            setTableData(result.records);
+            createMessage.success(res);
+          });
+        });
       }
 
       function handleSuccess({ isUpdate, values }) {
@@ -116,9 +122,11 @@
           // 演示不刷新表格直接更新内部数据。
           // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
           const result = updateTableDataRecord(values.id, values);
-          console.log(result);
         } else {
-          reload();
+          reload().then(() => {
+            const data = getRawDataSource();
+            setTableData(data.records);
+          });
         }
       }
 

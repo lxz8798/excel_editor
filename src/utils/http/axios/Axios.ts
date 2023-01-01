@@ -9,6 +9,7 @@ import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum } from '/@/enums/httpEnum';
 import { RequestEnum } from '/@/enums/httpEnum';
 import { PageEnum } from '/@/enums/pageEnum';
+import { useMessage } from "/@/hooks/web/useMessage";
 
 export * from './axiosTransform';
 
@@ -104,10 +105,14 @@ export class VAxios {
     this.axiosInstance.interceptors.response.use((res: AxiosResponse<any>) => {
       res && axiosCanceler.removePending(res.config);
       if (responseInterceptors && isFunction(responseInterceptors)) {
+        const { createMessage } = useMessage();
         res = responseInterceptors(res);
         switch (res.data.code) {
-          // 无效令牌，登录失效
           case 1:
+            createMessage.error('服务器状态异常!');
+          break;
+          // 无效令牌，登录失效
+          case 401:
             localStorage.clear();
             sessionStorage.clear();
             let timer = null;

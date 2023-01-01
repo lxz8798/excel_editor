@@ -101,7 +101,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
-  import AES from '/@/utils/auth/AES';
+  // import AES from '/@/utils/auth/AES';
   import { PageEnum } from '/@/enums/pageEnum';
   //import { onKeyStroke } from '@vueuse/core';
 
@@ -114,6 +114,7 @@
   const { prefixCls } = useDesign('login');
   const userStore = useUserStore();
   import { useRouter } from 'vue-router';
+  import { useGo } from '/@/hooks/web/usePage';
   const { setLoginState, getLoginState } = useLoginState();
   const { getFormRules } = useFormRules();
 
@@ -121,13 +122,13 @@
   const loading = ref(false);
   const rememberMe = ref(false);
   const formData = reactive({
-    account: 'admin',
-    password: 'admin123',
+    account: '',
+    password: '',
   });
 
   const { validForm } = useFormValid(formRef);
   const router = useRouter();
-
+  const go = useGo();
   const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN);
 
   async function handleLogin() {
@@ -135,9 +136,13 @@
     if (!data) return;
     try {
       loading.value = true;
+      const type = userStore.getGotoDocID;
       const userInfo = await userStore.login({
-        goHome: '/account/center',
-        password: AES.encrypt(data.password, 'exam_repot!QAZ2wsx202212'),
+        // goHome: type !== '' ? router.push(`/${type}/form`) : '/account/center',
+        // goHome: '/account/center',
+        redirect: type !== '' ? `/${type}/form` : '/account/center',
+        // AES.encrypt(data.password, 'exam_repot!QAZ2wsx202212') // 这个是AES加密，因服务器SDK不得行，所以不能用
+        password: data.password,
         account: data.account,
         mode: 'none', //不要默认的错误提示
       });
@@ -147,6 +152,10 @@
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realName}`,
           duration: 3,
         });
+        // console.log(userInfo.redirect, 'userInfo.redirect');
+        // console.log(type, 'type');
+        // window.location.href = 'http://' + window.location.href.split('/')[2] + type;
+        // console.log(window.location.href, 'window.location.href');
         location.reload();
       }
     } catch (error) {

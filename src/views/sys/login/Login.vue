@@ -132,6 +132,7 @@
     if (!userStore.getToken) {
       createMessage.info(t('component.verify.loginFail'));
     }
+    userStore.setGotoDocID(type);
   }
 </script>
 <style lang="less">
@@ -192,7 +193,7 @@
       width: 100%;
       height: 100%;
       margin-left: -48%;
-      background-image: url(/@/assets/svg/login-bg.svg);
+      background-image: url(/@/assets/images/bg.png);
       background-position: 100%;
       background-repeat: no-repeat;
       background-size: auto 100%;
@@ -303,6 +304,8 @@
     justify-content: center;
     align-items: center;
 
+    transform: translate(-12%, 5%) !important;
+
     .circle,
     .plant {
       border: 2px solid #13c2c2;
@@ -332,13 +335,13 @@
     .circle.box1 {
       width: 120px;
       height: 120px;
-      background: rgba(164, 140, 85, 0.3);
+      background: rgba(164, 140, 85, 0.5);
     }
 
     .circle.box2 {
       width: 220px;
       height: 220px;
-      background: rgba(46, 186, 45, 0.3);
+      background: rgba(46, 186, 45, 0.5);
       > p {
         transform: translate(82px, 10px);
       }
@@ -347,7 +350,7 @@
     .circle.box3 {
       width: 290px;
       height: 290px;
-      background: rgba(16, 193, 149, 0.3);
+      background: rgba(16, 193, 149, 0.5);
       > p {
         transform: translate(125px, 10px);
       }
@@ -356,7 +359,7 @@
     .circle.box4 {
       width: 350px;
       height: 350px;
-      background: rgba(4, 152, 207, 0.3);
+      background: rgba(4, 152, 207, 0.5);
       > p {
         transform: translate(158px, 10px);
       }
@@ -371,7 +374,7 @@
       transform-style: preserve-3d;
       transform: scaleY(0.1) rotateZ(30deg);
       border-radius: 50%;
-      animation: planet-rotate 16s linear infinite; // 无限次
+      animation: planet-rotate 60s linear infinite; // 无限次
     }
 
     .ball {
@@ -391,7 +394,7 @@
       align-items: center;
 
       transform: rotateZ(-30deg) scaleY(2);
-      animation: self-rotate 16s linear infinite;
+      animation: self-rotate 60s linear infinite;
 
       //animation-name: self-rotate, ping;
       //animation-duration: 16s, 1s;

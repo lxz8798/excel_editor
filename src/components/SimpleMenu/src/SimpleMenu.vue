@@ -34,8 +34,11 @@
 
   import { useOpenKeys } from './useOpenKeys';
   import { useFormStore } from '/@/store/modules/form';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   const formStore = useFormStore();
+  const { createMessage } = useMessage();
+
   export default defineComponent({
     name: 'SimpleMenu',
     components: {
@@ -131,6 +134,10 @@
       }
 
       async function handleSelect(key: string) {
+        if (key.includes('technology') || key.includes('category')) {
+          createMessage.info('功能正在开发中，请先使用表单功能!');
+          return;
+        };
         if (isUrl(key)) {
           openWindow(key);
           return;
@@ -143,7 +150,7 @@
         const children = toRaw(items.value).filter((i) => i.name === 'routes.demo.menu.form')[0];
         if (children) {
           const item = children.children.filter((i) => i.path === key)[0];
-          sessionStorage.setItem('currTemp', JSON.stringify(item));
+          localStorage.setItem('currTemp', JSON.stringify(item));
           formStore.setCurrTemp(item);
         }
         emit('menuClick', key);

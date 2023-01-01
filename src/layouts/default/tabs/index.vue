@@ -122,7 +122,7 @@
         // router.getRoutes().find.bind(findHandler);
         const allMenu = permissionStore.getFrontMenuList.flatMap((item) => item.children.length && item.children?.flatMap((c) => c.children)).filter((i) => i);
         const currTemp = allMenu.filter((item) => item.path === activeKey)[0];
-        currTemp && sessionStorage.setItem('currTemp', JSON.stringify(currTemp));
+        currTemp && localStorage.setItem('currTemp', JSON.stringify(currTemp));
         activeKeyRef.value = activeKey;
         go(activeKey, false);
       }

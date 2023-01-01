@@ -8,6 +8,7 @@ import {
   getMenuChildren,
   getColumn,
   editTemplateTitle,
+  deleteTemplateRow,
   changeInputValue
 } from '/@/api/demo/form';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -94,14 +95,14 @@ export const useFormStore = defineStore({
       this.templateTitle = await editTemplateTitle(params);
       createMessage.success(this.templateTitle);
       if (this.templateTitle == '修改成功') {
-        const currTemp = JSON.parse(sessionStorage.getItem('currTemp'));
+        const currTemp = JSON.parse(localStorage.getItem('currTemp'));
         getMenuChildren({ menuId: currTemp.menuId }).then((menu) => {
           const filterTemp = menu.filter((i) => i.id === currTemp.id)[0];
           currTemp.title =
             currTemp.name =
             currTemp.meta.title =
               currTemp.name.split('-')[0] + '-' + filterTemp.templateTitle;
-          sessionStorage.setItem('currTemp', JSON.stringify(Object.assign(currTemp, filterTemp)));
+          localStorage.setItem('currTemp', JSON.stringify(Object.assign(currTemp, filterTemp)));
           window.location.reload();
         });
       }
@@ -128,6 +129,9 @@ export const useFormStore = defineStore({
         i.inputs = [];
         return i;
       });
+    },
+    setDeleteTemplateRow(params) {
+      return deleteTemplateRow(params);
     },
     async uploadExcel(params) {
       const result = await uploadExcel(params);

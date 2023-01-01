@@ -18,22 +18,22 @@
           :placeholder="t('sys.login.realName')"
         />
       </FormItem>
-      <FormItem name="mobile" class="enter-x">
+      <FormItem name="phone" class="enter-x">
         <Input
           size="large"
-          v-model:value="formData.mobile"
-          :placeholder="t('sys.login.mobile')"
+          v-model:value="formData.phone"
+          :placeholder="t('sys.login.phone')"
           class="fix-auto-fill"
         />
       </FormItem>
-      <FormItem name="sms" class="enter-x">
+      <!--<FormItem name="sms" class="enter-x">
         <CountdownInput
           size="large"
           class="fix-auto-fill"
           v-model:value="formData.sms"
           :placeholder="t('sys.login.smsCode')"
         />
-      </FormItem>
+      </FormItem>-->
       <FormItem name="password" class="enter-x">
         <StrengthMeter
           size="large"
@@ -96,7 +96,7 @@
     realName: '',
     password: '',
     confirmPassword: '',
-    mobile: '',
+    phone: '',
     sms: '',
     policy: false,
   });
@@ -109,12 +109,12 @@
 
   async function handleRegister() {
     const data = await validForm();
-    const { account, mobile, password, policy, realName, sms } = data;
+    const { account, phone, password, policy, realName, sms } = data;
     formData.account = account;
     formData.realName = realName;
     formData.password = password;
     formData.confirmPassword = password;
-    formData.mobile = mobile;
+    formData.phone = phone;
     formData.sms = sms;
     formData.policy = policy;
     userStore.regUser(data);

@@ -7,7 +7,7 @@ import { PageEnum } from '/@/enums/pageEnum';
 import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import { GetUserInfoModel, LoginParams, registerModel } from '/@/api/sys/model/userModel';
-import { doLogout, getUserInfo, loginApi, regUser } from '/@/api/sys/user';
+import { doLogout, getUserInfo, loginApi, regUser, deleteUser } from '/@/api/sys/user';
 import { getFromTemplateList, getMenuChildren } from '/@/api/demo/form';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -43,7 +43,7 @@ export const useUserStore = defineStore({
     sessionTimeout: false,
     // Last fetch time
     lastUpdateTime: 0,
-    gotoDocId: 0,
+    gotoDocId: '',
     templateUpDate: 0,
     userList: [],
   }),
@@ -71,8 +71,8 @@ export const useUserStore = defineStore({
     },
   },
   actions: {
-    setGotoDocID(id: string | number) {
-      this.gotoDocId = id;
+    setGotoDocID(type: string | number) {
+      this.gotoDocId = type;
     },
     setToken(info: string | undefined) {
       this.token = info ? info : ''; // for null or undefined value
@@ -135,7 +135,7 @@ export const useUserStore = defineStore({
           permissionStore.setDynamicAddedRoute(true);
         }
         // 获得所有的表单信息
-        formStore.setInputItems({ templateId: this.gotoDocId });
+        // formStore.setInputItems({ templateId: this.gotoDocId });
         // 临时改变服务端返回的hotPath
         userInfo['homePath'] = path;
         goHome && (await router.replace(userInfo?.homePath || PageEnum.BASE_HOME));
@@ -184,6 +184,11 @@ export const useUserStore = defineStore({
       params['name'] = params.account;
       delete params['account'];
       const res = await regUser(params);
+      createMessage.success(res);
+    },
+    async deleteUser(params: object) {
+      const result = await deleteUser(params);
+      return result;
     },
     /**
      * @description: Confirm before logging out

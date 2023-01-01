@@ -8,8 +8,9 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { accountFormSchema } from './account.data';
-  import { getDeptList } from '/@/api/demo/system';
-
+  import { regUser, editUser } from '/@/api/sys/user';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountModal',
     components: { BasicModal, BasicForm },
@@ -60,9 +61,16 @@
           const values = await validate();
           setModalProps({ confirmLoading: true });
           // TODO custom api
-          console.log(values);
-          closeModal();
+          let result = '';
+          if (!unref(isUpdate)) {
+            result = await regUser(values);
+          } else {
+            values.id = rowId.value;
+            result = await editUser(values);
+          }
+          createMessage.success(result);
           emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
+          closeModal();
         } finally {
           setModalProps({ confirmLoading: false });
         }

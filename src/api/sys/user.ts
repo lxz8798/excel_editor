@@ -61,9 +61,9 @@ export function regUser(params) {
 }
 
 export function editUser(params) {
-  return defHttp.post({ url: Api.editUserInfo, params });
+  return defHttp.put({ url: Api.editUserInfo, params });
 }
 
 export function deleteUser(params) {
-  return defHttp.delete({ url: Api.deleteUser, params });
+  return defHttp.delete({ url: Api.deleteUser + params.userId });
 }

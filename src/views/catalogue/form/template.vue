@@ -1,5 +1,5 @@
 <template>
-  <PageWrapper :title="currTempDetail.name" contentFullHeight>
+  <PageWrapper :title="(currTempDetail && Object.keys(currTempDetail).length) && currTempDetail.name || ''" contentFullHeight>
     <!--<a-button type="primary" :size="size" style="margin-bottom: 20px;">上传EXCEL</a-button>-->
     <BasicUpload :maxSize="20" :maxNumber="1" style="margin-bottom: 20px;" :api="uploadApi" :accept="['.xlsx']" :uploadParams="uploadParams" @change="handleChange" />
     <CollapseContainer class="form_wrap">
@@ -23,14 +23,14 @@
             :key="key"
             :class="input.type === 'add' && 'add_icon'"
             :data-input="JSON.stringify(input)"
-            @click="clickInputItem($event, input, form, key)"
+            @click="clickInputItem($event, input, form, key, index)"
           >
             <Input
               size="large"
               v-model:value="input.value"
               :item="input"
               v-if="input.type === 'input'"
-              @change="changeInputeValue($event, input, key)"
+              @change="changeInputeValue($event, input, key, index)"
             />
             <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
           </div>
@@ -144,7 +144,7 @@
       watch(
         uplpdaNum,
         () => {
-          state.currTemp = computed(() => JSON.parse(sessionStorage.getItem('currTemp')));
+          state.currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
           fillForm(state.currTemp);
         },
         { immediate: true, deep: true },
@@ -167,7 +167,7 @@
       const getIsOpen = computed(() => status.value === 'OPEN');
       const getTagColor = computed(() => (getIsOpen.value ? 'success' : 'red'));
       const mergeForm = computed(() => [...state.basicFormHeader, ...state.dynamicFormHeader]);
-
+      // state.currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
       const getList = computed(() => {
         return [...state.recordList].reverse();
       });
@@ -180,11 +180,14 @@
         }
       }
 
-      function changeInputeValue(e, input, index) {
+      function changeInputeValue(e, input, key, index) {
         input.value = e.target.value;
+        let _columnIndex = index - 1;
+        if (index < 1) return;
         if (e.target.value !== '') {
           const params = {
-            columnIndex: index + 1,
+            columnIndex: key + 1,
+            columnType: _columnIndex,
             templateId: input.templateId,
             value: e.target.value,
           };
@@ -195,7 +198,7 @@
         }
       }
 
-      function clickInputItem(e, input, form, key) {
+      function clickInputItem(e, input, form, key, columnType) {
         if (e.target.tagName === 'DIV' && e.target.className === 'column') {
           const { createConfirm } = useMessage();
           createConfirm({
@@ -207,15 +210,33 @@
                 i.inputs.splice(key, 1);
                 return i;
               });
+              const params = {
+                // importFlag: '0',
+                templateId: state.currTemp.id,
+                columnIndex: key,
+                columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
+              };
+              formStore.setDeleteTemplateRow(params).then((res) => console.log(res))
+              formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => createMessage.success('保存成功。'));
             },
           });
         }
 
         if (e.target.tagName === 'INPUT' && e.target.value !== '') {
+          let _columnIndex = columnType - 1;
+          if (columnType <= '0' || columnType <= '1') return;
           openModal1(true);
+          if (!input.hasOwnProperty('inputs')) {
+            formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
+            fillForm(state.currTemp);
+          }
+          const importCurrColumnIndex = formStore.getTemplateEcho && formStore.getTemplateEcho.filter((i) => input.lableId === i.id)[0].inputs.filter((item) => item.importFlag === 1).findIndex((idx) => idx.id === input.id) + 1;
           const params = {
-            columnIndex: key + 1,
+            columnIndex: !input.importFlag ? key + 1 : importCurrColumnIndex,
+            columnType: _columnIndex,
+            importFlag: input.importFlag,
             templateId: form.templateId,
+            value: input.value,
           };
           formStore.setColumnDetail(input);
           formStore.setColumnList(params);
@@ -237,6 +258,7 @@
           return i;
         });
         state.basicFormHeader[0].inputs[state.no].value = state.no++;
+        formStore.saveForm(mergeForm.value.slice(1, 5)).then(() => fillForm());
       }
 
       const n = ref(1);
@@ -290,6 +312,7 @@
         state.currTempDetail = currTemp;
         if (state.currTempDetail && Object.keys(state.currTempDetail).length) {
           const _id = state.currTempDetail.id;
+          console.log(_id, '_id');
           state.uploadParams = { templateId:  state.currTempDetail.id};
           formStore.setBasicTemplate(_id);
           userStore.setGotoDocID(_id as number | string);
@@ -324,7 +347,7 @@
               const _filter = formStore.getTemplateEcho.filter((i) => i.label !== '序号');
               state.basicFormHeader = [noHandler()].concat(_filter.slice(0,4));
               state.dynamicFormHeader = _filter.slice(4, _filter.length);
-              formStore.saveForm(mergeForm.value.slice(1, 5));
+              // formStore.saveForm(mergeForm.value.slice(1, 5));
             }
           });
         }
@@ -357,15 +380,23 @@
         saveFormDatas: (inputs: any) => {
           // setFieldsValue(inputs);
           // formStore.setDefaultValues(schama);
+          // const children = toRaw(items.value).filter((i) => i.name === 'routes.demo.menu.form')[0];
+          // const item = children.children.filter((i) => i.path === key)[0];
           formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => {
-            fillForm();
+            fillForm(state.currTemp);
             createMessage.success('保存成功!');
           });
         },
         handleSubmit: async (values: any) => {
+          if (!state.currTemp && !Object.keys(state.currTemp).length) {
+            createMessage.info('您正在空白模板进行手动输入的操作，可能需要重新进入一下页面才能生成表格!');
+            return;
+          };
           const a = document.createElement('a');
           a.target = '_blank';
-          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + state.currTempDetail.id;
+          // apiUrl +
+          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + state.currTemp.id;
+          console.log(a.href);
           document.body.appendChild(a);
           a.click(); //触发下载
           document.body.removeChild(a);
@@ -379,7 +410,7 @@
         clickInputItem,
         uploadApi,
         handleChange: (list: string[]) => {
-          createMessage.info(`已上传文件${JSON.stringify(list)}`);
+          createMessage.info(`已上传文件`);
         },
         addInputRow,
         editTemplateTitle,

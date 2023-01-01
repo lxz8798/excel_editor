@@ -43,7 +43,7 @@
       isExtra: Boolean,
     },
     setup(props) {
-      const currTemp = computed(() => JSON.parse(sessionStorage.getItem('currTemp')));
+      const currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
       const { prefixCls } = useDesign('multiple-tabs-content');
       const { t } = useI18n();
 
