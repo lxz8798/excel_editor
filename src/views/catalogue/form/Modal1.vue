@@ -17,7 +17,7 @@
       <ul class="row_list" v-if="datas.length">
         <li :key="index" v-for="(input, index) in datas" @mouseenter="showIocn(input)" @mouseleave="leaveIcon(input)">
           [no.{{index}}]-<input style="color: #4dc6cb; font-weight: bold; font-size: 16px;" v-model="input.value" @change="changeInfoInputVlaue($event, input, index)">
-          <CloseCircleOutlined v-show="input.showIconFlag" @click="deleteInputItem(input)" />
+          <CloseCircleOutlined v-show="input.showIconFlag" @click="deleteInputItem(input, index)" />
         </li>
         <li class="add_icon" @click="addInputRow"><PlusSquareOutlined style="cursor: pointer" /></li>
       </ul>
@@ -85,10 +85,10 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
       }
 
       function okHandler() {
-        const filterList = state.datas.filter((i) => i.type !== 'add');
-        if (filterList.length) {
-          saveAddInputs(JSON.parse(JSON.stringify(filterList))).then((res) => createMessage.success(res));
-        }
+        // const filterList = state.datas.filter((i) => i.type !== 'add');
+        // if (filterList.length) {
+        //   saveAddInputs(JSON.parse(JSON.stringify(filterList))).then((res) => createMessage.success(res));
+        // }
         setModalProps({ visible: false });
       }
 
@@ -98,14 +98,17 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
       function leaveIcon(input) {
         input.showIconFlag = false;
       }
-      function deleteInputItem(input) {
+      function deleteInputItem(input, index) {
         createConfirm({
           iconType: 'warning',
-          title: () => h('span', '删除有风险!'),
-          content: () => h('span', '是否确认删除？'),
+          title: () => h('span', '为了同步，只能修改成占位符!'),
+          content: () => h('span', '是否确认修改？'),
           onOk: () => {
-            state.datas = state.datas.filter((i) => i.id !== input.id);
-            deleteInputItemApi({ infoId: input.id }).then((res) => createMessage.success(res));
+            input.value = '0';
+            input.headFlag = !index ? true : false;
+            changeInfoInputVlaueApi(input).then((res) => createMessage.success(res));
+            // state.datas = state.datas.filter((i) => i.id !== input.id);
+            // deleteInputItemApi({ infoId: input.id }).then((res) => createMessage.success(res));
           },
         });
       }

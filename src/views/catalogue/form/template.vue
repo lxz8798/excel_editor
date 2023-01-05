@@ -216,7 +216,7 @@
                 columnIndex: key,
                 columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
               };
-              formStore.setDeleteTemplateRow(params).then((res) => console.log(res))
+              formStore.setDeleteTemplateRow(params);
               formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => createMessage.success('保存成功。'));
             },
           });
@@ -230,16 +230,19 @@
             formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
             fillForm(state.currTemp);
           }
-          const importCurrColumnIndex = formStore.getTemplateEcho && formStore.getTemplateEcho.filter((i) => input.lableId === i.id)[0].inputs.filter((item) => item.importFlag === 1).findIndex((idx) => idx.id === input.id) + 1;
-          const params = {
-            columnIndex: !input.importFlag ? key + 1 : importCurrColumnIndex,
-            columnType: _columnIndex,
-            importFlag: input.importFlag,
-            templateId: form.templateId,
-            value: input.value,
-          };
-          formStore.setColumnDetail(input);
-          formStore.setColumnList(params);
+
+          if (formStore.getTemplateEcho) {
+            const importCurrColumnIndex = formStore.getTemplateEcho[columnType - 1].inputs.filter((item) => item.importFlag === 1).findIndex((idx) => idx.id === input.id) + 1;
+            const params = {
+              columnIndex: !input.importFlag ? key + 1 : importCurrColumnIndex,
+              columnType: _columnIndex,
+              importFlag: input.importFlag,
+              templateId: form.templateId,
+              value: input.value,
+            };
+            formStore.setColumnDetail(input);
+            formStore.setColumnList(params);
+          }
         }
 
         if (input.type !== 'add') return;
@@ -312,8 +315,7 @@
         state.currTempDetail = currTemp;
         if (state.currTempDetail && Object.keys(state.currTempDetail).length) {
           const _id = state.currTempDetail.id;
-          console.log(_id, '_id');
-          state.uploadParams = { templateId:  state.currTempDetail.id};
+          state.uploadParams = { templateId: state.currTempDetail.id };
           formStore.setBasicTemplate(_id);
           userStore.setGotoDocID(_id as number | string);
           formStore.setTemplateEcho(_id).then(() => {
