@@ -5,12 +5,11 @@ import {
   getBasicTemplate,
   templateEcho,
   uploadExcel,
-  getMenuChildren,
   getColumn,
   editTemplateTitle,
   deleteTemplateRow,
-  changeInputValue
 } from '/@/api/demo/form';
+import { getMenuChildren } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {

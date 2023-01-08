@@ -53,11 +53,11 @@ export const teams: ListItem[] = [
 export const details: ListItem[] = [
   {
     icon: 'ic:outline-contacts',
-    title: '交互专家',
+    title: '智能封堵攻关',
   },
   {
     icon: 'grommet-icons:cluster',
-    title: '某某某事业群',
+    title: '封堵学',
   },
   {
     icon: 'bx:bx-home-circle',

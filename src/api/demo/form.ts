@@ -2,7 +2,6 @@ import { defHttp } from '/@/utils/http/axios';
 
 enum Api {
   GET_FROM_LIST = '/sysMenuTemplate/menus', // 获得表单列表
-  GET_MENU_CHILDREN = '/sysMenuTemplate/menuTemplates',
   GET_TEMPLATE_DETAIL = '/dymcFrom/all', // 获得所有的表单项
   GET_TEMPLATE_ECHO = '/template/reportInfo', // 获得所有的表单项
   GET_TEMPLAYTE_COLUMN = '/template/reportInfoColumn',
@@ -20,7 +19,6 @@ enum Api {
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
-export const getMenuChildren = (params?) => defHttp.get({ url: Api.GET_MENU_CHILDREN, params });
 export const getBasicTemplate = (params?) => defHttp.get({ url: Api.BASIC_TEMPLATE, params });
 export const getTempItems = (params?) => defHttp.get({ url: Api.GET_TEMPLATE_DETAIL, params });
 export const templateEcho = (params?) => defHttp.get({ url: Api.GET_TEMPLATE_ECHO, params });

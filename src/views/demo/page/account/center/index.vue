@@ -7,7 +7,7 @@
             <div :class="`${prefixCls}-top__avatar`">
               <img width="70" :src="avatar" />
               <span>{{ realName }}</span>
-              <div>海纳百川，有容乃大</div>
+              <div>{{ introduction }}</div>
             </div>
           </a-col>
           <a-col :span="16">
@@ -24,13 +24,21 @@
       </a-col>
       <a-col :span="7" :class="`${prefixCls}-col`">
         <CollapseContainer title="标签" :canExpan="false">
-          <template v-for="tag in tags" :key="tag">
-            <Tag class="mb-2">
-              {{ tag }}
+          <template v-for="tag in tagList" :key="tag">
+            <a-input v-if="tag.label == 'add'" v-model:value="addTagValue" style="margin-top: 10px;">
+              <template #suffix>
+                <Icon :icon="'icon-park-solid:correct'" @click="correctAddTagHandler" class="corrent_icon"></Icon>
+              </template>
+            </a-input>
+            <Tag class="mb-2" @mouseenter="tag.isShow = true" @mouseleave="tag.isShow = false" v-else>
+              <div>
+                <span>{{ tag.label }}</span>
+                <Icon v-show="tag.isShow" :icon="'material-symbols:delete-outline-rounded'" @click="deleteTagHandler(tag)"/>
+              </div>
             </Tag>
           </template>
           <template #action>
-            <Icon icon="ant-design:plus-square-filled" style="cursor: pointer" />
+            <Icon icon="ant-design:plus-square-filled" style="cursor: pointer" @click="addUserTagHandler" />
           </template>
         </CollapseContainer>
       </a-col>
@@ -57,7 +65,8 @@
 
 <script lang="ts">
   import { Tag, Tabs, Row, Col } from 'ant-design-vue';
-  import { defineComponent, computed } from 'vue';
+  import { BasicModal, useModalInner } from '/@/components/Modal';
+  import { defineComponent, computed, onMounted, ref, h } from 'vue';
   import { CollapseContainer } from '/@/components/Container/index';
   import Icon from '/@/components/Icon/index';
   import Article from './Article.vue';
@@ -67,6 +76,7 @@
   import headerImg from '/@/assets/images/header.jpg';
   import { tags, teams, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
     components: {
@@ -83,22 +93,93 @@
     },
     setup() {
       const userStore = useUserStore();
+      const { createConfirm, createMessage } = useMessage();
+
+      const showDeleteIcon = ref(false);
+      const addTagValue = ref('');
+
       const avatar = computed(() => userStore.getUserInfo.avatar || headerImg);
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
+      const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
+      const tagList = computed(() => userStore.getUserTagsList || []);
+      userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+
+      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
+      // 添加TAG
+      function addUserTagHandler() {
+        if (!tagList.value.some((i) => i.type === 'add')) {
+          tagList.value.push({ label: 'add', color: 'blue' });
+        }
+      }
+      // 确认添加
+      function correctAddTagHandler() {
+        if (!tagList.value.some((i) => i.type === 'add')) {
+          const params = {
+            color: '#' + Math.random().toString(16).slice(-6),
+            label: addTagValue.value,
+            userId: userStore.userInfo.userId,
+          };
+          userStore.setUserTag(params).then((res) => createMessage.success(res));
+          userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+          tagList.value.pop();
+        }
+      }
+      // 删除TAG
+      function deleteTagHandler(tag) {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '删除有风险!'),
+          content: () => h('span', '是否确认删除？'),
+          onOk: async () => {
+            userStore.deleteUserTag({ id: tag.id }).then((res) => createMessage.success(res));
+            userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+          },
+        });
+      }
       return {
         prefixCls: 'account-center',
         avatar,
         realName,
+        introduction,
         tags,
+        tagList,
         teams,
         details,
         achieveList,
+        showDeleteIcon,
+        addTagValue,
+        addUserTagHandler,
+        correctAddTagHandler,
+        deleteTagHandler,
+        registerModal,
       };
     },
   });
 </script>
 <style lang="less" scoped>
   .account-center {
+    .corrent_icon {
+      cursor: pointer;
+      transition: .3s;
+      &:hover {
+        color: #59d12d;
+      }
+    }
+    .mb-2 {
+      cursor: pointer;
+      > div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .app-iconify {
+          transition: 0.3s;
+          &:hover {
+            color: red;
+          }
+        }
+      }
+    }
     &-col:not(:last-child) {
       padding: 0 10px;
 

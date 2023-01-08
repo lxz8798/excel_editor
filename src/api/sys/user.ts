@@ -12,6 +12,9 @@ enum Api {
   register = '/user/add',
   editUserInfo = '/user/editPwd',
   deleteUser = '/user/del/',
+  GET_USER_TAG = '/sysUserLabel/list',
+  ADD_USER_TAG = '/sysUserLabel/add',
+  DELETE_USER_TAG = '/sysUserLabel/del',
 }
 
 /**
@@ -66,4 +69,16 @@ export function editUser(params) {
 
 export function deleteUser(params) {
   return defHttp.delete({ url: Api.deleteUser + params.userId });
+}
+
+export function getUserTagList(params) {
+  return defHttp.get({ url: Api.GET_USER_TAG, params });
+}
+
+export function addUserTag(params) {
+  return defHttp.post({ url: Api.ADD_USER_TAG, params });
+}
+
+export function deleteUserTag(params) {
+  return defHttp.delete({ url: Api.DELETE_USER_TAG, params });
 }

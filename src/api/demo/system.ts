@@ -17,7 +17,8 @@ enum Api {
   IsAccountExist = '/system/accountExist',
   DeptList = '/system/getDeptList',
   setRoleStatus = '/system/setRoleStatus',
-  MenuList = '/system/getMenuList',
+  // 原始的MOCK 链接 /system/getMenuList
+  MenuList = '/sysMenu/tree',
   RolePageList = '/system/getRoleListByPage',
   GetAllRoleList = '/system/getAllRoleList',
 }

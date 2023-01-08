@@ -106,8 +106,8 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       fieldNames: {
         label: 'menuName',
-        key: 'id',
-        value: 'id',
+        key: 'menuId',
+        value: 'menuId',
       },
       getPopupContainer: () => document.body,
     },
@@ -128,7 +128,7 @@ export const formSchema: FormSchema[] = [
   },
 
   {
-    field: 'routePath',
+    field: 'path',
     label: '路由地址',
     component: 'Input',
     required: true,

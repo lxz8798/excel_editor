@@ -8,8 +8,8 @@ const userInfo = {
   email: 'test@gmail.com',
   signature: '海纳百川，有容乃大',
   introduction: '微笑着，努力着，欣赏着',
-  title: '交互专家',
-  group: '某某某事业群－某某平台部－某某技术部－UED',
+  title: '智能封堵攻关',
+  group: '封堵学',
   tags: [
     {
       key: '0',

@@ -8,7 +8,6 @@ import { isFunction } from '/@/utils/is';
 import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum } from '/@/enums/httpEnum';
 import { RequestEnum } from '/@/enums/httpEnum';
-import { PageEnum } from '/@/enums/pageEnum';
 import { useMessage } from "/@/hooks/web/useMessage";
 
 export * from './axiosTransform';
@@ -110,7 +109,7 @@ export class VAxios {
         switch (res.data.code) {
           case 1:
             createMessage.error('服务器状态异常!');
-          break;
+            break;
           // 无效令牌，登录失效
           case 401:
             localStorage.clear();
@@ -120,7 +119,7 @@ export class VAxios {
             timer = setTimeout(() => {
               window.location.href = `http://${window.location.href.split('/')[2]}/#/login`;
             }, 800);
-          break;
+            break;
         }
       }
       return res;

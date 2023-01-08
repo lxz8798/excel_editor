@@ -31,10 +31,10 @@
   import { useMessage } from '/@/hooks/web/useMessage';
 
   import headerImg from '/@/assets/images/header.jpg';
-  import { accountInfoApi } from '/@/api/demo/account';
   import { baseSetschemas } from './data';
   import { useUserStore } from '/@/store/modules/user';
   import { uploadApi } from '/@/api/sys/upload';
+  import { editUser } from '/@/api/sys/user';
 
   export default defineComponent({
     components: {
@@ -49,15 +49,10 @@
       const { createMessage } = useMessage();
       const userStore = useUserStore();
 
-      const [register, { setFieldsValue }] = useForm({
+      const [register, { setFieldsValue, getFieldsValue }] = useForm({
         labelWidth: 120,
         schemas: baseSetschemas,
         showActionButtonGroup: false,
-      });
-
-      onMounted(async () => {
-        // const data = await accountInfoApi();
-        // setFieldsValue(data);
       });
 
       const avatar = computed(() => {
@@ -69,7 +64,6 @@
         const userinfo = userStore.getUserInfo;
         userinfo.avatar = src;
         userStore.setUserInfo(userinfo);
-        console.log('data', data);
       }
 
       return {
@@ -78,7 +72,11 @@
         uploadApi: uploadApi as any,
         updateAvatar,
         handleSubmit: () => {
-          createMessage.success('更新成功！');
+          const params = getFieldsValue();
+          editUser(Object.assign(params, { id: userStore.getUserInfo.userId })).then((res) => {
+            console.log(res, 'res');
+            createMessage.success(res);
+          });
         },
       };
     },

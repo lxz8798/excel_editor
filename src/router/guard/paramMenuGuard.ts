@@ -3,7 +3,6 @@ import { configureDynamicParamsMenu } from '../helper/menuHelper';
 import { Menu } from '../types';
 import { PermissionModeEnum } from '/@/enums/appEnum';
 import { useAppStoreWithOut } from '/@/store/modules/app';
-import { getMenuChildren } from '/@/api/demo/form';
 import { usePermissionStoreWithOut } from '/@/store/modules/permission';
 
 export function createParamMenuGuard(router: Router) {

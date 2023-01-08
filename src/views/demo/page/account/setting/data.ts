@@ -21,16 +21,16 @@ export const settingList = [
     name: '安全设置',
     component: 'SecureSetting',
   },
-  {
-    key: '3',
-    name: '账号绑定',
-    component: 'AccountBind',
-  },
-  {
-    key: '4',
-    name: '新消息通知',
-    component: 'MsgNotify',
-  },
+  // {
+  //   key: '3',
+  //   name: '账号绑定',
+  //   component: 'AccountBind',
+  // },
+  // {
+  //   key: '4',
+  //   name: '新消息通知',
+  //   component: 'MsgNotify',
+  // },
 ];
 
 // 基础设置 form
@@ -42,9 +42,9 @@ export const baseSetschemas: FormSchema[] = [
     colProps: { span: 18 },
   },
   {
-    field: 'name',
+    field: 'realName',
     component: 'Input',
-    label: '昵称',
+    label: '真实姓名',
     colProps: { span: 18 },
   },
   {
@@ -59,12 +59,12 @@ export const baseSetschemas: FormSchema[] = [
     label: '联系电话',
     colProps: { span: 18 },
   },
-  {
-    field: 'address',
-    component: 'Input',
-    label: '所在地区',
-    colProps: { span: 18 },
-  },
+  // {
+  //   field: 'address',
+  //   component: 'Input',
+  //   label: '所在地区',
+  //   colProps: { span: 18 },
+  // },
 ];
 
 // 安全设置 list

@@ -1,5 +1,8 @@
 import type { RouteMeta } from 'vue-router';
 export interface RouteItem {
+  title: string;
+  orderNo: string | number;
+  menuId: string | number;
   path: string;
   component: any;
   meta: RouteMeta;

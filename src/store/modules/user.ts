@@ -7,8 +7,7 @@ import { PageEnum } from '/@/enums/pageEnum';
 import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import { GetUserInfoModel, LoginParams, registerModel } from '/@/api/sys/model/userModel';
-import { doLogout, getUserInfo, loginApi, regUser, deleteUser } from '/@/api/sys/user';
-import { getFromTemplateList, getMenuChildren } from '/@/api/demo/form';
+import { getUserInfo, loginApi, regUser, deleteUser, getUserTagList, addUserTag, deleteUserTag } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { router } from '/@/router';
@@ -28,6 +27,7 @@ interface UserState {
   gotoDocId: string | number;
   templateUpDate: number;
   userList: [];
+  userTagsList: [];
 }
 
 export const useUserStore = defineStore({
@@ -46,6 +46,7 @@ export const useUserStore = defineStore({
     gotoDocId: '',
     templateUpDate: 0,
     userList: [],
+    userTagsList: [],
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -68,6 +69,9 @@ export const useUserStore = defineStore({
     },
     getTemplateUpdate(): number {
       return this.templateUpDate;
+    },
+    getUserTagsList(): [] {
+      return this.userTagsList;
     },
   },
   actions: {
@@ -146,12 +150,6 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null;
       // const userStore = useUserStore();
       const userInfo = await getUserInfo();
-      // 获得工程菜单列表暂时隐藏
-      // const tempList = await getFromTemplateList();
-      // const formStore = useFormStore();
-      // if (formStore) {
-      //   formStore.setTempList(tempList);
-      // }
       const { roles = [] } = userInfo;
       if (isArray(roles)) {
         const roleList = roles.map((item) => item.value) as RoleEnum[];
@@ -187,8 +185,21 @@ export const useUserStore = defineStore({
       createMessage.success(res);
     },
     async deleteUser(params: object) {
-      const result = await deleteUser(params);
-      return result;
+      const res = await deleteUser(params);
+      return res;
+    },
+    async setUserTagsList(params: object) {
+      this.userTagsList = await getUserTagList(params);
+      this.userTagsList.map((i) => {
+        i.isShow = false;
+        return i;
+      });
+    },
+    async setUserTag(params: object) {
+      return await addUserTag(params);
+    },
+    async deleteUserTag(params: object) {
+      return await deleteUserTag(params);
     },
     /**
      * @description: Confirm before logging out

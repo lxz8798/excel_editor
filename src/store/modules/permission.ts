@@ -1,12 +1,11 @@
 import type { AppRouteRecordRaw, Menu } from '/@/router/types';
+import { router } from '/@/router';
+import { getParentLayout, LAYOUT } from '/@/router/constant';
 
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
-import { useI18n } from '/@/hooks/web/useI18n';
+import { t, useI18n } from "/@/hooks/web/useI18n";
 import { useUserStore } from './user';
-import { useFormStore } from './form';
-import { router } from '/@/router';
-import { getMenuChildren } from '/@/api/demo/form';
 
 import { useAppStoreWithOut } from './app';
 import { toRaw } from 'vue';
@@ -22,7 +21,7 @@ import { ERROR_LOG_ROUTE, PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
 import { filter } from '/@/utils/helper/treeHelper';
 
-import { getMenuList } from '/@/api/sys/menu';
+import { getMenuList, getMenuChildren } from '/@/api/sys/menu';
 import { getPermCode } from '/@/api/sys/user';
 
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -183,6 +182,23 @@ export const usePermissionStore = defineStore({
 
         // 路由映射， 默认进入该case
         case PermissionModeEnum.ROUTE_MAPPING:
+          // getMenuList().then((menu) => {
+          //   menu.forEach((m) => {
+          //     const _obj = {
+          //       path: m.path,
+          //       name: m.name,
+          //       menuId: m.menuId,
+          //       orderNo: m.orderNo,
+          //       component: 'LAYOUT',
+          //       meta: {
+          //         id: m.menuId,
+          //         title: m.title,
+          //       },
+          //       children: [],
+          //     };
+          //     router.addRoute(_obj);
+          //   });
+          // });
           // 对非一级路由进行过滤
           routes = filter(asyncRoutes, routeFilter);
           // 对一级路由再次根据角色权限过滤
@@ -236,28 +252,113 @@ export const usePermissionStore = defineStore({
         //  如果确定不需要做后台动态权限，请在下方注释整个判断
         case PermissionModeEnum.BACK:
           const { createMessage } = useMessage();
-
+          const accountRoutes = {
+            path: '/account',
+            name: 'AccountPage',
+            component: 'LAYOUT',
+            redirect: '/account/center',
+            meta: {
+              orderNo: 0,
+              icon: 'ion:aperture-outline',
+              title: t('routes.demo.page.account'),
+            },
+            children: [
+              {
+                path: 'center',
+                name: 'AccountCenterPage',
+                component: '/demo/page/account/center/index.vue',
+                meta: {
+                  title: t('routes.demo.page.accountCenter'),
+                },
+              },
+              {
+                path: 'setting',
+                name: 'AccountSettingPage',
+                component: '/demo/page/account/setting/index.vue',
+                meta: {
+                  title: t('routes.demo.page.accountSetting'),
+                },
+              },
+            ],
+          };
+          const systemRoutes = {
+            path: '/system',
+            name: 'System',
+            component: 'LAYOUT',
+            meta: {
+              orderNo: 99,
+              icon: 'ion:settings-outline',
+              title: t('routes.demo.system.moduleName'),
+            },
+            children: [
+              {
+                path: 'account',
+                name: 'AccountManagement',
+                meta: {
+                  title: t('routes.demo.system.account'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/account/index.vue',
+              },
+              {
+                path: 'account_detail/:id',
+                name: 'AccountDetail',
+                meta: {
+                  hideMenu: true,
+                  title: t('routes.demo.system.account_detail'),
+                  ignoreKeepAlive: true,
+                  showMenu: false,
+                  currentActiveMenu: '/system/account',
+                },
+                component: '/demo/system/account/AccountDetail.vue',
+              },
+              {
+                path: 'menu',
+                name: 'MenuManagement',
+                meta: {
+                  title: t('routes.demo.system.menu'),
+                  ignoreKeepAlive: true,
+                },
+                component: '/demo/system/menu/index.vue',
+              },
+              // {
+              //   path: 'changePassword',
+              //   name: 'ChangePassword',
+              //   meta: {
+              //     title: t('routes.demo.system.password'),
+              //     ignoreKeepAlive: true,
+              //   },
+              //   component: '/demo/system/password/index.vue',
+              // },
+            ],
+          };
           createMessage.loading({
             content: t('sys.app.menuLoading'),
             duration: 1,
           });
-
           // !Simulate to obtain permission codes from the background,
           // 模拟从后台获取权限码，
           // this function may only need to be executed once, and the actual project can be put at the right time by itself
           // 这个功能可能只需要执行一次，实际项目可以自己放在合适的时间
           let routeList: AppRouteRecordRaw[] = [];
           try {
-            await this.changePermissionCode();
+            // await this.changePermissionCode();
             routeList = (await getMenuList()) as AppRouteRecordRaw[];
+            routeList.map((m) => {
+              const icons = {
+              };
+              m.meta = {
+                icon: m.icon,
+                title: m.menuName,
+              };
+              return m;
+            });
           } catch (error) {
             console.error(error);
           }
-
           // Dynamically introduce components
           // 动态引入组件
-          routeList = transformObjToRoute(routeList);
-
+          routeList = transformObjToRoute([accountRoutes, ...routeList, systemRoutes]);
           //  Background routing to menu structure
           //  后台路由到菜单结构
           const backMenuList = transformRouteToMenu(routeList);
