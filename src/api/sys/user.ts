@@ -80,5 +80,5 @@ export function addUserTag(params) {
 }
 
 export function deleteUserTag(params) {
-  return defHttp.delete({ url: Api.DELETE_USER_TAG, params });
+  return defHttp.delete({ url: `${Api.DELETE_USER_TAG}?id=${params.id}` });
 }

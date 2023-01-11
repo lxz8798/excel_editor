@@ -4,7 +4,7 @@ import { getParentLayout, LAYOUT } from '/@/router/constant';
 
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
-import { t, useI18n } from "/@/hooks/web/useI18n";
+import { t, useI18n } from '/@/hooks/web/useI18n';
 import { useUserStore } from './user';
 
 import { useAppStoreWithOut } from './app';
@@ -42,6 +42,7 @@ interface PermissionState {
   backMenuList: Menu[];
   // 菜单列表
   frontMenuList: Menu[];
+  addMenuShowCategory: boolean;
 }
 
 export const usePermissionStore = defineStore({
@@ -61,6 +62,7 @@ export const usePermissionStore = defineStore({
     // menu List
     // 菜单列表
     frontMenuList: [],
+    addMenuShowCategory: false,
   }),
   getters: {
     getPermCodeList(): string[] | number[] {
@@ -77,6 +79,9 @@ export const usePermissionStore = defineStore({
     },
     getIsDynamicAddedRoute(): boolean {
       return this.isDynamicAddedRoute;
+    },
+    getAddMenuShowCategory(): boolean {
+      return this.addMenuShowCategory;
     },
   },
   actions: {
@@ -105,6 +110,9 @@ export const usePermissionStore = defineStore({
       this.permCodeList = [];
       this.backMenuList = [];
       this.lastBuildMenuTime = 0;
+    },
+    setAddMenuShowCategory(flag) {
+      this.addMenuShowCategory = flag;
     },
     async changePermissionCode() {
       const codeList = await getPermCode();
@@ -344,21 +352,35 @@ export const usePermissionStore = defineStore({
           try {
             // await this.changePermissionCode();
             routeList = (await getMenuList()) as AppRouteRecordRaw[];
-            routeList.map((m) => {
-              const icons = {
-              };
-              m.meta = {
-                icon: m.icon,
-                title: m.menuName,
-              };
-              return m;
-            });
+            // routeList.forEach((menu) => {
+            //   if (menu.children) {
+            //     const sourceMenu = menu.children[2];
+            //     if (sourceMenu && sourceMenu.menuName.includes('源数据')) {
+            //       getMenuChildren({ menuId: sourceMenu.menuId }).then((res) => {
+            //         sourceMenu.children = res.map((c) => {
+            //           let _comp = {
+            //             path: 'source',
+            //             name: sourceMenu.menuName + '-' + c.templateTitle,
+            //             component: '/components/Form/template/template.vue',
+            //             meta: {
+            //               id: c.menuId,
+            //               title: c.templateTitle,
+            //             },
+            //           };
+            //           return _comp;
+            //         });
+            //         routeList = transformObjToRoute(sourceMenu.children);
+            //       });
+            //     }
+            //   }
+            // });
           } catch (error) {
             console.error(error);
           }
           // Dynamically introduce components
           // 动态引入组件
           routeList = transformObjToRoute([accountRoutes, ...routeList, systemRoutes]);
+          console.log(routeList, 'routeList');
           //  Background routing to menu structure
           //  后台路由到菜单结构
           const backMenuList = transformRouteToMenu(routeList);

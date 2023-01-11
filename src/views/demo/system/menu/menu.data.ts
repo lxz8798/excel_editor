@@ -1,9 +1,10 @@
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-import { h } from 'vue';
-import { Tag } from 'ant-design-vue';
+import { h, ref, reactive } from 'vue';
+import { Tag, Input, Select, SelectOption, FormItemRest, Checkbox } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
-
+import { getCategory } from '/@/api/sys/menu';
+import { usePermissionStore } from '/@/store/modules/permission';
 export const columns: BasicColumn[] = [
   {
     title: '菜单名称',
@@ -55,7 +56,7 @@ export const columns: BasicColumn[] = [
 const isDir = (type: string) => type === '0';
 const isMenu = (type: string) => type === '1';
 const isButton = (type: string) => type === '2';
-
+const permissionStore = usePermissionStore();
 export const searchFormSchema: FormSchema[] = [
   {
     field: 'menuName',
@@ -77,6 +78,10 @@ export const searchFormSchema: FormSchema[] = [
   },
 ];
 
+const isShowCategory = ref(false);
+const state = reactive({
+  categoryOptions: [],
+});
 export const formSchema: FormSchema[] = [
   {
     field: 'type',
@@ -96,23 +101,52 @@ export const formSchema: FormSchema[] = [
     field: 'menuName',
     label: '菜单名称',
     component: 'Input',
-    required: true,
+    rules: [{ required: true }],
+    render: ({ model, field }) => {
+      return h(FormItemRest, {}, h('div', { class: 'menuNameBox' }, [
+          h(Select, {
+              style: isShowCategory.value ? 'display: block;' : 'display: none;',
+              placeholder: '请选择分类',
+            },
+            state.categoryOptions.map((i) => h(SelectOption, { label: i.menuName, value: i.menuName }))),
+          h(Input, {
+            placeholder: '请输入名称',
+            value: model[field],
+            onChange: (e) => {
+              model[field] = e.target.value;
+            },
+          }),
+        ]),
+      );
+    },
   },
-
   {
     field: 'parentMenu',
     label: '上级菜单',
     component: 'TreeSelect',
+    suffix: (recoder) =>
+      h(FormItemRest, {}, [
+        h(Checkbox, {
+          onChange: (e) => {
+            isShowCategory.value = e.target.checked;
+            permissionStore.setAddMenuShowCategory(e.target.checked);
+          },
+        }),
+      ]),
     componentProps: {
       fieldNames: {
-        label: 'menuName',
-        key: 'menuId',
+        label: 'name',
         value: 'menuId',
+        key: 'menuId',
+      },
+      onChange: (id) => {
+        getCategory({ menuId: id }).then((res) => {
+          state.categoryOptions = res;
+        });
       },
       getPopupContainer: () => document.body,
     },
   },
-
   {
     field: 'orderNo',
     label: '排序',

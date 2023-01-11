@@ -20,3 +20,7 @@ export function uploadApi(
     params,
   );
 }
+
+export function uploadAvatar() {
+
+}

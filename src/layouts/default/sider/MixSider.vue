@@ -127,7 +127,7 @@
       const userStore = useUserStore();
       const formStore = useFormStore();
       // 使用路由
-      const route = useRouter();
+      const router = useRouter();
       const { prefixCls } = useDesign('layout-mix-sider');
       const go = useGo();
       const { t } = useI18n();
@@ -258,6 +258,7 @@
           return;
         }
         childrenMenus.value = children;
+        console.log(router.currentRoute);
       }
 
       // Set the currently active menu and submenu

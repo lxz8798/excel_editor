@@ -119,9 +119,11 @@
             label: addTagValue.value,
             userId: userStore.userInfo.userId,
           };
-          userStore.setUserTag(params).then((res) => createMessage.success(res));
-          userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
-          tagList.value.pop();
+          userStore.setUserTag(params).then((res) => {
+            userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+            createMessage.success(res);
+            tagList.value.pop();
+          });
         }
       }
       // 删除TAG
@@ -131,8 +133,9 @@
           title: () => h('span', '删除有风险!'),
           content: () => h('span', '是否确认删除？'),
           onOk: async () => {
-            userStore.deleteUserTag({ id: tag.id }).then((res) => createMessage.success(res));
-            userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+            userStore.deleteUserTag({ id: tag.id }).then((res) => {userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+              createMessage.success(res);
+            });
           },
         });
       }

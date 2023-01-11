@@ -134,10 +134,10 @@
       }
 
       async function handleSelect(key: string) {
-        if (key.includes('technology') || key.includes('category')) {
-          createMessage.info('功能正在开发中，请先使用表单功能!');
-          return;
-        };
+        // if (key.includes('technology') || key.includes('category')) {
+        //   createMessage.info('功能正在开发中，请先使用表单功能!');
+        //   return;
+        // };
         if (isUrl(key)) {
           openWindow(key);
           return;

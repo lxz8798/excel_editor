@@ -23,7 +23,7 @@
 </template>
 <script lang="ts">
   import { Button, Row, Col } from 'ant-design-vue';
-  import { computed, defineComponent, onMounted } from 'vue';
+  import { computed, defineComponent, onMounted, toRaw } from "vue";
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
   import { CropperAvatar } from '/@/components/Cropper';
@@ -74,8 +74,11 @@
         handleSubmit: () => {
           const params = getFieldsValue();
           editUser(Object.assign(params, { id: userStore.getUserInfo.userId })).then((res) => {
-            console.log(res, 'res');
-            createMessage.success(res);
+            const _userInfo = toRaw(userStore.getUserInfo);
+            _userInfo['token'] = res['token'];
+            userStore.setToken(res['token']);
+            userStore.setUserInfo(_userInfo);
+            createMessage.success('编辑成功!');
           });
         },
       };
