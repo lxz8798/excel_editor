@@ -174,7 +174,7 @@
             menuState.currTemp = menus.filter((i) => i.path === currentRoute.value.path)[0];
             localStorage.setItem('currTemp', JSON.stringify(menuState.currTemp));
             formStore.setCurrTemp(menuState.currTemp);
-          }, 100);
+          }, 300);
         });
         // if (menuState.currTemp) {
         //   const item = menu.children.filter((i) => i.path === key)[0];
