@@ -352,28 +352,6 @@ export const usePermissionStore = defineStore({
           try {
             // await this.changePermissionCode();
             routeList = (await getMenuList()) as AppRouteRecordRaw[];
-            // routeList.forEach((menu) => {
-            //   if (menu.children) {
-            //     const sourceMenu = menu.children[2];
-            //     if (sourceMenu && sourceMenu.menuName.includes('源数据')) {
-            //       getMenuChildren({ menuId: sourceMenu.menuId }).then((res) => {
-            //         sourceMenu.children = res.map((c) => {
-            //           let _comp = {
-            //             path: 'source',
-            //             name: sourceMenu.menuName + '-' + c.templateTitle,
-            //             component: '/components/Form/template/template.vue',
-            //             meta: {
-            //               id: c.menuId,
-            //               title: c.templateTitle,
-            //             },
-            //           };
-            //           return _comp;
-            //         });
-            //         routeList = transformObjToRoute(sourceMenu.children);
-            //       });
-            //     }
-            //   }
-            // });
           } catch (error) {
             console.error(error);
           }

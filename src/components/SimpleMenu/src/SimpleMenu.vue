@@ -144,14 +144,6 @@
         setOpenKeys(path);
       }
 
-      function flatten(tree = [], nodes = []) {
-        for (let item of tree) {
-          nodes.push(item);
-          item.children && flatten(item.children, nodes);
-        }
-        return Promise.resolve(nodes);
-      }
-
       async function handleSelect(key: string) {
         // if (key.includes('technology') || key.includes('category')) {
         //   createMessage.info('功能正在开发中，请先使用表单功能!');
@@ -166,21 +158,6 @@
           const flag = await beforeClickFn(key);
           if (!flag) return;
         }
-        // const menu = flatten(toRaw(items.value));
-        flatten(toRaw(items.value)).then((menus) => {
-          let timer = null;
-          if (timer) clearTimeout(timer);
-          timer = setTimeout(() => {
-            menuState.currTemp = menus.filter((i) => i.path === currentRoute.value.path)[0];
-            localStorage.setItem('currTemp', JSON.stringify(menuState.currTemp));
-            formStore.setCurrTemp(menuState.currTemp);
-          }, 300);
-        });
-        // if (menuState.currTemp) {
-        //   const item = menu.children.filter((i) => i.path === key)[0];
-        //   localStorage.setItem('currTemp', JSON.stringify(item));
-        //   formStore.setCurrTemp(item);
-        // }
         emit('menuClick', key);
         isClickGo.value = true;
         setOpenKeys(key);

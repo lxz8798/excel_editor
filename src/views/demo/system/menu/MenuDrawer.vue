@@ -72,22 +72,14 @@
             // 添加菜单
             setDrawerProps({ confirmLoading: true });
             // TODO custom api
-            // if (formDatas['parentMenu'] === '技术') {
-            //   formDatas['childFlag'] = true;
-            // } else {
-            //   formDatas['childFlag'] = false;
-            // }
-            console.log(formDatas, 'formDatasformDatas');
             if (type == 0 && permissionStore.getAddMenuShowCategory) {
               formDatas['childFlag'] = true;
-              // } else if (type == 1) {
-              //   console.log(formDatas, 'formDatas');
-              //   formDatas['templateFlag'] = '1';
             } else {
               formDatas['childFlag'] = false;
             }
             const addResult = await addMenu(formDatas);
             createMessage.success(addResult);
+            location.reload();
           } else {
             const { menuId, component } = toRaw(state.datas.record);
             if (type == 1 && component.includes('template')) {

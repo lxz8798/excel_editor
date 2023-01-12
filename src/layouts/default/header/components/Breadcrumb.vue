@@ -4,10 +4,10 @@
       <template #itemRender="{ route, routes: routesMatched, paths }">
         <Icon :icon="getIcon(route)" v-if="getShowBreadCrumbIcon && getIcon(route)" />
         <span v-if="!hasRedirect(routesMatched, route)">
-          {{ t(route.name || route.meta.title) }}
+          {{ t(route.name.split('-')[route.name.split('-').length - 1] || route.meta.title.split('-')[route.meta.title.split('-').length - 1]) }}
         </span>
         <router-link v-else to="" @click="handleClick(route, paths, $event)">
-          {{ t(route.name || route.meta.title) }}
+          {{ t(route.name.split('-')[route.name.split('-').length - 1] || route.meta.title.split('-')[route.meta.title.split('-').length - 1]) }}
         </router-link>
       </template>
     </a-breadcrumb>
@@ -18,7 +18,7 @@
   import { useRouter } from 'vue-router';
   import type { Menu } from '/@/router/types';
 
-  import { defineComponent, ref, watchEffect } from 'vue';
+  import { defineComponent, ref, watchEffect, computed } from 'vue';
 
   import { Breadcrumb } from 'ant-design-vue';
   import Icon from '/@/components/Icon';

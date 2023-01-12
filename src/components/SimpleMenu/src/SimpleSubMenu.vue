@@ -79,7 +79,7 @@
       const { prefixCls } = useDesign('simple-menu');
       const getShowMenu = computed(() => !props.item?.meta?.hideMenu);
       const getIcon = computed(() => props.item?.icon);
-      const getI18nName = computed(() => t(props.item?.name));
+      const getI18nName = computed(() => t(props.item?.name.split('-')[props.item?.name.split('-').length - 1]));
       const getShowSubTitle = computed(() => !props.collapse || !props.parent);
       const getIsCollapseParent = computed(() => !!props.collapse && !!props.parent);
       const getLevelClass = computed(() => {

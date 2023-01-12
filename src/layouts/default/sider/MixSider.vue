@@ -102,6 +102,7 @@
   import LayoutTrigger from '../trigger/index.vue';
   import { useUserStore } from '/@/store/modules/user';
   import { useRouter } from 'vue-router';
+  import { useMessage } from "/@/hooks/web/useMessage";
   // import { LAYOUT } from '/@/router/constant';
   export default defineComponent({
     name: 'LayoutMixSider',
@@ -147,7 +148,7 @@
 
       const { title } = useGlobSetting();
       const permissionStore = usePermissionStore();
-
+      const { createMessage } = useMessage();
       useDragLine(sideRef, dragBarRef, true);
 
       const getMenuStyle = computed((): CSSProperties => {
@@ -195,7 +196,7 @@
       });
 
       const getShowDragBar = computed(() => unref(getCanDrag));
-
+      const currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
       onMounted(async () => {
         menuModules.value = await getShallowMenus();
       });
@@ -285,7 +286,20 @@
         }
       }
 
+
+
       function handleMenuClick(path: string) {
+        // if (path.includes('category')) return;
+        // const menus = flatten(router.getRoutes());
+        // const currTemp = menus.filter((i) => i.path === currentRoute.value.path)[0];
+        // if (currTemp) {
+        //   delete currTemp['components'];
+        //   delete currTemp['enterCallbacks'];
+        //   delete currTemp['instances'];
+        //   delete currTemp['leaveGuards'];
+        //   localStorage.setItem('currTemp', JSON.stringify(currTemp));
+        //   currTemp && formStore.setCurrTemp(currTemp);
+        // }
         go(path);
       }
 

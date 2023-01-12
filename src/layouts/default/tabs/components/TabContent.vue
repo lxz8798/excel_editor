@@ -19,7 +19,7 @@
   import type { PropType } from 'vue';
   import type { RouteLocationNormalized } from 'vue-router';
 
-  import { defineComponent, computed, unref, toRaw, onMounted } from 'vue';
+  import { defineComponent, computed, unref } from 'vue';
   import { Dropdown } from '/@/components/Dropdown/index';
   import { Icon } from '/@/components/Icon';
 
@@ -31,7 +31,6 @@
   import { useFormStore } from '/@/store/modules/form';
 
   const formStore = useFormStore();
-
   export default defineComponent({
     name: 'TabContent',
     components: { Dropdown, Icon },
@@ -43,20 +42,12 @@
       isExtra: Boolean,
     },
     setup(props) {
-      const currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
       const { prefixCls } = useDesign('multiple-tabs-content');
       const { t } = useI18n();
 
-      const isCurrTemp = computed(() => {
-        const range = ['/medical', '/architecture', '/mineral', '/petroleum'];
-        return range.some((i) => window.location.href.includes(i));
-      });
-
-      const getCurrTempTitle = computed(() => currTemp.value.name);
-
       const getTitle = computed(() => {
         const { tabItem: { meta } = {} } = props;
-        return meta && meta.title.includes('工程') ? getCurrTempTitle : t(meta.title as string);
+        return meta && meta.title.includes('-') ? meta.title.split('-')[meta.title.split('-').length - 1] : t(meta.title as string);
       });
 
       const getIsTabs = computed(() => !props.isExtra);
@@ -81,10 +72,7 @@
         handleContext,
         getTrigger,
         getIsTabs,
-        isCurrTemp,
         getTitle,
-        getCurrTempTitle,
-        currTemp,
       };
     },
   });

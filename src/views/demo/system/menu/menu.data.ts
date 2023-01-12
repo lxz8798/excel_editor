@@ -103,25 +103,25 @@ export const formSchema: FormSchema[] = [
     label: '菜单名称',
     component: 'Input',
     rules: [{ required: true }],
-    render: ({ model, field }) => h(FormItemRest, { class: 'menuNameBox' }, [
-      h(
-        Select,
-        {
-          style: isShowCategory.value ? 'display: block;' : 'display: none;',
-          placeholder: '请选择分类',
-        },
-        state.categoryOptions.map((i) =>
-          h(SelectOption, { label: i.menuName, value: i.menuName }),
+    render: ({ model, field }) => h('div', { class: 'menuNameBox' }, [
+        h(
+          Select,
+          {
+            style: isShowCategory.value ? 'display: block;' : 'display: none;',
+            placeholder: '请选择分类',
+          },
+          state.categoryOptions.map((i) =>
+            h(SelectOption, { label: i.menuName, value: i.menuName }),
+          ),
         ),
-      ),
-      h(Input, {
-        placeholder: '请输入名称',
-        value: model[field],
-        onChange: (e) => {
-          model[field] = e.target.value;
-        },
-      }),
-    ]),
+        h(Input, {
+          placeholder: '请输入名称',
+          value: model[field],
+          onChange: (e) => {
+            model[field] = e.target.value;
+          },
+        }),
+      ]),
   },
   {
     field: 'parentMenu',

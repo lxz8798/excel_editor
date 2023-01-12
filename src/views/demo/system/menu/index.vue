@@ -30,7 +30,7 @@
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent, nextTick, onMounted } from 'vue';
+  import { defineComponent, nextTick } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getMenuList } from '/@/api/demo/system';
@@ -47,7 +47,7 @@
     setup() {
       const { createMessage } = useMessage();
       const [registerDrawer, { openDrawer }] = useDrawer();
-      const [registerTable, { reload, expandAll, getRawDataSource }] = useTable({
+      const [registerTable, { reload, expandAll }] = useTable({
         title: '菜单列表',
         api: getMenuList,
         columns,
@@ -71,23 +71,6 @@
           fixed: undefined,
         },
       });
-      // let timer = null;
-      // onMounted(() => {
-      //   if (timer) clearTimeout(timer);
-      //   timer = setTimeout(() => {
-      //     const data = getRawDataSource();
-      //     data.forEach((m) => {
-      //       if (m.children) {
-      //         const sourceMenu = m.children[2];
-      //         if (sourceMenu && sourceMenu.menuName.includes('源数据')) {
-      //           getMenuChildren({ menuId: sourceMenu.menuId }).then((res) => {
-      //             console.log(res);
-      //           });
-      //         }
-      //       }
-      //     });
-      //   }, 1000);
-      // });
       function handleCreate() {
         openDrawer(true, {
           isUpdate: false,
@@ -95,7 +78,6 @@
       }
 
       function handleEdit(record: Recordable) {
-        console.log('编辑时点击获得的数据 ->', record);
         openDrawer(true, {
           record,
           isUpdate: true,

@@ -2,10 +2,10 @@
   <PageWrapper :title="(currTempDetail && Object.keys(currTempDetail).length) && currTempDetail.name || ''" contentFullHeight>
     <!--<a-button type="primary" :size="size" style="margin-bottom: 20px;">上传EXCEL</a-button>-->
     <BasicUpload :maxSize="20" :maxNumber="1" style="margin-bottom: 20px;" :api="uploadApi" :accept="['.xlsx']" :uploadParams="uploadParams" @change="handleChange" />
-    <CollapseContainer class="form_wrap">
+    <CollapseContainer class="form_wrap" v-if="currTempDetail && Object.keys(currTempDetail).length">
       <template #title>
         <div class="form_title">
-          <a-input v-if="currTempDetail && Object.keys(currTempDetail).length" size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[1]" style="padding-left: 5px;"></a-input>
+          <a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />
         </div>
       </template>
@@ -38,15 +38,6 @@
       </div>
       <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" />
       <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas" style="margin-top: 25px;">
-        <!--<template #add="{ field }">
-          <div class="roll">
-            <ul>
-              <li v-for="msg in recordList">{{msg.value}}</li>
-            </ul>
-          </div>
-          <Button v-if="Number(field) === 0" @click="add">+</Button>
-          <Button v-if="field > 0" @click="del(field)">-</Button>
-        </template>-->
       </BasicForm>
     </CollapseContainer>
     <!--弹窗-->
@@ -81,6 +72,7 @@
   import Modal1 from './Modal1.vue';
   import { changeInputValueApi } from '/@/api/demo/form';
   import Icon from '/@/components/Icon';
+  import { useRouter } from 'vue-router';
   const formStore = useFormStore();
   const userStore = useUserStore();
   const { wsUrl, apiUrl, uploadUrl } = useGlobSetting();
@@ -100,6 +92,7 @@
     setup() {
       // 使用消息
       const { createMessage, createConfirm } = useMessage();
+      const { currentRoute } = useRouter();
       // 获得当前模板的详情
       // formStore.setCurrTemp(state.currTempDetail.id as string);
       // STATE
@@ -144,8 +137,7 @@
       watch(
         uplpdaNum,
         () => {
-          state.currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
-          fillForm(state.currTemp);
+          if (currentRoute.value.meta.hasOwnProperty('templateId')) fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title });
         },
         { immediate: true, deep: true },
       );
@@ -212,7 +204,7 @@
               });
               const params = {
                 // importFlag: '0',
-                templateId: state.currTemp.id,
+                templateId: state.currTemp.meta.templateId,
                 columnIndex: key,
                 columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
               };
@@ -309,50 +301,47 @@
         }
       }
 
-      function fillForm(currTemp) {
+      function fillForm({ id, name }) {
         // formStore.setCurrTemp(item);
+        state.currTempDetail = { id: id, name: name };
         // 获得所有的表单项
-        state.currTempDetail = currTemp;
-        if (state.currTempDetail && Object.keys(state.currTempDetail).length) {
-          const _id = state.currTempDetail.id;
-          state.uploadParams = { templateId: state.currTempDetail.id };
-          formStore.setBasicTemplate(_id);
-          userStore.setGotoDocID(_id as number | string);
-          formStore.setTemplateEcho(_id).then(() => {
-            if (!formStore.getTemplateEcho.length) {
-              // 没值的情况下前端给默认
-              const defaultBasicTemplate = [
-                {
-                  templateId: _id,
-                  label: '组份名称',
-                  inputs: [],
-                },
-                {
-                  templateId: _id,
-                  label: '计量单位',
-                  inputs: [],
-                },
-                {
-                  templateId: _id,
-                  label: '计量数量',
-                  inputs: [],
-                },
-                {
-                  templateId: _id,
-                  label: '测量方法',
-                  inputs: [],
-                },
-              ];
-              state.basicFormHeader = [noHandler()].concat(defaultBasicTemplate);
-              state.dynamicFormHeader = [];
-            } else {
-              const _filter = formStore.getTemplateEcho.filter((i) => i.label !== '序号');
-              state.basicFormHeader = [noHandler()].concat(_filter.slice(0,4));
-              state.dynamicFormHeader = _filter.slice(4, _filter.length);
-              // formStore.saveForm(mergeForm.value.slice(1, 5));
-            }
-          });
-        }
+        state.uploadParams = { templateId: id };
+        formStore.setBasicTemplate(id);
+        userStore.setGotoDocID(id as number | string);
+        formStore.setTemplateEcho(id).then(() => {
+          if (!formStore.getTemplateEcho.length) {
+            // 没值的情况下前端给默认
+            const defaultBasicTemplate = [
+              {
+                templateId: id,
+                label: '组份名称',
+                inputs: [],
+              },
+              {
+                templateId: id,
+                label: '计量单位',
+                inputs: [],
+              },
+              {
+                templateId: id,
+                label: '计量数量',
+                inputs: [],
+              },
+              {
+                templateId: id,
+                label: '测量方法',
+                inputs: [],
+              },
+            ];
+            state.basicFormHeader = [noHandler()].concat(defaultBasicTemplate);
+            state.dynamicFormHeader = [];
+          } else {
+            const _filter = formStore.getTemplateEcho.filter((i) => i.label !== '序号');
+            state.basicFormHeader = [noHandler()].concat(_filter.slice(0,4));
+            state.dynamicFormHeader = _filter.slice(4, _filter.length);
+            // formStore.saveForm(mergeForm.value.slice(1, 5));
+          }
+        });
       }
       function editTemplateTitle() {
         state.editTitleFlag = !state.editTitleFlag;
@@ -397,7 +386,7 @@
           const a = document.createElement('a');
           a.target = '_blank';
           // apiUrl +
-          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + state.currTemp.id;
+          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + state.currTemp.meta.templateId;
           console.log(a.href);
           document.body.appendChild(a);
           a.click(); //触发下载
