@@ -52,7 +52,7 @@
         return range.some((i) => window.location.href.includes(i));
       });
 
-      const getCurrTempTitle = computed(() => currTemp.value.title);
+      const getCurrTempTitle = computed(() => currTemp.value.name);
 
       const getTitle = computed(() => {
         const { tabItem: { meta } = {} } = props;

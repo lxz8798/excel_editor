@@ -69,6 +69,7 @@ export function getDynamicProps<T, U>(props: T): Partial<U> {
 
 export function getRawRoute(route: RouteLocationNormalized): RouteLocationNormalized {
   if (!route) return route;
+  // console.log(route, 'route');
   const { matched, ...opt } = route;
   return {
     ...opt,

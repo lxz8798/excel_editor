@@ -103,12 +103,20 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
     rules: [{ required: true }],
     render: ({ model, field }) => {
-      return h(FormItemRest, {}, h('div', { class: 'menuNameBox' }, [
-          h(Select, {
+      return h(
+        FormItemRest,
+        {},
+        h('div', { class: 'menuNameBox' }, [
+          h(
+            Select,
+            {
               style: isShowCategory.value ? 'display: block;' : 'display: none;',
               placeholder: '请选择分类',
             },
-            state.categoryOptions.map((i) => h(SelectOption, { label: i.menuName, value: i.menuName }))),
+            state.categoryOptions.map((i) =>
+              h(SelectOption, { label: i.menuName, value: i.menuName }),
+            ),
+          ),
           h(Input, {
             placeholder: '请输入名称',
             value: model[field],
@@ -124,15 +132,15 @@ export const formSchema: FormSchema[] = [
     field: 'parentMenu',
     label: '上级菜单',
     component: 'TreeSelect',
-    suffix: (recoder) =>
-      h(FormItemRest, {}, [
-        h(Checkbox, {
-          onChange: (e) => {
-            isShowCategory.value = e.target.checked;
-            permissionStore.setAddMenuShowCategory(e.target.checked);
-          },
-        }),
-      ]),
+    // suffix: (recoder) =>
+    //   h(FormItemRest, {}, [
+    //     h(Checkbox, {
+    //       onChange: (e) => {
+    //         isShowCategory.value = e.target.checked;
+    //         permissionStore.setAddMenuShowCategory(e.target.checked);
+    //       },
+    //     }),
+    //   ]),
     componentProps: {
       fieldNames: {
         label: 'name',
@@ -165,7 +173,6 @@ export const formSchema: FormSchema[] = [
     field: 'path',
     label: '路由地址',
     component: 'Input',
-    required: true,
     ifShow: ({ values }) => !isButton(values.type),
   },
   {

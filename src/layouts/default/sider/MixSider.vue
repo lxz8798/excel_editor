@@ -258,7 +258,6 @@
           return;
         }
         childrenMenus.value = children;
-        console.log(router.currentRoute);
       }
 
       // Set the currently active menu and submenu

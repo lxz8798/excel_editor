@@ -8,20 +8,6 @@ import { usePermissionStoreWithOut } from '/@/store/modules/permission';
 export function createParamMenuGuard(router: Router) {
   const permissionStore = usePermissionStoreWithOut();
   router.beforeEach(async (to, _, next) => {
-    // const { name: originalName } = to;
-    // if (to.fullPath.includes('/form')) {
-    //   const formList = await getMenuChildren({ menuId: to.meta.menuId });
-    //   let _index = 0;
-    //   to.matched[0].children.forEach((m) => {
-    //     if (m.name.includes('工程')) {
-    //       m.name = originalName.split('-')[0] + '-' + formList[_index].templateTitle;
-    //       m.meta.id = formList[_index].id;
-    //       m.meta.title = formList[_index].templateTitle || '暂未命名';
-    //       m.meta._index = _index;
-    //       _index++;
-    //     }
-    //   });
-    // };
     // filter no name route
     if (!to.name) {
       next();
