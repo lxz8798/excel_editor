@@ -11,6 +11,9 @@ export const columns: BasicColumn[] = [
     title: '菜单名称',
     dataIndex: 'menuName',
     align: 'left',
+    customRender: ({ record }) => {
+      return h('span', record.name.split('-')[record.name.split('-').length - 1]);
+    },
   },
   {
     title: '图标',
