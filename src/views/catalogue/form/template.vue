@@ -371,7 +371,7 @@
           onOk: async () => {
             clearTemplate({ templateId: state.currTempDetail.id }).then((res) => createMessage.success(res));
             // formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
-            fillForm(state.currTempDetail);
+            location.reload();
           },
         });
       }

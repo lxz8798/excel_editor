@@ -110,7 +110,7 @@ export const formSchema: FormSchema[] = [
             placeholder: '请选择分类',
           },
           state.categoryOptions.map((i) =>
-            h(SelectOption, { label: i.menuName, value: i.menuName }),
+            h(SelectOption, { label: i.menuName.split('-')[i.menuName.split('-').length - 1], value: i.menuName.split('-')[i.menuName.split('-').length - 1] }),
           ),
         ),
         h(Input, {
