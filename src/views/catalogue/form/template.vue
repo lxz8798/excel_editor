@@ -5,8 +5,10 @@
     <CollapseContainer class="form_wrap" v-if="currTempDetail && Object.keys(currTempDetail).length">
       <template #title>
         <div class="form_title">
-          <a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
-          <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />
+          <!--{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}-->
+          {{ currTempDetail.name }}
+          <!--<a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
+          <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
         </div>
       </template>
       <div class="form">
@@ -38,6 +40,9 @@
       </div>
       <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" />
       <BasicForm @register="register" @submit="handleSubmit" @save="saveFormDatas" style="margin-top: 25px;">
+        <template #advanceAfter>
+          <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>
+        </template>
       </BasicForm>
     </CollapseContainer>
     <!--弹窗-->
@@ -70,7 +75,7 @@
   import { uploadApi } from '/@/api/sys/upload';
   import { useModal } from '/@/components/Modal';
   import Modal1 from './Modal1.vue';
-  import { changeInputValueApi } from '/@/api/demo/form';
+  import { changeInputValueApi, clearTemplate } from '/@/api/demo/form';
   import Icon from '/@/components/Icon';
   import { useRouter } from 'vue-router';
   const formStore = useFormStore();
@@ -184,7 +189,7 @@
             value: e.target.value,
           };
           changeInputValueApi(params).then((res) => {
-            formStore.saveForm(mergeForm.value.slice(1, 5)).then(() => fillForm());
+            formStore.saveForm(mergeForm.value.slice(1, 5)).then(() => fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title }));
             createMessage.success(res);
           });
         }
@@ -204,7 +209,7 @@
               });
               const params = {
                 // importFlag: '0',
-                templateId: state.currTemp.meta.templateId,
+                templateId: currentRoute.value.meta.templateId,
                 columnIndex: key,
                 columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
               };
@@ -220,7 +225,7 @@
           openModal1(true);
           if (!input.hasOwnProperty('inputs')) {
             formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
-            fillForm(state.currTemp);
+            fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title });
           }
 
           if (formStore.getTemplateEcho) {
@@ -253,7 +258,7 @@
           return i;
         });
         state.basicFormHeader[0].inputs[state.no].value = state.no++;
-        formStore.saveForm(mergeForm.value.slice(1, 5)).then(() => fillForm());
+        formStore.saveForm(mergeForm.value.slice(1, 5)).then(() => fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title }));
       }
 
       const n = ref(1);
@@ -282,7 +287,7 @@
       }
 
       function noHandler() {
-        const _no = { id: '0', label: '序号', sort: 0, inputs: [], templateId: state.currTempDetail.id };
+        const _no = { id: '0', label: '序号', sort: 0, inputs: [], templateId: currentRoute.value.meta.templateId };
         if (formStore.getTemplateEcho.length) {
           // 从接口返回的数据如果有值的情况下
           let _filter = formStore.getTemplateEcho.filter(((i) => i.label !== '序号'));
@@ -358,6 +363,18 @@
           },
         });
       }
+      function clearFormDatas() {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '清空数据有风险!'),
+          content: () => h('span', '是否确认清空？'),
+          onOk: async () => {
+            clearTemplate({ templateId: state.currTempDetail.id }).then((res) => createMessage.success(res));
+            // formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
+            fillForm(state.currTempDetail);
+          },
+        });
+      }
       // onMounted(() => {
       //   fillForm();
       // });
@@ -368,13 +385,14 @@
         registerModal,
         openModal1,
         register,
+        clearFormDatas,
         saveFormDatas: (inputs: any) => {
           // setFieldsValue(inputs);
           // formStore.setDefaultValues(schama);
           // const children = toRaw(items.value).filter((i) => i.name === 'routes.demo.menu.form')[0];
           // const item = children.children.filter((i) => i.path === key)[0];
           formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => {
-            fillForm(state.currTemp);
+            fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title });
             createMessage.success('保存成功!');
           });
         },
@@ -386,7 +404,7 @@
           const a = document.createElement('a');
           a.target = '_blank';
           // apiUrl +
-          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + state.currTemp.meta.templateId;
+          a.href = apiUrl + '/excel/downLoadExcelVertical?templateId=' + currentRoute.value.meta.templateId;
           console.log(a.href);
           document.body.appendChild(a);
           a.click(); //触发下载

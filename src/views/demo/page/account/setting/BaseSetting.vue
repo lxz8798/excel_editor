@@ -79,6 +79,7 @@
             userStore.setToken(res['token']);
             userStore.setUserInfo(_userInfo);
             createMessage.success('编辑成功!');
+            location.reload();
           });
         },
       };

@@ -87,9 +87,7 @@
       function handleDelete(record: Recordable) {
         deleteMenu({ menuId: record.menuId }).then((res) => {
           createMessage.success(res);
-          getMenuList().then((menuList) => {
-            reload();
-          });
+          getMenuList().then(() => reload());
         });
       }
 
@@ -114,3 +112,8 @@
     },
   });
 </script>
+<style>
+  .vben-basic-form--compact {
+    display: none;
+  }
+</style>

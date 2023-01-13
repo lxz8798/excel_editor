@@ -286,10 +286,8 @@
         }
       }
 
-
-
       function handleMenuClick(path: string) {
-        // if (path.includes('category')) return;
+        if (path.includes('category')) return;
         // const menus = flatten(router.getRoutes());
         // const currTemp = menus.filter((i) => i.path === currentRoute.value.path)[0];
         // if (currTemp) {

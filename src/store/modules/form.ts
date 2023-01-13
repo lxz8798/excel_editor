@@ -92,19 +92,11 @@ export const useFormStore = defineStore({
     },
     async setTemplateTitle(params: object) {
       this.templateTitle = await editTemplateTitle(params);
-      createMessage.success(this.templateTitle);
-      if (this.templateTitle == '修改成功') {
-        const currTemp = JSON.parse(localStorage.getItem('currTemp'));
-        getMenuChildren({ menuId: currTemp.menuId }).then((menu) => {
-          const filterTemp = menu.filter((i) => i.id === currTemp.id)[0];
-          currTemp.title =
-            currTemp.name =
-            currTemp.meta.title =
-              currTemp.name.split('-')[0] + '-' + filterTemp.templateTitle;
-          localStorage.setItem('currTemp', JSON.stringify(Object.assign(currTemp, filterTemp)));
-          window.location.reload();
-        });
-      }
+      console.log(this.templateTitle, 'this.templateTitle');
+      getMenuChildren({ menuId: params.id }).then(() => location.reload());
+      // if (this.templateTitle == '修改成功') {
+      //   getMenuChildren({ menuId: params.id }).then(() => location.reload());
+      // }
     },
     async setMenuChildren(menuId: number) {
       this.menuChildren = await getMenuChildren(menuId);

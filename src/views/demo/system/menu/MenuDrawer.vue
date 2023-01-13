@@ -24,7 +24,7 @@
   export default defineComponent({
     name: 'MenuDrawer',
     components: { BasicDrawer, BasicForm },
-    emits: ['success', 'register'],
+    emits: ['success', 'register', 'reload'],
     setup(_, { emit }) {
       const { createMessage } = useMessage();
       const permissionStore = usePermissionStore();
@@ -79,7 +79,6 @@
             }
             const addResult = await addMenu(formDatas);
             createMessage.success(addResult);
-            location.reload();
           } else {
             const { menuId, component } = toRaw(state.datas.record);
             if (type == 1 && component.includes('template')) {
@@ -90,6 +89,7 @@
             const editResult = await editMenu(formDatas);
             createMessage.success(editResult);
           }
+          permissionStore.buildRoutesAction();
           closeDrawer();
           emit('success');
         } finally {

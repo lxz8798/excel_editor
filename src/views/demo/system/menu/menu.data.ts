@@ -10,7 +10,6 @@ export const columns: BasicColumn[] = [
   {
     title: '菜单名称',
     dataIndex: 'menuName',
-    width: 200,
     align: 'left',
   },
   {
@@ -92,8 +91,8 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       options: [
         { label: '目录', value: '0' },
-        { label: '菜单', value: '1' },
-        { label: '按钮', value: '2' },
+        // { label: '菜单', value: '1' },
+        // { label: '按钮', value: '2' },
       ],
     },
     colProps: { lg: 24, md: 24 },
@@ -102,7 +101,7 @@ export const formSchema: FormSchema[] = [
     field: 'menuName',
     label: '菜单名称',
     component: 'Input',
-    rules: [{ required: true }],
+    // rules: [{ required: true }],
     render: ({ model, field }) => h('div', { class: 'menuNameBox' }, [
         h(
           Select,
