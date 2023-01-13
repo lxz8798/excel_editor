@@ -40,12 +40,14 @@
 
   import { columns, searchFormSchema } from './menu.data';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { usePermissionStore } from '/@/store/modules/permission';
 
   export default defineComponent({
     name: 'MenuManagement',
     components: { BasicTable, MenuDrawer, TableAction },
     setup() {
       const { createMessage } = useMessage();
+      const permissionStore = usePermissionStore();
       const [registerDrawer, { openDrawer }] = useDrawer();
       const [registerTable, { reload, expandAll }] = useTable({
         title: '菜单列表',
@@ -86,8 +88,9 @@
 
       function handleDelete(record: Recordable) {
         deleteMenu({ menuId: record.menuId }).then((res) => {
+          permissionStore.buildRoutesAction();
+          reload();
           createMessage.success(res);
-          getMenuList().then(() => reload());
         });
       }
 
