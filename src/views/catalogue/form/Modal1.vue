@@ -30,12 +30,13 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
   import { useFormStore } from '/@/store/modules/form';
   import { PlusSquareOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
   import { useUserStore } from '/@/store/modules/user';
-  import { changeInfoInputVlaueApi, saveAddInputs, deleteInputItemApi } from '/@/api/demo/form';
+  import { changeInfoInputVlaueApi } from '/@/api/demo/form';
   import { useMessage } from '/@/hooks/web/useMessage';
   const { createMessage, createConfirm } = useMessage();
   export default defineComponent({
     components: { BasicModal, PlusSquareOutlined, CloseCircleOutlined },
-    setup() {
+    emits: ['editDone'],
+    setup(props, { emit }) {
       const formStore = useFormStore();
       const userStore = useUserStore();
       const loading = ref(true);
@@ -81,7 +82,10 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
 
       function changeInfoInputVlaue(e, input, index) {
         input.headFlag = !index ? true : false;
-        changeInfoInputVlaueApi(input).then((res) => createMessage.success(res));
+        changeInfoInputVlaueApi(input).then((res) => {
+          emit('editDone');
+          createMessage.success(res);
+        });
       }
 
       function okHandler() {
@@ -107,6 +111,7 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
             input.value = '0';
             input.headFlag = !index ? true : false;
             changeInfoInputVlaueApi(input).then((res) => createMessage.success(res));
+
             // state.datas = state.datas.filter((i) => i.id !== input.id);
             // deleteInputItemApi({ infoId: input.id }).then((res) => createMessage.success(res));
           },

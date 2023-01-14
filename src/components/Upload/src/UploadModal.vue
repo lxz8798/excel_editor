@@ -212,10 +212,6 @@
 
       // 点击开始上传
       async function handleStartUpload() {
-        if (!formStore.getTemplateEcho.map((i) => i.inputs).some((i) => i.length)) {
-          createMessage.info('您需要先上传一个EXCEL!');
-          return;
-        }
         const { maxNumber } = props;
         if ((fileListRef.value.length + props.previewFileList?.length ?? 0) > maxNumber) {
           return createMessage.warning(t('component.upload.maxNumber', [maxNumber]));

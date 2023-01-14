@@ -46,7 +46,7 @@
       </BasicForm>
     </CollapseContainer>
     <!--弹窗-->
-    <Modal1 @register="registerModal" :minHeight="100" :options="modalOptions" />
+    <Modal1 @editDone="editDoneHandler" @register="registerModal" :minHeight="100" :options="modalOptions" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -243,6 +243,10 @@
         }
 
         if (input.type !== 'add') return;
+        // if (!formStore.getTemplateEcho.map((i) => i.inputs).some((i) => i.length)) {
+        //   createMessage.info('您需要先上传一个EXCEL!');
+        //   return;
+        // }
         form.inputs.splice(form.inputs.length - 1, 0, {
           type: 'input',
           value: '',
@@ -369,11 +373,15 @@
           title: () => h('span', '清空数据有风险!'),
           content: () => h('span', '是否确认清空？'),
           onOk: async () => {
-            clearTemplate({ templateId: state.currTempDetail.id }).then((res) => createMessage.success(res));
-            // formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
-            location.reload();
+            clearTemplate({ templateId: state.currTempDetail.id }).then((res) => {
+              createMessage.success(res);
+              fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title });
+            });
           },
         });
+      }
+      function editDoneHandler() {
+        fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title });
       }
       // onMounted(() => {
       //   fillForm();
@@ -418,6 +426,7 @@
         changeInputeValue,
         clickInputItem,
         uploadApi,
+        editDoneHandler,
         handleChange: (list: string[]) => {
           createMessage.info(`已上传文件`);
         },
