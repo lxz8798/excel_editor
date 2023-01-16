@@ -108,7 +108,7 @@ export class VAxios {
         res = responseInterceptors(res);
         switch (res.data.code) {
           case 1:
-            createMessage.error('服务器状态异常!');
+            createMessage.error(res.data.message);
             break;
           // 无效令牌，登录失效
           case 401:

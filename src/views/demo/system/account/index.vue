@@ -102,6 +102,8 @@
       }
 
       function handleEdit(record: Recordable) {
+        console.log(record, 'record');
+        record['password'] = '';
         openModal(true, {
           record,
           isUpdate: true,
