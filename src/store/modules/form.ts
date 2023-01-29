@@ -8,6 +8,7 @@ import {
   getColumn,
   editTemplateTitle,
   deleteTemplateRow,
+  changeTemplateProjectName,
 } from '/@/api/demo/form';
 import { getMenuChildren } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -25,6 +26,7 @@ interface formState {
   columnList: [];
   columnDetail: {};
   templateTitle: '';
+  projectName: '';
 }
 const { createMessage } = useMessage();
 export const useFormStore = defineStore({
@@ -41,6 +43,7 @@ export const useFormStore = defineStore({
     columnList: [],
     columnDetail: {},
     templateTitle: '',
+    projectName: '',
   }),
   getters: {
     getTempList(): any[] {
@@ -76,6 +79,9 @@ export const useFormStore = defineStore({
     getTemplateTitle(): string {
       return this.templateTitle;
     },
+    getTemplateProjectName(): string {
+      return this.projectName;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -90,9 +96,11 @@ export const useFormStore = defineStore({
     setColumnDetail(obj: object) {
       this.columnDetail = obj;
     },
+    setDeleteTemplateRow(params) {
+      return deleteTemplateRow(params);
+    },
     async setTemplateTitle(params: object) {
       this.templateTitle = await editTemplateTitle(params);
-      console.log(this.templateTitle, 'this.templateTitle');
       getMenuChildren({ menuId: params.id }).then(() => location.reload());
       // if (this.templateTitle == '修改成功') {
       //   getMenuChildren({ menuId: params.id }).then(() => location.reload());
@@ -121,8 +129,9 @@ export const useFormStore = defineStore({
         return i;
       });
     },
-    setDeleteTemplateRow(params) {
-      return deleteTemplateRow(params);
+    async setTemplateProjectName(params) {
+      this.projectName = await changeTemplateProjectName(params);
+      return Promise.resolve(this.projectName);
     },
     async uploadExcel(params) {
       const result = await uploadExcel(params);

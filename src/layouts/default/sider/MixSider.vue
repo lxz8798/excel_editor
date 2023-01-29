@@ -53,7 +53,8 @@
           },
         ]"
       >
-        <span class="text"> {{ title }}</span>
+<!--        <span class="text"> {{ title }}</span>-->
+        <span class="text">工程技术表单管理系统</span>
         <Icon
           :size="16"
           :icon="getMixSideFixed ? 'ri:pushpin-2-fill' : 'ri:pushpin-2-line'"
