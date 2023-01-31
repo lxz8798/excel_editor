@@ -18,6 +18,9 @@ enum Api {
   CLEAR_TEMPLATE = '/template',
   DELETE_TEMPLATE_ROW = '/template/delReportInfo',
   CHANGE_TEMPLATE_PROJECT_NAME = '/template/getProjectName',
+  GET_PROJECT_LIST = '/examContract/list',
+  ADD_PROJECT_ITEM = '/examContract/add',
+  DEL_PROJECT_ITEM = '/examContract/del',
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -37,3 +40,6 @@ export const clearTemplate = (params?) => defHttp.delete({ url: `${Api.CLEAR_TEM
 export const deleteTemplateRow = (params?) => defHttp.delete({ url: `${Api.DELETE_TEMPLATE_ROW}?templateId=${params.templateId}&columnIndex=${params.columnIndex}&columnType=${params.columnType}` });
 export const saveFormData = (params) => defHttp.get({ url: Api.SAVE_FORM_DATA, params });
 export const downloadEXCEL = (params) => defHttp.get({ url: Api.DOWN_EXCEL, params });
+export const getProjectList = () => defHttp.get({ url: Api.GET_PROJECT_LIST });
+export const addProjectItem = (params) => defHttp.post({ url: Api.ADD_PROJECT_ITEM, params });
+export const delProjectItem = ({ id }) => defHttp.delete({ url: `${Api.DEL_PROJECT_ITEM}?id=${id}` });

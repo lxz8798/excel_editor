@@ -9,6 +9,9 @@ import {
   editTemplateTitle,
   deleteTemplateRow,
   changeTemplateProjectName,
+  getProjectList,
+  addProjectItem,
+  delProjectItem,
 } from '/@/api/demo/form';
 import { getMenuChildren } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -27,6 +30,7 @@ interface formState {
   columnDetail: {};
   templateTitle: '';
   projectName: '';
+  projectNameList: [];
 }
 const { createMessage } = useMessage();
 export const useFormStore = defineStore({
@@ -44,6 +48,7 @@ export const useFormStore = defineStore({
     columnDetail: {},
     templateTitle: '',
     projectName: '',
+    projectNameList: [],
   }),
   getters: {
     getTempList(): any[] {
@@ -82,6 +87,9 @@ export const useFormStore = defineStore({
     getTemplateProjectName(): string {
       return this.projectName;
     },
+    getProjectNamesList(): [] {
+      return this.projectNameList;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -101,7 +109,7 @@ export const useFormStore = defineStore({
     },
     async setTemplateTitle(params: object) {
       this.templateTitle = await editTemplateTitle(params);
-      getMenuChildren({ menuId: params.id }).then(() => location.reload());
+      getMenuChildren({ menuId: params.id });
       // if (this.templateTitle == '修改成功') {
       //   getMenuChildren({ menuId: params.id }).then(() => location.reload());
       // }
@@ -135,6 +143,18 @@ export const useFormStore = defineStore({
     },
     async uploadExcel(params) {
       const result = await uploadExcel(params);
+    },
+    async setProjectNamesList() {
+      this.projectNameList = await getProjectList();
+      return this.projectNameList;
+    },
+    async addProjectNameToList(params) {
+      const result = await addProjectItem(params);
+      return Promise.resolve(result);
+    },
+    async delProjectNameFormList(params) {
+      const result = await delProjectItem(params);
+      return Promise.resolve(result);
     },
   },
 });
