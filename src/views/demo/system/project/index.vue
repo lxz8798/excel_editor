@@ -3,12 +3,18 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" @click="handleCreate">新增项目</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
+              // {
+              //   icon: 'material-symbols:play-arrow-rounded',
+              //   color: 'green',
+              //   tooltip: '计算',
+              //   // onClick: handleView.bind(null, record),
+              // },
               {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
@@ -29,21 +35,19 @@
         </template>
       </template>
     </BasicTable>
-    <!--  用户编辑  -->
-    <AccountModal @register="registerModal" @success="handleSuccess" />
+    <ProjectModal @register="registerModal" @success="handleSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
   import { defineComponent, reactive, onMounted } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getAccountList } from '/@/api/demo/system';
+  import { getProjectList } from '/@/api/sys/project';
   import { PageWrapper } from '/@/components/Page';
-  import DeptTree from './DeptTree.vue';
 
   import { useModal } from '/@/components/Modal';
-  import AccountModal from './AccountModal.vue';
-  import { columns, searchFormSchema } from './account.data';
+  import ProjectModal from './projectModal.vue';
+  import { columns, searchFormSchema } from './project.data';
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -51,15 +55,15 @@
   const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
-    components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
+    components: { BasicTable, PageWrapper, ProjectModal, TableAction },
     setup() {
       const go = useGo();
       const [registerModal, { openModal }] = useModal();
       const searchInfo = reactive<Recordable>({});
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
-          title: '用户列表',
-          api: getAccountList,
+          title: '项目列表',
+          api: getProjectList,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -82,14 +86,14 @@
         });
 
       // mounted
-      let timer = null;
-      onMounted(() => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-          const data = getRawDataSource();
-          setTableData(data.records);
-        }, 1000);
-      });
+      // let timer = null;
+      // onMounted(() => {
+      //   if (timer) clearTimeout(timer);
+      //   timer = setTimeout(() => {
+      //     const data = getRawDataSource();
+      //     setTableData(data.records);
+      //   }, 1000);
+      // });
 
       function handleCreate() {
         openModal(true, {
@@ -108,7 +112,7 @@
 
       function handleDelete(record: Recordable) {
         userStore.deleteUser({ userId: record.id }).then((res) => {
-          getAccountList({ page: 1, pageSize: 30 }).then((result) => {
+          getProjectList({ page: 1, pageSize: 30 }).then((result) => {
             setTableData(result.records);
             createMessage.success(res);
           });

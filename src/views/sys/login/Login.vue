@@ -17,21 +17,7 @@
       <div class="flex h-full">
         <!-- 登录页面左侧AD -->
         <div class="hidden min-h-full pl-4 mr-4 xl:flex xl:flex-col xl:w-6/12">
-          <!--<AppLogo class="-enter-x" />
-          <div class="my-auto">
-            <img
-              :alt="title"
-              src="../../../assets/svg/login-box-bg.svg"
-              class="w-1/2 -mt-16 -enter-x"
-            />
-            <div class="mt-10 font-medium text-white -enter-x">
-              <span class="inline-block mt-4 text-3xl"> {{ t('sys.login.signInTitle') }}</span>
-            </div>
-            <div class="mt-5 font-normal text-white dark:text-gray-500 -enter-x">
-              {{ t('sys.login.signInDesc') }}
-            </div>
-          </div>
-          <Satellite />-->
+          <!--<AppLogo class="-enter-x" />-->
           <div class="plant_wrap -enter-x">
             <div class="circle box1 animate-pulse">
               <p>封堵</p>
@@ -85,7 +71,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useLocaleStore } from '/@/store/modules/locale';
   import { useUserStore } from '/@/store/modules/user';
-  import { getFromTemplateList } from '/@/api/demo/form';
+  import { getRoles } from '/@/api/sys/user';
   import { useFormStore } from '/@/store/modules/form';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useI18n } from '/@/hooks/web/useI18n';
@@ -103,28 +89,7 @@
   const formStore = useFormStore();
   const { createMessage } = useMessage();
   const router = useRouter();
-  // 点击小球把ID存起来
-  // getFromTemplateList().then((template) => {
-  //   if (template.length) {
-  //     formStore.setTempList(template);
-  //     const $balls = document.querySelectorAll('.ball');
-  //     template.forEach((temp, key) => {
-  //       const $p = document.createElement('p');
-  //       $p.innerText = temp.templateTitle.replace('检测报告单', '报告').replace('天然气', ' ');
-  //       // $p.dataset.templateId = t.id;
-  //       $balls[key].appendChild($p);
-  //       $balls[key].addEventListener('click', () => {
-  //         userStore.setGotoDocID(temp.id);
-  //         if (!Object.keys(userStore.getUserInfo).length) {
-  //           createMessage.warning(t('component.verify.loginFail'));
-  //         }
-  //       });
-  //     });
-  //   }
-  // });
-  // function toEditDocHandler(e) {
-  //   userStore.setGotoDocID(e);
-  // }
+
   const showLocale = localeStore.getShowPicker;
   const title = computed(() => globSetting?.title ?? '');
 
@@ -134,6 +99,10 @@
     }
     userStore.setGotoDocID(type);
   }
+
+  getRoles().then((roles) => {
+    userStore.setRoleList(roles);
+  });
 </script>
 <style lang="less">
   @prefix-cls: ~'@{namespace}-login';

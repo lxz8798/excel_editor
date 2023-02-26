@@ -3,12 +3,23 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" @click="handleCreate">新增团队</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
+              // {
+              //   icon: 'material-symbols:play-arrow-rounded',
+              //   color: 'green',
+              //   tooltip: '计算',
+              //   // onClick: handleView.bind(null, record),
+              // },
+              {
+                icon: 'fluent-mdl2:permissions-solid',
+                tooltip: '权限',
+                // onClick: handleView.bind(null, record),
+              },
               {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
@@ -29,8 +40,7 @@
         </template>
       </template>
     </BasicTable>
-    <!--  用户编辑  -->
-    <AccountModal @register="registerModal" @success="handleSuccess" />
+    <!--<AccountModal @register="registerModal" @success="handleSuccess" />-->
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -43,7 +53,7 @@
 
   import { useModal } from '/@/components/Modal';
   import AccountModal from './AccountModal.vue';
-  import { columns, searchFormSchema } from './account.data';
+  import { columns, searchFormSchema } from './skills.data';
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -51,7 +61,8 @@
   const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
-    components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
+    // DeptTree, AccountModal,
+    components: { BasicTable, PageWrapper, TableAction },
     setup() {
       const go = useGo();
       const [registerModal, { openModal }] = useModal();
@@ -80,6 +91,9 @@
             // slots: { customRender: 'action' },
           },
         });
+
+      // create
+      userStore.setProjectList();
 
       // mounted
       let timer = null;

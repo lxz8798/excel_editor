@@ -69,13 +69,13 @@ export default {
   },
   login: {
     backSignIn: 'Back sign in',
-    mobileSignInFormTitle: 'Mobile sign in',
+    mobileSignInFormTitle: 'Phone Number sign in',
     qrSignInFormTitle: 'Qr code sign in',
     signInFormTitle: 'Sign in',
     signUpFormTitle: 'Sign up',
     forgetFormTitle: 'Reset password',
 
-    signInTitle: 'Backstage management system',
+    signInTitle: 'Make blocking smarter and smarter',
     signInDesc: 'Enter your personal details and get started!',
     policy: 'I agree to the xxx Privacy Policy',
     scanSign: `scanning the code to complete the login`,
@@ -105,5 +105,7 @@ export default {
     email: 'Email',
     smsCode: 'SMS code',
     phone: 'Phone',
+    team: 'my team',
+    skills: 'my skills',
   },
 };

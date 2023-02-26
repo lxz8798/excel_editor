@@ -3,12 +3,17 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" @click="handleCreate">新增团队</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
+              {
+                icon: 'fluent:people-team-add-24-filled',
+                tooltip: '添加成员',
+                onClick: addTeamMebers.bind(null, record),
+              },
               {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
@@ -29,21 +34,23 @@
         </template>
       </template>
     </BasicTable>
-    <!--  用户编辑  -->
-    <AccountModal @register="registerModal" @success="handleSuccess" />
+    <!--  添加和编辑  -->
+    <TeamModal @register="registerModal1" @success="handleSuccess" />
+    <!--  添加成员  -->
+    <AddTeamMebersModal @register="registerModal2" />
   </PageWrapper>
 </template>
 <script lang="ts">
   import { defineComponent, reactive, onMounted } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getAccountList } from '/@/api/demo/system';
+  import { getTeams } from '/@/api/sys/team';
   import { PageWrapper } from '/@/components/Page';
-  import DeptTree from './DeptTree.vue';
 
   import { useModal } from '/@/components/Modal';
-  import AccountModal from './AccountModal.vue';
-  import { columns, searchFormSchema } from './account.data';
+  import TeamModal from './TeamModal.vue';
+  import AddTeamMebersModal from './AddTeamMebersModal.vue';
+  import { columns, searchFormSchema } from './team.data';
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -51,15 +58,23 @@
   const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
-    components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
+    // AccountModal,
+    components: { BasicTable, PageWrapper, TeamModal, AddTeamMebersModal, TableAction },
     setup() {
       const go = useGo();
-      const [registerModal, { openModal }] = useModal();
+      const [registerModal1, { openModal: openModal1 }] = useModal();
+      const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
+
+      userStore.setUserList({ page: 1, pageSize: 10 });
+
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
-          title: '用户列表',
-          api: getAccountList,
+          title: '团队列表',
+          beforeFetch: (params) => {
+            params['userId'] = userStore.getUserInfo.userId;
+          },
+          api: getTeams,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -81,18 +96,20 @@
           },
         });
 
+      // create
+
       // mounted
-      let timer = null;
-      onMounted(() => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-          const data = getRawDataSource();
-          setTableData(data.records);
-        }, 1000);
-      });
+      // let timer = null;
+      // onMounted(() => {
+      //   if (timer) clearTimeout(timer);
+      //   timer = setTimeout(() => {
+      //     const data = getRawDataSource();
+      //     setTableData(data.records);
+      //   }, 1000);
+      // });
 
       function handleCreate() {
-        openModal(true, {
+        openModal1(true, {
           isUpdate: false,
         });
       }
@@ -100,32 +117,35 @@
       function handleEdit(record: Recordable) {
         console.log(record, 'record');
         record['password'] = '';
-        openModal(true, {
+        openModal1(true, {
           record,
           isUpdate: true,
         });
       }
 
       function handleDelete(record: Recordable) {
-        userStore.deleteUser({ userId: record.id }).then((res) => {
-          getAccountList({ page: 1, pageSize: 30 }).then((result) => {
-            setTableData(result.records);
-            createMessage.success(res);
-          });
+        const { id } = record;
+        userStore.delTeamItem({id: id}).then((res) => {
+          createMessage.success(res);
+          openModal1(false);
+          userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+          reload();
         });
       }
 
       function handleSuccess({ isUpdate, values }) {
-        if (isUpdate) {
-          // 演示不刷新表格直接更新内部数据。
-          // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-          const result = updateTableDataRecord(values.id, values);
-        } else {
-          reload().then(() => {
-            const data = getRawDataSource();
-            setTableData(data.records);
-          });
-        }
+        userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        reload();
+        // if (isUpdate) {
+        //   // 演示不刷新表格直接更新内部数据。
+        //   注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
+        //   const result = updateTableDataRecord(values.id, values);
+        // } else {
+        //   reload().then(() => {
+        //     const data = getRawDataSource();
+        //     setTableData(data.records);
+        //   });
+        // }
       }
 
       function handleSelect(deptId = '') {
@@ -133,19 +153,23 @@
         reload();
       }
 
-      function handleView(record: Recordable) {
-        go('/system/account_detail/' + record.id);
+      function addTeamMebers(record: Recordable) {
+        openModal2(true, {
+          isUpdate: false,
+        });
+
       }
 
       return {
         registerTable,
-        registerModal,
+        registerModal1,
+        registerModal2,
         handleCreate,
         handleEdit,
         handleDelete,
         handleSuccess,
         handleSelect,
-        handleView,
+        addTeamMebers,
         searchInfo,
       };
     },

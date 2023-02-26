@@ -168,7 +168,12 @@ export default {
   },
   system: {
     moduleName: 'System management',
-
+    project: 'Project management',
+    projectList: 'Project List',
+    team: 'Team management',
+    teamList: 'Team List',
+    skills: 'Skills management',
+    skillsList: 'Skills List',
     account: 'Account management',
     account_detail: 'Account detail',
     password: 'Change password',

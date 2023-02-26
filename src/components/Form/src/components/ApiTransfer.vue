@@ -34,8 +34,8 @@
       alwaysLoad: propTypes.bool.def(false),
       afterFetch: { type: Function as PropType<Fn> },
       resultField: propTypes.string.def(''),
-      labelField: propTypes.string.def('title'),
-      valueField: propTypes.string.def('key'),
+      labelField: propTypes.string.def('name'),
+      valueField: propTypes.string.def('id'),
       showSearch: { type: Boolean, default: false },
       disabled: { type: Boolean, default: false },
       filterOption: {
@@ -59,12 +59,11 @@
       });
       const getdataSource = computed(() => {
         const { labelField, valueField } = props;
-
         return unref(_dataSource).reduce((prev, next: Recordable) => {
           if (next) {
             prev.push({
               ...omit(next, [labelField, valueField]),
-              title: next[labelField],
+              title: `${next[labelField]}【技能：${next['userSkills'] ?? '末设置技能'}】`,
               key: next[valueField],
             });
           }

@@ -1,4 +1,16 @@
 <template>
+  <div class="my-auto" v-if="getLoginState === 0 || getLoginState === 3">
+    <img :alt="title" src="../../../assets/svg/login-box-bg.svg" class="w-1/2 -mt-16 -enter-x" />
+    <div class="mb-30 font-medium text-white -enter-x">
+      <span class="inline-block mt-4 text-3xl line-animate" style="color: #0960bd">
+        {{ t('sys.login.signInTitle') }}</span
+      >
+    </div>
+    <!--<div class="mt-5 font-normal text-white dark:text-gray-500 -enter-x">
+      {{ t('sys.login.signInDesc') }}
+    </div>-->
+  </div>
+  <Satellite />
   <LoginFormTitle v-show="getShow" class="enter-x" />
   <Form
     class="p-4 enter-x"
@@ -8,13 +20,14 @@
     v-show="getShow"
     @keypress.enter="handleLogin"
   >
-    <FormItem name="account" class="enter-x">
+    <FormItem name="account" class="enter-x account_form">
       <Input
         size="large"
         v-model:value="formData.account"
         :placeholder="t('sys.login.userName')"
         class="fix-auto-fill"
       />
+
     </FormItem>
     <FormItem name="password" class="enter-x">
       <InputPassword
@@ -85,7 +98,6 @@
   import { reactive, ref, unref, computed } from 'vue';
   // 被注释的其他组件可能会用到 Divider
   import { Checkbox, Form, Input, Row, Col, Button } from 'ant-design-vue';
-  import type { AppRouteModule } from '/@/router/types';
   // import {
   //   GithubFilled,
   //   WechatFilled,
@@ -101,9 +113,6 @@
   import { useUserStore } from '/@/store/modules/user';
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
-  // import AES from '/@/utils/auth/AES';
-  import { PageEnum } from '/@/enums/pageEnum';
-  //import { onKeyStroke } from '@vueuse/core';
 
   const ACol = Col;
   const ARow = Row;
@@ -168,4 +177,43 @@
       loading.value = false;
     }
   }
+
+  function registerHandler() {
+    setLoginState(LoginStateEnum.REGISTER);
+
+  }
 </script>
+<style lang="less">
+  .account_form {
+    .ant-form-item-control-input-content {
+      display: flex;
+      align-items: center;
+    }
+  }
+  .line-animate {
+    display: inline-block;
+    position: relative;
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 85%;
+      border-right: 2px solid #0960bd;
+      transform: translate(10px, 15%);
+      animation: fadenum 1s infinite;
+    }
+  }
+  @keyframes fadenum {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+</style>

@@ -1,7 +1,7 @@
 <template>
   <div class="m-4 mr-0 overflow-hidden bg-white">
     <BasicTree
-      title="部门列表"
+      title="用户列表"
       toolbar
       search
       treeWrapperClassName="h-[calc(100%-35px)] overflow-auto"
@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
   import { defineComponent, onMounted, ref } from 'vue';
-
+  import { getAccountList } from '/@/api/demo/system';
   import { BasicTree, TreeItem } from '/@/components/Tree';
   import { getDeptList } from '/@/api/demo/system';
 
@@ -28,7 +28,7 @@
 
       async function fetch() {
         // 暂时隐藏部门列表
-        // treeData.value = (await getDeptList()) as unknown as TreeItem[];
+        // treeData.value = (await getAccountList()) as unknown as TreeItem[];
       }
 
       function handleSelect(keys) {

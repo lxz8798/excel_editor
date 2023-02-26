@@ -321,6 +321,33 @@ export const usePermissionStore = defineStore({
                 component: '/demo/system/account/AccountDetail.vue',
               },
               {
+                path: 'team',
+                name: 'TeamManagement',
+                meta: {
+                  title: t('routes.demo.system.team'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/team/index.vue',
+              },
+              {
+                path: 'project',
+                name: 'ProjectManagement',
+                meta: {
+                  title: t('routes.demo.system.project'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/project/index.vue',
+              },
+              {
+                path: 'skills',
+                name: 'SkillsManagement',
+                meta: {
+                  title: t('routes.demo.system.skills'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/skills/index.vue',
+              },
+              {
                 path: 'menu',
                 name: 'MenuManagement',
                 meta: {

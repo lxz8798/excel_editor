@@ -7,17 +7,27 @@ import { PageEnum } from '/@/enums/pageEnum';
 import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import { GetUserInfoModel, LoginParams, registerModel } from '/@/api/sys/model/userModel';
-import { getUserInfo, loginApi, regUser, deleteUser, getUserTagList, addUserTag, deleteUserTag } from '/@/api/sys/user';
+import { AccountListGetResultModel } from '/@/api/demo/model/systemModel';
+import {
+  getUserInfo,
+  loginApi,
+  regUser,
+  deleteUser,
+  getUserTagList,
+  addUserTag,
+  deleteUserTag,
+} from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { router } from '/@/router';
 import { usePermissionStore } from '/@/store/modules/permission';
-import { useFormStore } from '/@/store/modules/form';
 import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
 import { h } from 'vue';
-
+import { getTeams, delTeam } from '/@/api/sys/team';
+import { getProjectList } from '/@/api/sys/project';
+import { getAccountList } from '/@/api/demo/system';
 interface UserState {
   userInfo: Nullable<UserInfo>;
   token?: string;
@@ -28,6 +38,8 @@ interface UserState {
   templateUpDate: number;
   userList: [];
   userTagsList: [];
+  projectList: [];
+  teamList: [];
 }
 
 export const useUserStore = defineStore({
@@ -47,6 +59,8 @@ export const useUserStore = defineStore({
     templateUpDate: 0,
     userList: [],
     userTagsList: [],
+    projectList: [],
+    teamList: [],
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -72,6 +86,15 @@ export const useUserStore = defineStore({
     },
     getUserTagsList(): [] {
       return this.userTagsList;
+    },
+    getProjectList(): [] {
+      return this.projectList;
+    },
+    getTeamList(): [] {
+      return this.teamList;
+    },
+    getUserList(): [] {
+      return this.userList;
     },
   },
   actions: {
@@ -124,6 +147,11 @@ export const useUserStore = defineStore({
         return Promise.reject(error);
       }
     },
+    async setUserList(params): Promise<AccountListGetResultModel[] | null> {
+      const _userList = await getAccountList(params);
+      this.userList = _userList['records'];
+      return this.userList;
+    },
     async afterLoginAction(goHome?: boolean, path?: string): Promise<GetUserInfoModel | null> {
       if (!this.getToken) return null;
       // get user info
@@ -147,6 +175,7 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null;
       // const userStore = useUserStore();
       const userInfo = await getUserInfo();
+      console.log(this.getRoleList.values(), 'this.getRoleList');
       const { roles = [] } = userInfo;
       if (isArray(roles)) {
         const roleList = roles.map((item) => item.value) as RoleEnum[];
@@ -180,6 +209,7 @@ export const useUserStore = defineStore({
       delete params['account'];
       const res = await regUser(params);
       createMessage.success(res);
+      return Promise.resolve(res);
     },
     async deleteUser(params: object) {
       const res = await deleteUser(params);
@@ -192,11 +222,23 @@ export const useUserStore = defineStore({
         return i;
       });
     },
+    // 用户标签
     async setUserTag(params: object) {
       return await addUserTag(params);
     },
     async deleteUserTag(params: object) {
       return await deleteUserTag(params);
+    },
+    // 得到用户列表
+    async setProjectList(params) {
+      return await getProjectList(params);
+    },
+    // 得到团队列表
+    async setTeamList(params) {
+      return await getTeams(params);
+    },
+    async delTeamItem(params) {
+      return await delTeam(params);
     },
     /**
      * @description: Confirm before logging out

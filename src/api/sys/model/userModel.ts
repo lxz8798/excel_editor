@@ -3,6 +3,8 @@
  */
 export interface registerModel {
   account: string;
+  team: object | string;
+  skills: object | string;
   realName: string;
   password: string;
   confirmPassword: string;

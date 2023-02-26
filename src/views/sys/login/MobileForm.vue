@@ -6,19 +6,26 @@
         <Input
           size="large"
           v-model:value="formData.mobile"
-          :placeholder="t('sys.login.mobile')"
+          :placeholder="t('sys.login.phone')"
           class="fix-auto-fill"
         />
       </FormItem>
-      <FormItem name="sms" class="enter-x">
+      <!--<FormItem name="sms" class="enter-x">
         <CountdownInput
           size="large"
           class="fix-auto-fill"
           v-model:value="formData.sms"
           :placeholder="t('sys.login.smsCode')"
         />
+      </FormItem>-->
+      <FormItem name="password" class="enter-x">
+        <InputPassword
+          size="large"
+          visibilityToggle
+          v-model:value="formData.password"
+          :placeholder="t('sys.login.password')"
+        />
       </FormItem>
-
       <FormItem class="enter-x">
         <Button type="primary" size="large" block @click="handleLogin" :loading="loading">
           {{ t('sys.login.loginButton') }}
@@ -39,6 +46,7 @@
   import { useLoginState, useFormRules, useFormValid, LoginStateEnum } from './useLogin';
 
   const FormItem = Form.Item;
+  const InputPassword = Input.Password;
   const { t } = useI18n();
   const { handleBackLogin, getLoginState } = useLoginState();
   const { getFormRules } = useFormRules();

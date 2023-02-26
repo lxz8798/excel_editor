@@ -1,28 +1,25 @@
+import { regUser } from '/@/api/sys/user';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 
 export const columns: BasicColumn[] = [
   {
-    title: '用户名',
+    title: '项目名称',
     dataIndex: 'name',
-    width: 160,
   },
   {
-    title: '真实名字',
-    dataIndex: 'realName',
-    width: 160,
+    title: '项目长',
+    dataIndex: 'projectName',
+    width: 120,
   },
   {
-    title: '所属团队',
-    dataIndex: 'userTeams',
+    title: '参与人',
+    dataIndex: 'projectName',
+    width: 300,
   },
   {
-    title: '专业技能',
-    dataIndex: 'userSkills',
-  },
-  {
-    title: '到期时间',
-    dataIndex: 'DaysLeft',
+    title: '限时完成',
+    dataIndex: 'LimitedTime',
     width: 120,
   },
 ];
@@ -96,16 +93,6 @@ export const accountFormSchema: FormSchema[] = [
     field: 'skills',
     label: '专业技能',
     component: 'Select',
-  },
-  {
-    field: 'expiration',
-    label: '到期时间',
-    component: 'DatePicker',
-    componentProps: ({ formModel, formActionType }) => {
-      return {
-        style: 'width: 100%',
-      };
-    },
   },
   {
     field: 'phone',

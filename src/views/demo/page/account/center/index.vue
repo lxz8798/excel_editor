@@ -1,16 +1,16 @@
 <template>
   <div :class="prefixCls">
     <a-row :class="`${prefixCls}-top`">
-      <a-col :span="9" :class="`${prefixCls}-col`">
+      <a-col :span="6" :class="`${prefixCls}-col`">
         <a-row>
-          <a-col :span="8">
+          <a-col :span="16">
             <div :class="`${prefixCls}-top__avatar`">
               <img width="70" :src="avatar" />
               <span>{{ realName }}</span>
               <div>{{ introduction }}</div>
             </div>
           </a-col>
-          <a-col :span="16">
+          <!--<a-col :span="16">
             <div :class="`${prefixCls}-top__detail`">
               <template v-for="detail in details" :key="detail.title">
                 <p>
@@ -19,10 +19,18 @@
                 </p>
               </template>
             </div>
-          </a-col>
+          </a-col>-->
         </a-row>
       </a-col>
-      <a-col :span="7" :class="`${prefixCls}-col`">
+      <a-col :span="10" :class="`${prefixCls}-col`">
+        <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpan="false">
+          <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
+            <Icon :icon="team.icon" :color="team.color" />
+            <span>{{ team.title }}</span>
+          </div>
+        </CollapseContainer>
+      </a-col>
+      <a-col :span="8" :class="`${prefixCls}-col`">
         <CollapseContainer title="标签" :canExpan="false">
           <template v-for="tag in tagList" :key="tag">
             <a-input v-if="tag.label == 'add'" v-model:value="addTagValue" style="margin-top: 10px;">
@@ -40,14 +48,6 @@
           <template #action>
             <Icon icon="ant-design:plus-square-filled" style="cursor: pointer" @click="addUserTagHandler" />
           </template>
-        </CollapseContainer>
-      </a-col>
-      <a-col :span="8" :class="`${prefixCls}-col`">
-        <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpan="false">
-          <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
-            <Icon :icon="team.icon" :color="team.color" />
-            <span>{{ team.title }}</span>
-          </div>
         </CollapseContainer>
       </a-col>
     </a-row>
@@ -103,7 +103,7 @@
       const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
       const tagList = computed(() => userStore.getUserTagsList || []);
       userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
-
+      userStore.setTeamList({ userId: userStore.getUserInfo.userId });
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
       // 添加TAG
       function addUserTagHandler() {
@@ -161,6 +161,11 @@
 </script>
 <style lang="less" scoped>
   .account-center {
+    ::v-deep(.ant-row) {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
     .corrent_icon {
       cursor: pointer;
       transition: .3s;

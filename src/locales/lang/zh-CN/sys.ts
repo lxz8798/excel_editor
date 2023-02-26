@@ -67,15 +67,15 @@ export default {
   },
   login: {
     backSignIn: '返回',
-    signInFormTitle: '登录',
-    mobileSignInFormTitle: '手机登录',
+    signInFormTitle: '用户名登录',
+    mobileSignInFormTitle: '手机号登录',
     qrSignInFormTitle: '二维码登录',
     signUpFormTitle: '注册',
     forgetFormTitle: '重置密码',
 
-    signInTitle: '开箱即用的中后台管理系统',
+    signInTitle: '让，封堵越来越智能',
     signInDesc: '输入您的个人详细信息开始使用！',
-    policy: '我同意《使用表单管理》',
+    policy: '我同意使用《封堵智能软件》',
     scanSign: `扫码后点击"确认"，即可完成登录`,
 
     loginButton: '登录',
@@ -103,5 +103,7 @@ export default {
     email: '邮箱',
     smsCode: '短信验证码',
     phone: '手机号码',
+    team: '我的团队',
+    skills: '我的专业',
   },
 };

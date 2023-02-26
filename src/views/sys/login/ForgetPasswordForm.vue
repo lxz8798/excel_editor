@@ -11,7 +11,7 @@
       </FormItem>
 
       <FormItem name="mobile" class="enter-x">
-        <Input size="large" v-model:value="formData.mobile" :placeholder="t('sys.login.mobile')" />
+        <Input size="large" v-model:value="formData.mobile" :placeholder="t('sys.login.phone')" />
       </FormItem>
       <FormItem name="sms" class="enter-x">
         <CountdownInput
