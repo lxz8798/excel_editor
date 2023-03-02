@@ -7,25 +7,18 @@ interface SkillsState {
   getUserSkillsList: [];
 }
 
-export const useProjectStore = defineStore({
-  id: 'app-project',
+export const useSkillsStore = defineStore({
+  id: 'app-skills',
   state: (): SkillsState => ({
-    menuIds: undefined,
     getUserSkillsList: [],
   }),
   getters: {
-    getMenuIds(): string[] | undefined {
-      return this.menuIds;
-    },
     getProjectUserList(): [] {
       return this.getUserSkillsList;
     },
   },
   actions: {
     // sync
-    setMenuIds(list: string[]) {
-      this.menuIds = list;
-    },
     // async
     async setProjectUserList() {
       this.getUserSkillsList = await getSkills();
@@ -34,6 +27,6 @@ export const useProjectStore = defineStore({
   },
 });
 
-export function useProjectStoreWithOut() {
-  return useProjectStore(store);
+export function useSkillsStoreWithOut() {
+  return useSkillsStore(store);
 }

@@ -112,7 +112,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, toRefs, unref, computed, h } from "vue";
+  import { reactive, ref, toRefs, unref, computed, h } from "vue";
   import LoginFormTitle from './LoginFormTitle.vue';
   import { Form, Input, Button, Checkbox, Select } from 'ant-design-vue';
   import { StrengthMeter } from '/@/components/StrengthMeter';
@@ -122,6 +122,12 @@ import { reactive, ref, toRefs, unref, computed, h } from "vue";
   import { useLoginState, useFormRules, useFormValid, LoginStateEnum } from './useLogin';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+
+  import { useSkillsStore } from '/@/store/modules/skills';
+  import { useTeamsStore } from '/@/store/modules/teams';
+
+  const skillsStore = useSkillsStore();
+  const teamStore = useTeamsStore();
 
   const FormItem = Form.Item;
   const InputPassword = Input.Password;
