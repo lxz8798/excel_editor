@@ -39,7 +39,7 @@
   import { defineComponent, reactive, onMounted } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getTeams } from '/@/api/sys/team';
+  import { getSkills } from '/@/api/sys/skills';
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
@@ -69,7 +69,7 @@
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },
-          api: getTeams,
+          api: getSkills,
           rowKey: 'id',
           columns,
           formConfig: {

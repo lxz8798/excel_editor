@@ -10,10 +10,13 @@
                 <span :style="{ color: item.color }">{{ item.title }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
+                项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
+              </div>
+              <div :class="`${prefixCls}__card-num`">
                 参与人员：<span>{{ item.teams ?? '暂无' }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
-                完成进度：还有<span>{{ item.day }}天到期</span>
+                完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue' }">&nbsp;{{ item.day }}&nbsp;</span>天到期
               </div>
             </Card>
           </ListItem>
@@ -23,7 +26,7 @@
   </List>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive } from 'vue';
+  import { defineComponent, reactive, computed } from 'vue';
   import { List, Card, Row, Col } from 'ant-design-vue';
   import Icon from '/@/components/Icon/index';
   import { useFormStore } from '/@/store/modules/form';
@@ -67,6 +70,8 @@
             state.formList<ProjectCarModel>.push({
               id: t['id'],
               title: t['name'],
+              leaderName: t['leaderName'],
+              teams: t['teamUsers'].map((i) => i['name']).toString(),
               icon: 'gg:loadbar-doc',
               color: Color(),
               day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),

@@ -10,6 +10,11 @@
           <TableAction
             :actions="[
               {
+                icon: 'mingcute:unlock-line',
+                tooltip: '激活',
+                onClick: handleEdit.bind(null, record),
+              },
+              {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
                 onClick: handleEdit.bind(null, record),

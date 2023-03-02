@@ -31,7 +31,7 @@
           :options="state.teamOptions"
           v-if="state['teamState']"
         />
-        <a-input v-model:value="state.teamValue" :placeholder="'输入回车添加我的团队'" @pressEnter="addTeam" v-else />
+        <a-input v-model:value="state.teamValue" placeholder="请使用回车添加新团队" @pressEnter="addTeam" v-else />
         <Icon icon="material-symbols:add-box-outline" title="我的团队" size="32" class="add_button" @click="state.teamState = !state.teamState" />
       </FormItem>
       <FormItem name="skills" class="enter-x role_wrap">
@@ -44,7 +44,7 @@
           :options="state.skillOptions"
           v-if="state['skillState']"
         />
-        <a-input v-model:value="state.skillValue" :placeholder="'输入回车添加我的团队'" @pressEnter="addSkills" v-else />
+        <a-input v-model:value="state.skillValue" placeholder="请使用回车添加新技能" @pressEnter="addSkills" v-else />
         <Icon icon="material-symbols:add-box-outline" title="添加技能" size="32" class="add_button" @click="state.skillState = !state.skillState" />
       </FormItem>
 
