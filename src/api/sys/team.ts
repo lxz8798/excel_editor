@@ -1,12 +1,23 @@
 import { defHttp } from '/@/utils/http/axios';
 
 import { TeamItemModel, TeamParams } from './model/teamModel';
+import { SkillsItemModel } from '/@/api/sys/model/skillsModel';
 
 enum Api {
+  GET_ALL_TEAMS = '/user/teams',
   GET_TEAM_LIST = '/sysUserTeam/list',
   ADD_TEAM = '/sysUserTeam/add',
   DEL_TEAM = '/sysUserTeam/del',
   UPDATA_TEAM = '/sysUserTeam/update',
+}
+
+export function getAllTeams() {
+  return defHttp.get<SkillsItemModel>(
+    {
+      url: Api.GET_ALL_TEAMS,
+    },
+    {},
+  );
 }
 
 export function getTeams(params: TeamParams) {

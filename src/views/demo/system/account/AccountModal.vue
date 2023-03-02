@@ -68,7 +68,6 @@
             values.id = rowId.value;
             result = await editUser(values);
           }
-          createMessage.success(result);
           emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
           closeModal();
         } finally {

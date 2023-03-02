@@ -76,6 +76,8 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useRouter } from 'vue-router';
+  import { useSkillsStore } from '/@/store/modules/skills';
+  import { useTeamsStore } from '/@/store/modules/teams';
   defineProps({
     sessionTimeout: {
       type: Boolean,
@@ -89,9 +91,15 @@
   const formStore = useFormStore();
   const { createMessage } = useMessage();
   const router = useRouter();
+  const skillsStore = useSkillsStore();
+  const teamStore = useTeamsStore();
 
   const showLocale = localeStore.getShowPicker;
   const title = computed(() => globSetting?.title ?? '');
+
+  // INIT
+  skillsStore.setSkillsUserList();
+  teamStore.setTeamsUserList();
 
   function enterMenu(type) {
     if (!userStore.getToken) {

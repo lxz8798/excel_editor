@@ -3,10 +3,20 @@ import { defHttp } from '/@/utils/http/axios';
 import { SkillsItemModel, SkillsParams } from './model/skillsModel';
 
 enum Api {
+  GET_ALL_SKILLS = '/user/skill',
   GET_SKILLS_LIST = '/sysUserSkill/list',
   ADD_SKILLS = '/sysUserSkill/add',
   DEL_SKILLS = '/sysUserSkill/del',
   UPDATA_SKILLS = '/sysUserTeam/update',
+}
+
+export function getAllSkills() {
+  return defHttp.get<SkillsItemModel>(
+    {
+      url: Api.GET_ALL_SKILLS,
+    },
+    {},
+  );
 }
 
 export function getSkills(params: SkillsParams) {

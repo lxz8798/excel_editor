@@ -16,6 +16,7 @@ enum Api {
   ADD_USER_TAG = '/sysUserLabel/add',
   DELETE_USER_TAG = '/sysUserLabel/del',
   GET_ROLE_LIST = '/roleList',
+  SET_ACTIVE_USER = '/activeProjectUser',
 }
 
 /**
@@ -66,6 +67,10 @@ export function regUser(params) {
 
 export function editUser(params) {
   return defHttp.put({ url: Api.editUserInfo, params });
+}
+
+export function activeUser(params) {
+  return defHttp.post({ url: Api.SET_ACTIVE_USER, params });
 }
 
 export function deleteUser(params) {

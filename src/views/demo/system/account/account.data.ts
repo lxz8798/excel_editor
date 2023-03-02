@@ -1,8 +1,16 @@
+import { computed, h, toRaw } from "vue";
+
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-import { h } from 'vue';
+
 import { useUserStore } from '/@/store/modules/user';
+import { useSkillsStore } from '/@/store/modules/skills';
+import { useTeamsStore } from '/@/store/modules/teams';
+import { getRoles } from '/@/api/sys/user';
+import { getAllSkills } from "/@/api/sys/skills";
 const userStore = useUserStore();
+const skillsStore = useSkillsStore();
+const teamStore = useTeamsStore();
 export const columns: BasicColumn[] = [
   {
     title: '用户名',
@@ -31,11 +39,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'userSkills',
   },
   {
-    dataIndex: 'status',
+    dataIndex: 'activeFlag',
     title: '激活状态',
     width: 100,
     customRender: ({ record }) => {
-      return h('span', { style: `color: ${record['status'] === 1 ? 'green' : 'red'}` },record['status'] === 1 ? '已激活' : '末激活');
+      return h('span', { style: `color: ${record['status'] === 1 ? 'green' : 'red'}` },record['status'] ? '已激活' : '末激活');
     },
   },
   {
@@ -43,7 +51,8 @@ export const columns: BasicColumn[] = [
     dataIndex: 'expireTime',
     width: 200,
     ifShow: () => {
-      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
+      if (!Object.keys(userStore.getUserInfo).length) return;
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');
     },
     customRender: ({ record }) => {
       return h('span', !record['expireTime'] ? '末设置' : new Date(record['expireTime']).toLocaleDateString());
@@ -113,9 +122,11 @@ export const accountFormSchema: FormSchema[] = [
     label: '所属团队',
     component: 'Select',
     componentProps: ({ formModel, formActionType }) => {
+      const options = computed(() => toRaw(teamStore.getTeamsUserList));
       return {
         mode: 'multiple',
         placeholder: '请选择你的团队',
+        options: options,
       };
     },
   },
@@ -124,18 +135,21 @@ export const accountFormSchema: FormSchema[] = [
     label: '专业技能',
     component: 'Select',
     componentProps: ({ formModel, formActionType }) => {
+      const options = computed(() => toRaw(skillsStore.getSkillsUserList));
       return {
         mode: 'multiple',
         placeholder: '请选择你的技能',
+        options: toRaw(skillsStore.getUserSkillsList),
       };
     },
   },
   {
-    field: 'expiration',
+    field: 'expireTime',
     label: '到期时间',
     component: 'DatePicker',
     ifShow: () => {
-      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
+      if (!Object.keys(userStore.getUserInfo).length) return;
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');
     },
     componentProps: ({ formModel, formActionType }) => {
       return {
@@ -153,11 +167,14 @@ export const accountFormSchema: FormSchema[] = [
     field: 'role',
     component: 'ApiSelect',
     componentProps: {
-      // api: getAllRoleList,
+      api: getRoles,
       labelField: 'roleName',
       valueField: 'roleValue',
     },
-    required: true,
+    ifShow: () => {
+      if (!Object.keys(userStore.getUserInfo).length) return;
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');
+    },
   },
 ];
 

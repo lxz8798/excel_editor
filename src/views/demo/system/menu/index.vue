@@ -30,7 +30,7 @@
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent, nextTick } from 'vue';
+  import { computed, defineComponent, nextTick } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getMenuList } from '/@/api/demo/system';
@@ -41,7 +41,8 @@
   import { columns, searchFormSchema } from './menu.data';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { usePermissionStore } from '/@/store/modules/permission';
-
+  import { useUserStore } from '/@/store/modules/user';
+  const userStore = useUserStore();
   export default defineComponent({
     name: 'MenuManagement',
     components: { BasicTable, MenuDrawer, TableAction },
@@ -73,13 +74,24 @@
           fixed: undefined,
         },
       });
+
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
+
       function handleCreate() {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openDrawer(true, {
           isUpdate: false,
         });
       }
 
       function handleEdit(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openDrawer(true, {
           record,
           isUpdate: true,
@@ -87,6 +99,10 @@
       }
 
       function handleDelete(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         deleteMenu({ menuId: record.menuId }).then((res) => {
           permissionStore.buildRoutesAction();
           reload();

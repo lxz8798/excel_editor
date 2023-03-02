@@ -10,11 +10,6 @@
           <TableAction
             :actions="[
               {
-                icon: 'mingcute:unlock-line',
-                tooltip: '激活',
-                onClick: handleEdit.bind(null, record),
-              },
-              {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
                 onClick: handleEdit.bind(null, record),
@@ -39,7 +34,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted } from 'vue';
+import { defineComponent, reactive, onMounted, computed } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getAccountList } from '/@/api/demo/system';
@@ -52,8 +47,13 @@
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useSkillsStore } from '/@/store/modules/skills';
+  import { useTeamsStore } from '/@/store/modules/teams';
+  import { getRoles } from '/@/api/sys/user';
   const userStore = useUserStore();
   const { createMessage } = useMessage();
+  const skillsStore = useSkillsStore();
+  const teamStore = useTeamsStore();
   export default defineComponent({
     name: 'AccountManagement',
     components: { BasicTable, PageWrapper, DeptTree, AccountModal, TableAction },
@@ -61,6 +61,7 @@
       const go = useGo();
       const [registerModal, { openModal }] = useModal();
       const searchInfo = reactive<Recordable>({});
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '用户列表',
@@ -86,6 +87,13 @@
           },
         });
 
+      // INIT
+      skillsStore.setSkillsUserList();
+      teamStore.setTeamsUserList();
+      // getRoles().then((roles) => {
+      //   userStore.setRoleList(roles);
+      // });
+
       // mounted
       let timer = null;
       onMounted(() => {
@@ -97,13 +105,28 @@
       });
 
       function handleCreate() {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openModal(true, {
           isUpdate: false,
         });
       }
 
+      function activeAccount(record: Recordable) {
+        const params = {
+          expireTime: '',
+          targetUserId: 0,
+        };
+        // userStore.setActiveUser()
+      }
+
       function handleEdit(record: Recordable) {
-        console.log(record, 'record');
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         record['password'] = '';
         openModal(true, {
           record,
@@ -112,6 +135,10 @@
       }
 
       function handleDelete(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         userStore.deleteUser({ userId: record.id }).then((res) => {
           getAccountList({ page: 1, pageSize: 30 }).then((result) => {
             setTableData(result.records);
@@ -122,9 +149,7 @@
 
       function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          // 演示不刷新表格直接更新内部数据。
-          // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-          const result = updateTableDataRecord(values.id, values);
+          getAccountList({ page: 1, pageSize: 30 }).then((result) => setTableData(result.records));
         } else {
           reload().then(() => {
             const data = getRawDataSource();
@@ -146,6 +171,7 @@
         registerTable,
         registerModal,
         handleCreate,
+        activeAccount,
         handleEdit,
         handleDelete,
         handleSuccess,

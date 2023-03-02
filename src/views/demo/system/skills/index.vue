@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增团队</a-button>
+        <a-button type="primary" @click="handleCreate">新增技能</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -30,22 +30,22 @@
       </template>
     </BasicTable>
     <!--  添加和编辑  -->
-    <TeamModal @register="registerModal1" @success="handleSuccess" />
+    <SkillsModal @register="registerModal1" @success="handleSuccess" />
     <!--  添加成员  -->
-    <AddTeamMebersModal @register="registerModal2" />
+    <AddSkillsMebersModal @register="registerModal2" />
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted } from 'vue';
+import { defineComponent, reactive, onMounted, computed } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getSkills } from '/@/api/sys/skills';
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
-  import TeamModal from './TeamModal.vue';
-  import AddTeamMebersModal from './AddTeamMebersModal.vue';
-  import { columns, searchFormSchema } from './team.data';
+  import SkillsModal from './SkillsModal.vue';
+  import AddSkillsMebersModal from './AddSkillsMebersModal.vue';
+  import { columns, searchFormSchema } from './skills.data';
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -54,18 +54,18 @@
   export default defineComponent({
     name: 'AccountManagement',
     // AccountModal,
-    components: { BasicTable, PageWrapper, TeamModal, AddTeamMebersModal, TableAction },
+    components: { BasicTable, PageWrapper, SkillsModal, AddSkillsMebersModal, TableAction },
     setup() {
       const go = useGo();
       const [registerModal1, { openModal: openModal1 }] = useModal();
       const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
-
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
       userStore.setUserList({ page: 1, pageSize: 10 });
 
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
-          title: '团队列表',
+          title: '技能列表',
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },
@@ -104,12 +104,20 @@
       // });
 
       function handleCreate() {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openModal1(true, {
           isUpdate: false,
         });
       }
 
       function handleEdit(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         record['password'] = '';
         openModal1(true, {
           record,
@@ -118,6 +126,10 @@
       }
 
       function handleDelete(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         const { id } = record;
         userStore.delTeamItem({id: id}).then((res) => {
           createMessage.success(res);
@@ -128,6 +140,10 @@
       }
 
       function handleSuccess({ isUpdate, values }) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
         reload();
         // if (isUpdate) {

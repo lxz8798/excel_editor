@@ -14,7 +14,7 @@
   import { BasicForm, FormSchema, ApiTransfer, useForm } from '/@/components/Form/index';
   import { defineComponent, ref, computed, unref, toRaw } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
-  import { accountFormSchema } from './team.data';
+  import { accountFormSchema } from './skills.data';
   import { addTeamItem } from '/@/api/sys/team';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStore } from '/@/store/modules/user';

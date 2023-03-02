@@ -3,6 +3,7 @@
     <img :alt="title" src="../../../assets/svg/login-box-bg.svg" class="w-1/2 -mt-16 -enter-x" style="visibility:hidden;" />
     <LoginFormTitle class="enter-x" />
     <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
+      <!-- 角色选择 -->
       <FormItem name="account" class="enter-x role_wrap">
         <a-select
           v-model:value="formData.roleId"
@@ -22,30 +23,18 @@
 
       <!--新增表单-->
       <FormItem name="team" class="enter-x role_wrap">
-        <a-select
-          v-model:value="state.teamValue"
-          class="select-wrap"
-          :token-separators="[',']"
-          :placeholder="t('sys.login.team')"
-          @change="getTeamOptionItem"
-          :options="state.teamOptions"
-          v-if="state['teamState']"
-        />
-        <a-input v-model:value="state.teamValue" placeholder="请使用回车添加新团队" @pressEnter="addTeam" v-else />
-        <Icon icon="material-symbols:add-box-outline" title="我的团队" size="32" class="add_button" @click="state.teamState = !state.teamState" />
+        <a-select v-model:value="state.teamValue" mode="multiple" class="select-wrap" :placeholder="t('sys.login.team')" v-if="state['teamState']" @change="getTeamOptionItem">
+          <a-select-option v-for="(item, key) in state.teamOptions" :value="key">{{item.label}}</a-select-option>
+        </a-select>
+        <a-input v-model:value="state.teamValue" placeholder="输入完成后回车添加" @pressEnter="addTeam" v-else />
+        <Icon icon="material-symbols:add-box-outline" title="我的团队" size="32" class="add_button" @click="clickTeamOptionItem" />
       </FormItem>
       <FormItem name="skills" class="enter-x role_wrap">
-        <a-select
-          v-model:value="state.skillValue"
-          class="select-wrap"
-          :token-separators="[',']"
-          :placeholder="t('sys.login.skills')"
-          @change="getSkillOptionItem"
-          :options="state.skillOptions"
-          v-if="state['skillState']"
-        />
-        <a-input v-model:value="state.skillValue" placeholder="请使用回车添加新技能" @pressEnter="addSkills" v-else />
-        <Icon icon="material-symbols:add-box-outline" title="添加技能" size="32" class="add_button" @click="state.skillState = !state.skillState" />
+        <a-select v-model:value="state.skillValue" mode="multiple" class="select-wrap" :placeholder="t('sys.login.skills')" v-if="state['skillState']" @change="getSkillOptionItem">
+          <a-select-option v-for="(item, key) in state.skillOptions" :value="key">{{item.label}}</a-select-option>
+        </a-select>
+        <a-input v-model:value="state.skillValue" placeholder="输入完成后回车添加" @pressEnter="addSkills" v-else />
+        <Icon icon="material-symbols:add-box-outline" title="添加技能" size="32" class="add_button" @click="clickSkillsOptionItem" />
       </FormItem>
 
       <FormItem name="realName" class="enter-x">
@@ -58,6 +47,7 @@
       </FormItem>
       <FormItem name="phone" class="enter-x">
         <Input
+          type="number"
           size="large"
           v-model:value="formData.phone"
           :placeholder="t('sys.login.phone')"
@@ -112,11 +102,10 @@
   </template>
 </template>
 <script lang="ts" setup>
-  import { reactive, ref, toRefs, unref, computed, h } from "vue";
+import { reactive, ref, unref, computed, toRaw } from "vue";
   import LoginFormTitle from './LoginFormTitle.vue';
   import { Form, Input, Button, Checkbox, Select } from 'ant-design-vue';
   import { StrengthMeter } from '/@/components/StrengthMeter';
-  import { CountdownInput } from '/@/components/CountDown';
   import { Icon } from '/@/components/Icon';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useLoginState, useFormRules, useFormValid, LoginStateEnum } from './useLogin';
@@ -126,13 +115,10 @@
   import { useSkillsStore } from '/@/store/modules/skills';
   import { useTeamsStore } from '/@/store/modules/teams';
 
-  const skillsStore = useSkillsStore();
-  const teamStore = useTeamsStore();
-
   const FormItem = Form.Item;
   const InputPassword = Input.Password;
   const { t } = useI18n();
-  const { handleBackLogin, getLoginState } = useLoginState();
+  const { handleBackLogin, getLoginState, setLoginState } = useLoginState();
 
   const ASelect = Select;
   const ASelectOption = Select.Option;
@@ -166,6 +152,18 @@
   const { getFormRules } = useFormRules(formData);
   const { validForm } = useFormValid(formRef);
   const userStore = useUserStore();
+  const skillsStore = useSkillsStore();
+  const teamStore = useTeamsStore();
+
+  // INIT
+  state.skillOptions = computed(() => toRaw(skillsStore.getSkillsUserList));
+  state.teamOptions = computed(() => toRaw(teamStore.getTeamsUserList));
+  // skillsStore.setSkillsUserList().then((res) => {
+  //   state.skillOptions = res;
+  // });
+  // teamStore.setTeamsUserList().then((res) => {
+  //   state.teamOptions = res;
+  // });
 
   const getShow = computed(() => unref(getLoginState) === LoginStateEnum.REGISTER);
   const roleOptions = computed(() =>
@@ -192,14 +190,15 @@
     state['teamValue'] = state.teamOptions;
   }
 
-  function getTeamOptionItem(value, option) {
-    // if (!value.length) {
-    //   if (formData['roleId'] === '3') {
-    //     createMessage.info('请先输入或选择团队!');
-    //     return;
-    //   }
-    // }
-    state['teamValue'] = option;
+  function getTeamOptionItem(e) {
+    state['teamValue'] = toRaw(state.teamValue).map((i,k) => ({ icon: state.teamOptions[k]['icon'], label: state.teamOptions[k]['label'] }));
+  }
+
+  function clickTeamOptionItem() {
+    if (state['teamState']) {
+      state['teamValue'] = '';
+    }
+    state.teamState = !state.teamState;
   }
 
   function addSkills(e) {
@@ -217,7 +216,17 @@
   }
 
   function getSkillOptionItem(value, option) {
-    state['skillValue'] = option;
+    // state['skillValue'] = option;
+    state['skillValue'] = toRaw(state.skillValue).map((i,k) => ({ icon: state.skillOptions[k]['icon'], label: state.skillOptions[k]['label'] }));
+  }
+
+  function clickSkillsOptionItem() {
+    if (state['skillState']) {
+      state['skillValue'] = '';
+    } else {
+      addSkills();
+    }
+    state.skillState = !state.skillState;
   }
 
   async function handleRegister() {
@@ -261,6 +270,7 @@
             break;
         }
       }
+      if (res === '注册成功') setLoginState(LoginStateEnum.LOGIN);
     });
     if (!data) return;
   }

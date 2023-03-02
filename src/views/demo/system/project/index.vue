@@ -71,6 +71,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       const [registerModal1, { openModal: openModal1 }] = useModal();
       const [registerModal2, { openModal: openModal2, setModalProps }] = useModal();
       const searchInfo = reactive<Recordable>({});
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
 
       userStore.setUserList({ page: 1, pageSize: 10 });
       permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
@@ -111,12 +112,20 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       // });
 
       function handleCreate() {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openModal1(true, {
           isUpdate: false,
         });
       }
 
       function addProjectMebers(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openModal2(true, {
           isUpdate: false,
           project: record,
@@ -124,6 +133,10 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       }
 
       function handleEdit(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         console.log(record, 'record');
         record['password'] = '';
         openModal1(true, {
@@ -133,6 +146,10 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       }
 
       function handleDelete(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         // userStore.deleteUser({ userId: record.id }).then((res) => {
         //   delProject({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId }).then(
         //     (result) => {
@@ -141,7 +158,6 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
         //     },
         //   );
         // });
-        console.log(record, 'record');
         createConfirm({
           iconType: 'warning',
           title: () => h('span', '删除有风险!'),

@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增技能</a-button>
+        <a-button type="primary" @click="handleCreate">新增团队</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -36,7 +36,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted } from 'vue';
+import { defineComponent, reactive, onMounted, computed } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getTeams } from '/@/api/sys/team';
@@ -60,7 +60,7 @@
       const [registerModal1, { openModal: openModal1 }] = useModal();
       const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
-
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
       userStore.setUserList({ page: 1, pageSize: 10 });
 
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
@@ -104,12 +104,20 @@
       // });
 
       function handleCreate() {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         openModal1(true, {
           isUpdate: false,
         });
       }
 
       function handleEdit(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         record['password'] = '';
         openModal1(true, {
           record,
@@ -118,6 +126,10 @@
       }
 
       function handleDelete(record: Recordable) {
+        if (isActive) {
+          createMessage.info('当前账户末激活!');
+          return;
+        }
         const { id } = record;
         userStore.delTeamItem({id: id}).then((res) => {
           createMessage.success(res);

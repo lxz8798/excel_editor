@@ -13,6 +13,7 @@ import {
   loginApi,
   regUser,
   deleteUser,
+  activeUser,
   getUserTagList,
   addUserTag,
   deleteUserTag,
@@ -205,6 +206,10 @@ export const useUserStore = defineStore({
       this.setSessionTimeout(false);
       this.setUserInfo(null);
       goLogin && router.push(PageEnum.BASE_LOGIN);
+    },
+    async setActiveUser(params: registerModel) {
+      const res = await activeUser(params);
+      return res;
     },
     async regUser(params: registerModel) {
       const { createMessage } = useMessage();
