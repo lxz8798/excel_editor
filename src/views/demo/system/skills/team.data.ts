@@ -8,12 +8,8 @@ export const columns: BasicColumn[] = [
     width: 100,
   },
   {
-    title: '团队名称',
+    title: '技能名称',
     dataIndex: 'label',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
   },
 ];
 
@@ -54,8 +50,12 @@ export const accountFormSchema: FormSchema[] = [
 
 export const teamFormSchema: BasicColumn[] = [
   {
-    title: '技能名称',
+    title: '用户名',
     dataIndex: 'name',
+  },
+  {
+    title: '团队',
+    dataIndex: 'team',
   },
   {
     title: '技能',

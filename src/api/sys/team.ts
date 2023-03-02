@@ -29,7 +29,7 @@ export function addTeamItem(params: TeamParams) {
   );
 }
 
-export function editTeam(params) {
+export function editTeamItem(params) {
   return defHttp.put<TeamItemModel>(
     {
       url: `${Api.UPDATA_TEAM}/${params.id}`,

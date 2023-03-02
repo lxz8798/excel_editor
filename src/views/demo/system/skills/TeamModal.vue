@@ -7,10 +7,12 @@
   import { defineComponent, ref, computed, unref } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { accountFormSchema } from './project.data';
-  import { regUser, editUser } from '/@/api/sys/user';
+  import { accountFormSchema } from './team.data';
+  import { addTeamItem } from '/@/api/sys/team';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useUserStore } from '/@/store/modules/user';
   const { createMessage } = useMessage();
+  const userStore = useUserStore();
   export default defineComponent({
     name: 'AccountModal',
     components: { BasicModal, BasicForm },
@@ -19,7 +21,7 @@
       const isUpdate = ref(true);
       const rowId = ref('');
 
-      const [registerForm, { setFieldsValue, updateSchema, resetFields, validate }] = useForm({
+      const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
         labelWidth: 100,
         baseColProps: { span: 24 },
         schemas: accountFormSchema,
@@ -40,36 +42,19 @@
             ...data.record,
           });
         }
-
-        // const treeData = await getDeptList();
-        // updateSchema([
-        //   {
-        //     field: 'pwd',
-        //     show: !unref(isUpdate),
-        //   },
-        //   {
-        //     field: 'dept',
-        //     componentProps: { treeData },
-        //   },
-        // ]);
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增团队' : '编辑团队'));
 
       async function handleSubmit() {
         try {
           const values = await validate();
           setModalProps({ confirmLoading: true });
           // TODO custom api
-          let result = '';
-          if (!unref(isUpdate)) {
-            result = await regUser(values);
-          } else {
-            values.id = rowId.value;
-            result = await editUser(values);
-          }
-          createMessage.success(result);
-          emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
+          addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) => {
+              emit('success', { isUpdate: unref(isUpdate), values: values });
+            },
+          );
           closeModal();
         } finally {
           setModalProps({ confirmLoading: false });

@@ -3,17 +3,12 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增团队</a-button>
+        <a-button type="primary" @click="handleCreate">新增技能</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
-              {
-                icon: 'fluent:people-team-add-24-filled',
-                tooltip: '添加成员',
-                onClick: addTeamMebers.bind(null, record),
-              },
               {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
@@ -70,7 +65,7 @@
 
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
-          title: '团队列表',
+          title: '技能列表',
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },
@@ -115,7 +110,6 @@
       }
 
       function handleEdit(record: Recordable) {
-        console.log(record, 'record');
         record['password'] = '';
         openModal1(true, {
           record,
@@ -157,7 +151,6 @@
         openModal2(true, {
           isUpdate: false,
         });
-
       }
 
       return {

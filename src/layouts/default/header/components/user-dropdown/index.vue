@@ -25,6 +25,12 @@
           icon="ion:lock-closed-outline"
         />
         <MenuItem
+          v-if="getUseLockPage"
+          key="changePassword"
+          :text="t('routes.demo.system.password')"
+          icon="mdi:password-check-outline"
+        />
+        <MenuItem
           key="logout"
           :text="t('layout.header.dropdownItemLoginOut')"
           icon="ion:power-outline"

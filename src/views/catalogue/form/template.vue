@@ -12,6 +12,7 @@
       :accept="['.xlsx']"
       :uploadParams="uploadParams"
       @change="handleChange"
+      v-show="isAdmin || isLeader"
     />
     <CollapseContainer
       class="form_wrap"
@@ -28,7 +29,7 @@
               v-model:value="projectNameDefalutValue"
             >
               <template #suffix>
-                <Icon icon="line-md:confirm-circle" @click="changeProjectName" title="添加项目名称" />
+                <Icon  icon="line-md:confirm-circle" @click="changeProjectName" title="添加项目名称" />
               </template> </a-input
           ></span>
           <span v-else>
@@ -36,7 +37,7 @@
               <a-select-option v-for="item in projectNames" :key="item.id">
                 <div style="display: flex; align-items: center; justify-content: space-between">
                   <span>{{ item.name }}</span>
-                  <Icon icon="material-symbols:delete-forever-outline" style="color: red" @click="delProjectName($event, item)" title="删除项目名称"></Icon>
+                  <Icon icon="material-symbols:delete-forever-outline" style="color: red" @click="delProjectName($event, item)" title="删除项目名称" v-if="isAdmin || isLeader"></Icon>
                 </div>
               </a-select-option>
               <template #suffixIcon>
@@ -62,31 +63,55 @@
           :key="index"
         >
           <div class="row">{{ form.label }}</div>
-          <div
-            class="column"
-            v-for="(input, key) in form.inputs"
-            :key="key"
-            :class="input.type === 'add' && 'add_icon'"
-            :data-input="JSON.stringify(input)"
-            @click="clickInputItem($event, input, form, key, index)"
-          >
-            <Input
-              size="large"
-              v-model:value="input.value"
-              :item="input"
-              v-if="input.type === 'input'"
-              @change="changeInputeValue($event, input, key, index)"
-            />
-            <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
-          </div>
+          <template v-if="isAdmin || isLeader">
+            <div
+              class="column"
+              v-for="(input, key) in form.inputs"
+              :key="key"
+              :class="input.type === 'add' && 'add_icon'"
+              :data-input="JSON.stringify(input)"
+              @click="clickInputItem($event, input, form, key, index)"
+            >
+              <Input
+                size="large"
+                v-model:value="input.value"
+                :item="input"
+                v-if="input.type === 'input'"
+                @change="changeInputeValue($event, input, key, index)"
+              />
+              <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+            </div>
+          </template>
+          <template v-else>
+            <div
+              class="column"
+              v-for="(input, key) in form.inputs"
+              :key="key"
+              :class="input.type === 'add' && 'add_icon'"
+              :data-input="JSON.stringify(input)"
+              @click="clickInputItem($event, input, form, key, index)"
+              @mouseenter="displayEnterHandler"
+              @mouseleave="displayLeaveHandler"
+            >
+              <Input
+                size="large"
+                v-model:value="input.value"
+                :item="input"
+                v-if="input.type === 'input'"
+                @change="changeInputeValue($event, input, key, index)"
+              />
+              <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+            </div>
+          </template>
         </div>
       </div>
-      <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" />
+      <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" v-show="isAdmin || isLeader" />
       <BasicForm
         @register="register"
         @submit="handleSubmit"
         @save="saveFormDatas"
         style="margin-top: 25px"
+        v-show="isAdmin || isLeader"
       >
         <template #advanceAfter>
           <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>
@@ -202,6 +227,8 @@
         heartbeat: true,
       });
       const uplpdaNum = computed(() => userStore.getTemplateUpdate);
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
       watch(
         uplpdaNum,
         () => {
@@ -407,6 +434,20 @@
           value: '',
         });
       }
+      function displayEnterHandler() {
+        const style = document.createElement('style');
+        document.head.appendChild(style);
+        const sheet = style.sheet;
+        sheet.addRule('.column:hover::before', 'display:none;');
+        sheet.insertRule('.column:hover::before{display:none;}');
+      }
+      function displayLeaveHandler() {
+        const style = document.createElement('style');
+        document.head.appendChild(style);
+        const sheet = style.sheet;
+        sheet.addRule('.column:hover::before', 'display:block;');
+        sheet.insertRule('.column:hover::before{display:block;}');
+      }
       function addInputRow() {
         mergeForm.value.map((i) => {
           i.inputs.push({
@@ -600,6 +641,8 @@
         delProjectName,
         changeAddProjectNameFlagState,
         clickInputItem,
+        displayEnterHandler,
+        displayLeaveHandler,
         uploadApi,
         editDoneHandler,
         handleChange: (list: string[]) => {
@@ -607,6 +650,8 @@
         },
         addInputRow,
         editTemplateTitle,
+        isAdmin,
+        isLeader,
       };
     },
   });

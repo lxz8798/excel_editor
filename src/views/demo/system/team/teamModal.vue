@@ -8,7 +8,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { accountFormSchema } from './team.data';
-  import { addTeamItem } from '/@/api/sys/team';
+  import { addTeamItem, editTeamItem } from '/@/api/sys/team';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStore } from '/@/store/modules/user';
   const { createMessage } = useMessage();
@@ -51,10 +51,12 @@
           const values = await validate();
           setModalProps({ confirmLoading: true });
           // TODO custom api
-          addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) => {
-              emit('success', { isUpdate: unref(isUpdate), values: values });
-            },
-          );
+          if (!unref(isUpdate)) {
+            addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) =>  emit('success', { isUpdate: unref(isUpdate), values: values }));
+          } else {
+            console.log(values, 'values');
+            // editTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) => emit('success', { isUpdate: unref(isUpdate), values: values }));
+          }
           closeModal();
         } finally {
           setModalProps({ confirmLoading: false });

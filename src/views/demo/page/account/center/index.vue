@@ -26,7 +26,7 @@
         <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpan="false">
           <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
             <Icon :icon="team.icon" :color="team.color" />
-            <span>{{ team.title }}</span>
+            <span :style="{ color: team.color }">{{ team.label }}</span>
           </div>
         </CollapseContainer>
       </a-col>
@@ -74,7 +74,7 @@
   import Project from './Project.vue';
 
   import headerImg from '/@/assets/images/header.jpg';
-  import { tags, teams, details, achieveList } from './data';
+  import { tags, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
 
@@ -98,12 +98,15 @@
       const showDeleteIcon = ref(false);
       const addTagValue = ref('');
 
+      userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
+      userStore.setTeamList({ userId: userStore.getUserInfo.userId });
+
       const avatar = computed(() => userStore.getUserInfo.avatar || headerImg);
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
       const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
       const tagList = computed(() => userStore.getUserTagsList || []);
-      userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
-      userStore.setTeamList({ userId: userStore.getUserInfo.userId });
+      const teams = computed(() => userStore.getTeamList || []);
+
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
       // 添加TAG
       function addUserTagHandler() {

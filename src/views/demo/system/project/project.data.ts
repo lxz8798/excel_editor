@@ -1,7 +1,15 @@
-import { regUser } from '/@/api/sys/user';
+import { h, toRaw } from 'vue';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-
+import { usePermissionStore } from '/@/store/modules/permission';
+import { useProjectStore } from '/@/store/modules/project';
+import { getProjectUserList } from '/@/api/sys/project';
+import { useMessage } from '/@/hooks/web/useMessage';
+import { useUserStore } from '/@/store/modules/user';
+import { Option } from "ant-design-vue/es/vc-util/Children/toArray";
+const { createMessage } = useMessage();
+const projectStore = useProjectStore();
+const userStore = useUserStore();
 export const columns: BasicColumn[] = [
   {
     title: '项目名称',
@@ -9,18 +17,21 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '项目长',
-    dataIndex: 'projectName',
+    dataIndex: 'leaderName',
     width: 120,
   },
   {
-    title: '参与人',
-    dataIndex: 'projectName',
+    title: '团队成员',
+    dataIndex: 'teamUsers',
     width: 300,
+    customRender: ({ record }) => {
+      return h('span', record['teamUsers'].map((i) => i['name']).toString());
+    },
   },
   {
-    title: '限时完成',
-    dataIndex: 'LimitedTime',
-    width: 120,
+    title: '到期时间',
+    dataIndex: 'targetTime',
+    width: 200,
   },
 ];
 
@@ -39,101 +50,98 @@ export const searchFormSchema: FormSchema[] = [
   },
 ];
 
-export const accountFormSchema: FormSchema[] = [
+export const projectFormSchema: FormSchema[] = [
   {
-    field: 'name',
-    label: '用户名',
-    component: 'Input',
+    field: 'projectAdminId',
+    label: '指定项目长',
+    component: 'AutoComplete',
     rules: [
       {
         required: true,
-        message: '请输入用户名',
+        message: '管理员新建项目需要指定项目长',
       },
-      // {
-      //   validator(_, value) {
-      //     return new Promise((resolve, reject) => {
-      //       isAccountExist(value)
-      //         .then(() => resolve())
-      //         .catch((err) => {
-      //           reject(err.message || '验证失败');
-      //         });
-      //     });
-      //   },
-      // },
     ],
-  },
-  {
-    field: 'password',
-    label: '密码',
-    component: 'InputPassword',
-    required: true,
-  },
-  {
-    field: 'realName',
-    label: '真实名称',
-    component: 'Input',
-    required: true,
-  },
-  {
-    field: 'teamName',
-    label: '所属团队',
-    component: 'Select',
-    // componentProps: {
-    //   mode: 'tags',
-    // },
+    show: ({ values }) => {
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
+    },
     componentProps: ({ formModel, formActionType }) => {
-      console.log(formModel);
-      console.log(formActionType);
       return {
-        mode: 'tags',
+        allowClear: true,
+        placeholder: '管理员新建项目需要指定项目长',
+        labelField: 'name',
+        valueField: 'id',
+        options: toRaw(projectStore.getProjectUserList).map((i) => ({ value: i['name'] })),
+        filterOption: (input: string, option: Option) => {
+          return option['value'].includes(input);
+        },
       };
     },
   },
   {
-    field: 'skills',
-    label: '专业技能',
-    component: 'Select',
+    field: 'menuName',
+    label: '技术',
+    component: 'TreeSelect',
+    componentProps: ({ formModel, formActionType }) => {
+      const permissionStore = usePermissionStore();
+      const _technology = toRaw(permissionStore.getTechnologyTree);
+      return {
+        allowClear: true,
+        showSearch: true,
+        placeholder: '请先择技术在绑定',
+        treeData: _technology,
+        filterTreeNode: (str, node) => {
+          return node['menuName'].includes(str);
+        },
+        fieldNames: {
+          children: 'children',
+          label: 'menuName',
+          key: 'menuId',
+          value: 'menuId',
+        },
+        onChange: (id) => {
+          _technology.forEach((m) => {
+            let _node: object = {},
+              _technologyIds: string[] = [];
+            if (m.hasOwnProperty('children') && m['children']) {
+              _node = m.children.filter((i) => i['menuId'] === id)[0];
+              if (_node) {
+                _technologyIds = _node['children'][0]['children'].map((i) => i['menuId']); // 只取第一个源数据的所有表单
+                projectStore.setMenuIds(_technologyIds);
+              } else {
+                createMessage.warning('请选择技术本身而不是其父级或子级!');
+              }
+            }
+          });
+        },
+      };
+    },
+    rules: [
+      {
+        required: true,
+        message: '请输入项目名称',
+      },
+    ],
   },
   {
-    field: 'phone',
-    label: '手机号',
-    component: 'InputNumber',
-  },
-  // {
-  //   label: '角色',
-  //   field: 'role',
-  //   component: 'ApiSelect',
-  //   componentProps: {
-  //     api: getAllRoleList,
-  //     labelField: 'roleName',
-  //     valueField: 'roleValue',
-  //   },
-  //   required: true,
-  // },
-  // {
-  //   field: 'dept',
-  //   label: '所属部门',
-  //   component: 'TreeSelect',
-  //   componentProps: {
-  //     fieldNames: {
-  //       label: 'deptName',
-  //       key: 'id',
-  //       value: 'id',
-  //     },
-  //     getPopupContainer: () => document.body,
-  //   },
-  //   required: true,
-  // },
-  {
-    label: '邮箱',
-    field: 'email',
+    field: 'name',
+    label: '项目名称',
     component: 'Input',
+    rules: [
+      {
+        required: true,
+        message: '请输入项目名称',
+      },
+    ],
   },
-
   {
-    label: '备注',
-    field: 'remark',
-    component: 'InputTextArea',
+    field: 'daysLeft',
+    label: '到期时间',
+    component: 'DatePicker',
+    componentProps: ({ formModel, formActionType }) => {
+      return {
+        style: 'width: 100%',
+      };
+    },
   },
 ];
 

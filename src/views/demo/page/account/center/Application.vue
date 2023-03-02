@@ -7,17 +7,14 @@
             <Card :hoverable="true" :class="`${prefixCls}__card`" @click="clickHandler(item)">
               <div :class="`${prefixCls}__card-title`">
                 <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
-                {{ item.title }}
+                <span :style="{ color: item.color }">{{ item.title }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
-                表单描述：<span>{{ item.des == '' && '暂无描述' }}</span>
+                参与人员：<span>{{ item.teams ?? '暂无' }}</span>
               </div>
-              <Icon
-                :class="`${prefixCls}__card-download`"
-                v-if="item.download"
-                :icon="item.download"
-                @click="downloadExcel(item)"
-              />
+              <div :class="`${prefixCls}__card-num`">
+                完成进度：还有<span>{{ item.day }}天到期</span>
+              </div>
             </Card>
           </ListItem>
         </a-col>
@@ -31,9 +28,19 @@
   import Icon from '/@/components/Icon/index';
   import { useFormStore } from '/@/store/modules/form';
   import { useGlobSetting } from '/@/hooks/setting';
+  import { getOwnerProjectList } from '/@/api/sys/project';
+  import { useUserStore } from '/@/store/modules/user';
   const { apiUrl } = useGlobSetting();
   // 使用表单
   const formStore = useFormStore();
+  const userStore = useUserStore();
+  interface ProjectCarModel {
+    id?: number | string;
+    title: string;
+    icon?: string;
+    color?: Function | string;
+    day: string;
+  }
   export default defineComponent({
     components: {
       List,
@@ -47,17 +54,29 @@
       const state = reactive({
         formList: [],
       });
-      formStore.getTempList.forEach((t) => {
-        state.formList.push({
-          id: t.id,
-          title: t.templateTitle,
-          icon: 'gg:loadbar-doc',
-          color: '#1890ff',
-          des: t.templateDesc,
-          download: 'bx:bx-download',
-          downLoadUri: apiUrl + '/excel/downLoadExcelVertical?templateId=' + t.id,
-        });
-      });
+      function Color() {
+        let r, g, b;
+        r = Math.floor(Math.random() * 255);
+        g = Math.floor(Math.random() * 255);
+        b = Math.floor(Math.random() * 255);
+        return 'rgba(' + r + ',' + g + ',' + b + ',0.8)';
+      }
+      getOwnerProjectList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId }).then(
+        (result) => {
+          result.forEach((t) => {
+            state.formList<ProjectCarModel>.push({
+              id: t['id'],
+              title: t['name'],
+              icon: 'gg:loadbar-doc',
+              color: Color(),
+              day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),
+              // des: t.templateDesc,
+              // download: 'bx:bx-download',
+              // downLoadUri: apiUrl + '/excel/downLoadExcelVertical?templateId=' + t.id,
+            });
+          });
+        },
+      );
       function clickHandler(form) {
         // window.location.href = apiUrl + '/form/template/' + form.id;
       }
@@ -79,6 +98,23 @@
   });
 </script>
 <style lang="less">
+  .ant-list {
+    .ant-spin-container {
+      .ant-row {
+        justify-content: flex-start !important;
+        align-items: center !important;
+        .ant-list-item {
+          .ant-card {
+            .ant-card-body {
+              .account-center-application__card-num {
+                margin-left: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   .account-center-application {
     &__card {
       width: 100%;

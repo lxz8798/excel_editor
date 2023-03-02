@@ -24,9 +24,9 @@ import { usePermissionStore } from '/@/store/modules/permission';
 import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
-import { h } from 'vue';
+import { h, toRaw } from "vue";
 import { getTeams, delTeam } from '/@/api/sys/team';
-import { getProjectList } from '/@/api/sys/project';
+import { getProjects, getOwnerProjectList, delProject, addProject } from '/@/api/sys/project';
 import { getAccountList } from '/@/api/demo/system';
 interface UserState {
   userInfo: Nullable<UserInfo>;
@@ -94,7 +94,10 @@ export const useUserStore = defineStore({
       return this.teamList;
     },
     getUserList(): [] {
-      return this.userList;
+      const noNeeded = ['admin', this.userInfo['userName'] !== 'admin' ? this.userInfo['userName'] : null];
+      // if (!this.userList.length) return;
+      const _list = toRaw(this.userList).filter((i) => !noNeeded.includes(i['name']));
+      return _list;
     },
   },
   actions: {
@@ -229,15 +232,25 @@ export const useUserStore = defineStore({
     async deleteUserTag(params: object) {
       return await deleteUserTag(params);
     },
-    // 得到用户列表
-    async setProjectList(params) {
-      return await getProjectList(params);
-    },
     // 得到团队列表
     async setTeamList(params) {
-      return await getTeams(params);
+      this.teamList = await getTeams(params);
+      console.log(this.teamList, 'this.teamList');
     },
+    // 删除团队
     async delTeamItem(params) {
+      return await delTeam(params);
+    },
+    // 得到项目列表
+    async setProjectList(params) {
+      return await getOwnerProjectList(params);
+    },
+    // 添加合同
+    async addProject(params) {
+      return await addProject(params);
+    },
+    // 删除项目
+    async delProjectItem(params) {
       return await delTeam(params);
     },
     /**

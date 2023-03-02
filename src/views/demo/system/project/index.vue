@@ -9,12 +9,16 @@
         <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
-              // {
-              //   icon: 'material-symbols:play-arrow-rounded',
-              //   color: 'green',
-              //   tooltip: '计算',
-              //   // onClick: handleView.bind(null, record),
-              // },
+              {
+                icon: 'material-symbols:play-arrow-rounded',
+                color: 'green',
+                tooltip: '计算',
+              },
+              {
+                icon: 'fluent:people-team-add-24-filled',
+                tooltip: '添加成员',
+                onClick: addProjectMebers.bind(null, record),
+              },
               {
                 icon: 'clarity:note-edit-line',
                 tooltip: '编辑',
@@ -35,35 +39,46 @@
         </template>
       </template>
     </BasicTable>
-    <ProjectModal @register="registerModal" @success="handleSuccess" />
+    <!--  新增和编辑  -->
+    <ProjectModal @register="registerModal1" @success="handleSuccess" />
+    <!--  添加成员  -->
+    <AddProjectMebersModal @register="registerModal2" />
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted } from 'vue';
+import { defineComponent, reactive, onMounted, h, computed } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getProjectList } from '/@/api/sys/project';
+  import { getOwnerProjectList, delProject } from '/@/api/sys/project';
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
   import ProjectModal from './projectModal.vue';
+  import AddProjectMebersModal from './AddTeamMebersModal.vue';
   import { columns, searchFormSchema } from './project.data';
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { usePermissionStore } from '/@/store/modules/permission';
+  const permissionStore = usePermissionStore();
   const userStore = useUserStore();
-  const { createMessage } = useMessage();
+  const { createMessage, createConfirm } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
-    components: { BasicTable, PageWrapper, ProjectModal, TableAction },
+    components: { BasicTable, PageWrapper, ProjectModal, AddProjectMebersModal, TableAction },
     setup() {
       const go = useGo();
-      const [registerModal, { openModal }] = useModal();
+      const [registerModal1, { openModal: openModal1 }] = useModal();
+      const [registerModal2, { openModal: openModal2, setModalProps }] = useModal();
       const searchInfo = reactive<Recordable>({});
+
+      userStore.setUserList({ page: 1, pageSize: 10 });
+      permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
+
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '项目列表',
-          api: getProjectList,
+          api: getOwnerProjectList,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -96,26 +111,48 @@
       // });
 
       function handleCreate() {
-        openModal(true, {
+        openModal1(true, {
           isUpdate: false,
+        });
+      }
+
+      function addProjectMebers(record: Recordable) {
+        openModal2(true, {
+          isUpdate: false,
+          project: record,
         });
       }
 
       function handleEdit(record: Recordable) {
         console.log(record, 'record');
         record['password'] = '';
-        openModal(true, {
+        openModal1(true, {
           record,
           isUpdate: true,
         });
       }
 
       function handleDelete(record: Recordable) {
-        userStore.deleteUser({ userId: record.id }).then((res) => {
-          getProjectList({ page: 1, pageSize: 30 }).then((result) => {
-            setTableData(result.records);
-            createMessage.success(res);
-          });
+        // userStore.deleteUser({ userId: record.id }).then((res) => {
+        //   delProject({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId }).then(
+        //     (result) => {
+        //       setTableData(result['records']);
+        //       createMessage.success(res);
+        //     },
+        //   );
+        // });
+        console.log(record, 'record');
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '删除有风险!'),
+          content: () => h('span', '是否确认删除？'),
+          onOk: async () => {
+            delProject({ id: record['id'] }).then((result) => {
+              console.log(result, 'result');
+              reload();
+              createMessage.success(result);
+            });
+          },
         });
       }
 
@@ -123,11 +160,14 @@
         if (isUpdate) {
           // 演示不刷新表格直接更新内部数据。
           // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-          const result = updateTableDataRecord(values.id, values);
+          // const result = updateTableDataRecord(values.id, values);
         } else {
           reload().then(() => {
-            const data = getRawDataSource();
-            setTableData(data.records);
+            getOwnerProjectList({
+              page: 1,
+              pageSize: 10,
+              userId: userStore.getUserInfo.userId,
+            }).then((res) => setTableData(res));
           });
         }
       }
@@ -143,8 +183,10 @@
 
       return {
         registerTable,
-        registerModal,
+        registerModal1,
+        registerModal2,
         handleCreate,
+        addProjectMebers,
         handleEdit,
         handleDelete,
         handleSuccess,

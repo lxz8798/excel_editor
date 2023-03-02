@@ -1,6 +1,8 @@
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-
+import { h } from 'vue';
+import { useUserStore } from '/@/store/modules/user';
+const userStore = useUserStore();
 export const columns: BasicColumn[] = [
   {
     title: '用户名',
@@ -13,6 +15,14 @@ export const columns: BasicColumn[] = [
     width: 160,
   },
   {
+    title: '角色',
+    dataIndex: 'roleList',
+    width: 160,
+    customRender: ({ record }) => {
+      return h('span', record['roleList'].map((i) => i['roleName']).toString());
+    },
+  },
+  {
     title: '所属团队',
     dataIndex: 'userTeams',
   },
@@ -21,9 +31,23 @@ export const columns: BasicColumn[] = [
     dataIndex: 'userSkills',
   },
   {
+    dataIndex: 'status',
+    title: '激活状态',
+    width: 100,
+    customRender: ({ record }) => {
+      return h('span', { style: `color: ${record['status'] === 1 ? 'green' : 'red'}` },record['status'] === 1 ? '已激活' : '末激活');
+    },
+  },
+  {
     title: '到期时间',
-    dataIndex: 'DaysLeft',
-    width: 120,
+    dataIndex: 'expireTime',
+    width: 200,
+    ifShow: () => {
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
+    },
+    customRender: ({ record }) => {
+      return h('span', !record['expireTime'] ? '末设置' : new Date(record['expireTime']).toLocaleDateString());
+    },
   },
 ];
 
@@ -66,29 +90,32 @@ export const accountFormSchema: FormSchema[] = [
     ],
   },
   {
-    field: 'password',
-    label: '密码',
-    component: 'InputPassword',
-    required: true,
-  },
-  {
     field: 'realName',
     label: '真实名称',
     component: 'Input',
     required: true,
   },
   {
+    field: 'password',
+    label: '密码',
+    component: 'InputPassword',
+    componentProps: {
+      placeholder: '如果不需要修改密码则不填',
+    },
+  },
+  {
+    label: '邮箱',
+    field: 'email',
+    component: 'Input',
+  },
+  {
     field: 'teamName',
     label: '所属团队',
     component: 'Select',
-    // componentProps: {
-    //   mode: 'tags',
-    // },
     componentProps: ({ formModel, formActionType }) => {
-      console.log(formModel);
-      console.log(formActionType);
       return {
-        mode: 'tags',
+        mode: 'multiple',
+        placeholder: '请选择你的团队',
       };
     },
   },
@@ -96,11 +123,20 @@ export const accountFormSchema: FormSchema[] = [
     field: 'skills',
     label: '专业技能',
     component: 'Select',
+    componentProps: ({ formModel, formActionType }) => {
+      return {
+        mode: 'multiple',
+        placeholder: '请选择你的技能',
+      };
+    },
   },
   {
     field: 'expiration',
     label: '到期时间',
     component: 'DatePicker',
+    ifShow: () => {
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
+    },
     componentProps: ({ formModel, formActionType }) => {
       return {
         style: 'width: 100%',
@@ -112,41 +148,16 @@ export const accountFormSchema: FormSchema[] = [
     label: '手机号',
     component: 'InputNumber',
   },
-  // {
-  //   label: '角色',
-  //   field: 'role',
-  //   component: 'ApiSelect',
-  //   componentProps: {
-  //     api: getAllRoleList,
-  //     labelField: 'roleName',
-  //     valueField: 'roleValue',
-  //   },
-  //   required: true,
-  // },
-  // {
-  //   field: 'dept',
-  //   label: '所属部门',
-  //   component: 'TreeSelect',
-  //   componentProps: {
-  //     fieldNames: {
-  //       label: 'deptName',
-  //       key: 'id',
-  //       value: 'id',
-  //     },
-  //     getPopupContainer: () => document.body,
-  //   },
-  //   required: true,
-  // },
   {
-    label: '邮箱',
-    field: 'email',
-    component: 'Input',
-  },
-
-  {
-    label: '备注',
-    field: 'remark',
-    component: 'InputTextArea',
+    label: '角色',
+    field: 'role',
+    component: 'ApiSelect',
+    componentProps: {
+      // api: getAllRoleList,
+      labelField: 'roleName',
+      valueField: 'roleValue',
+    },
+    required: true,
   },
 ];
 
