@@ -112,7 +112,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       // });
 
       function handleCreate() {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }
@@ -122,7 +122,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       }
 
       function addProjectMebers(record: Recordable) {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }
@@ -133,7 +133,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       }
 
       function handleEdit(record: Recordable) {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }
@@ -146,7 +146,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       }
 
       function handleDelete(record: Recordable) {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }

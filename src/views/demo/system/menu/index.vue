@@ -78,7 +78,7 @@
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
 
       function handleCreate() {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }
@@ -88,7 +88,7 @@
       }
 
       function handleEdit(record: Recordable) {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }
@@ -99,7 +99,7 @@
       }
 
       function handleDelete(record: Recordable) {
-        if (isActive) {
+        if (!isActive.value) {
           createMessage.info('当前账户末激活!');
           return;
         }

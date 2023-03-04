@@ -139,7 +139,7 @@ export const accountFormSchema: FormSchema[] = [
       return {
         mode: 'multiple',
         placeholder: '请选择你的技能',
-        options: toRaw(skillsStore.getUserSkillsList),
+        options: options,
       };
     },
   },

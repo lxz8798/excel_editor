@@ -8,7 +8,7 @@
         <div class="change-avatar">
           <div class="mb-2">头像</div>
           <CropperAvatar
-            :uploadApi="uploadApi"
+            :uploadApi="uploadAvatar"
             :value="avatar"
             btnText="更换头像"
             :btnProps="{ preIcon: 'ant-design:cloud-upload-outlined' }"
@@ -23,7 +23,7 @@
 </template>
 <script lang="ts">
   import { Button, Row, Col } from 'ant-design-vue';
-  import { computed, defineComponent, onMounted, toRaw } from "vue";
+  import { computed, defineComponent, onMounted, toRaw } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
   import { CropperAvatar } from '/@/components/Cropper';
@@ -33,7 +33,7 @@
   import headerImg from '/@/assets/images/header.jpg';
   import { baseSetschemas } from './data';
   import { useUserStore } from '/@/store/modules/user';
-  import { uploadApi } from '/@/api/sys/upload';
+  import { uploadAvatar } from '/@/api/sys/upload';
   import { editUser } from '/@/api/sys/user';
 
   export default defineComponent({
@@ -69,7 +69,7 @@
       return {
         avatar,
         register,
-        uploadApi: uploadApi as any,
+        uploadAvatar: uploadAvatar as any,
         updateAvatar,
         handleSubmit: () => {
           const params = getFieldsValue();

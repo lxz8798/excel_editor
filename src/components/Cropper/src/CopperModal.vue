@@ -121,8 +121,11 @@
   import { dataURLtoBlob } from '/@/utils/file/base64Conver';
   import { isFunction } from '/@/utils/is';
   import { useI18n } from '/@/hooks/web/useI18n';
-
-  type apiFunParams = { file: Blob; name: string; filename: string };
+  import { useUserStore } from '/@/store/modules/user';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  const { createMessage } = useMessage();
+  // type apiFunParams = { files: Blob; name: string; filename: string };
+  type apiFunParams = FormData;
 
   const props = {
     circled: { type: Boolean, default: true },
@@ -130,7 +133,7 @@
       type: Function as PropType<(params: apiFunParams) => Promise<any>>,
     },
   };
-
+  const userStore = useUserStore();
   export default defineComponent({
     name: 'CropperModal',
     components: { BasicModal, Space, CropperImage, Upload, Avatar, Tooltip },
@@ -184,8 +187,12 @@
         if (uploadApi && isFunction(uploadApi)) {
           const blob = dataURLtoBlob(previewSource.value);
           try {
+            const formData: FormData = new FormData();
+            formData.append('files', blob);
             setModalProps({ confirmLoading: true });
-            const result = await uploadApi({ name: 'file', file: blob, filename });
+            const result = await uploadApi(formData);
+            userStore.setUserAvatar(result[0]);
+            createMessage.info('头像上传成功或者修改了基本信息，请点更新基本信息按钮同步。');
             emit('uploadSuccess', { source: previewSource.value, data: result.data });
             closeModal();
           } finally {

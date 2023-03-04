@@ -25,12 +25,13 @@ import { usePermissionStore } from '/@/store/modules/permission';
 import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
-import { h, toRaw } from "vue";
+import { h, toRaw } from 'vue';
 import { getTeams, delTeam } from '/@/api/sys/team';
-import { getProjects, getOwnerProjectList, delProject, addProject } from '/@/api/sys/project';
+import { getOwnerProjectList, addProject } from '/@/api/sys/project';
 import { getAccountList } from '/@/api/demo/system';
 interface UserState {
   userInfo: Nullable<UserInfo>;
+  userAvatar?: string;
   token?: string;
   roleList: RoleEnum[];
   sessionTimeout?: boolean;
@@ -48,6 +49,7 @@ export const useUserStore = defineStore({
   state: (): UserState => ({
     // user info
     userInfo: null,
+    userAvatar: '',
     // token
     token: undefined,
     // roleList
@@ -69,6 +71,9 @@ export const useUserStore = defineStore({
     },
     getUserInfo(): UserInfo {
       return this.userInfo || getAuthCache<UserInfo>(USER_INFO_KEY) || {};
+    },
+    getUserAvatar(): string | undefined {
+      return this.userAvatar;
     },
     getToken(): string {
       return this.token || getAuthCache<string>(TOKEN_KEY);
@@ -129,6 +134,9 @@ export const useUserStore = defineStore({
     },
     setTemplateUpdate(number: number) {
       this.templateUpDate = number;
+    },
+    setUserAvatar(str: string) {
+      this.userAvatar = str;
     },
     /**
      * @description: login

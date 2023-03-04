@@ -21,7 +21,7 @@ export const useTeamsStore = defineStore({
     // async
     async setTeamsUserList() {
       this.getUserTeamsList = await getAllTeams();
-      return this.getUserTeamsList;
+      return this.getUserTeamsList.map((i, k) => i['value'] = k);
     },
   },
 });

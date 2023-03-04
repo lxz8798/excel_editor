@@ -21,7 +21,7 @@ export const useSkillsStore = defineStore({
     // async
     async setSkillsUserList() {
       this.getUserSkillsList = await getAllSkills();
-      return this.getUserSkillsList;
+      return this.getUserSkillsList.map((i, k) => i['value'] = k);
     },
   },
 });

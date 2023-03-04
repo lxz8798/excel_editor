@@ -73,7 +73,6 @@
   import Application from './Application.vue';
   import Project from './Project.vue';
 
-  import headerImg from '/@/assets/images/header.jpg';
   import { tags, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -101,7 +100,7 @@
       userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
       userStore.setTeamList({ userId: userStore.getUserInfo.userId });
 
-      const avatar = computed(() => userStore.getUserInfo.avatar || headerImg);
+      const avatar = computed(() => userStore.getUserInfo.avatar || userStore.getUserAvatar);
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
       const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
       const tagList = computed(() => userStore.getUserTagsList || []);

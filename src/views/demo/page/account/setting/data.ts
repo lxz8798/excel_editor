@@ -1,5 +1,6 @@
 import { FormSchema } from '/@/components/Form/index';
-
+import { useUserStore } from '/@/store/modules/user';
+const userStore = useUserStore();
 export interface ListItem {
   key: string;
   title: string;
@@ -36,27 +37,38 @@ export const settingList = [
 // 基础设置 form
 export const baseSetschemas: FormSchema[] = [
   {
-    field: 'email',
+    field: 'userName',
     component: 'Input',
-    label: '邮箱',
+    label: '用户名',
+    defaultValue: userStore.getUserInfo['userName'],
     colProps: { span: 18 },
   },
   {
     field: 'realName',
     component: 'Input',
     label: '真实姓名',
-    colProps: { span: 18 },
-  },
-  {
-    field: 'introduction',
-    component: 'InputTextArea',
-    label: '个人简介',
+    defaultValue: userStore.getUserInfo['realName'],
     colProps: { span: 18 },
   },
   {
     field: 'phone',
     component: 'Input',
     label: '联系电话',
+    defaultValue: userStore.getUserInfo['phone'],
+    colProps: { span: 18 },
+  },
+  {
+    field: 'email',
+    component: 'Input',
+    label: '邮箱',
+    defaultValue: userStore.getUserInfo['email'],
+    colProps: { span: 18 },
+  },
+  {
+    field: 'introduction',
+    component: 'InputTextArea',
+    label: '个人简介',
+    defaultValue: userStore.getUserInfo['introduction'],
     colProps: { span: 18 },
   },
   // {

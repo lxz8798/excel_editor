@@ -46,7 +46,9 @@
   import { useI18n } from '/@/hooks/web/useI18n';
   import type { ButtonProps } from '/@/components/Button';
   import Icon from '/@/components/Icon';
-
+  import { useUserStore } from '/@/store/modules/user';
+  import { updateAvatar } from '/@/api/sys/upload';
+  const userStore = useUserStore();
   const props = {
     width: { type: [String, Number], default: '200px' },
     value: { type: String },
@@ -80,6 +82,8 @@
         (): CSSProperties => ({ width: unref(getWidth), height: unref(getWidth) }),
       );
 
+      const userAvatar = computed(() => userStore.getUserAvatar);
+
       watchEffect(() => {
         sourceValue.value = props.value || '';
       });
@@ -92,9 +96,12 @@
       );
 
       function handleUploadSuccess({ source, data }) {
-        sourceValue.value = source;
-        emit('change', { source, data });
-        createMessage.success(t('component.cropper.uploadSuccess'));
+        updateAvatar({ avatarUrl: userAvatar.value, userId: userStore.getUserInfo.userId }).then((res) => {
+            sourceValue.value = source;
+            emit('change', { source, data });
+            createMessage.success(t('component.cropper.uploadSuccess'));
+          },
+        );
       }
 
       expose({ openModal: openModal.bind(null, true), closeModal });
