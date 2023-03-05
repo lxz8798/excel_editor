@@ -34,7 +34,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, computed } from "vue";
+  import { defineComponent, reactive, onMounted, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getAccountList } from '/@/api/demo/system';
@@ -148,14 +148,26 @@ import { defineComponent, reactive, onMounted, computed } from "vue";
       }
 
       function handleSuccess({ isUpdate, values }) {
-        if (isUpdate) {
-          getAccountList({ page: 1, pageSize: 30 }).then((result) => setTableData(result.records));
-        } else {
-          reload().then(() => {
-            const data = getRawDataSource();
-            setTableData(data.records);
+        console.log(isUpdate, 'isUpdate');
+        // if (!isUpdate) {
+        //   getAccountList({ page: 1, pageSize: 30 }).then((result) => setTableData(result['records']));
+        // } else {
+        //   getAccountList({ page: 1, pageSize: 30 }).then((result) => setTableData(result['records']));
+        //   reload().then(() => {
+        //     const data = getRawDataSource();
+        //     console.log(data.records, 'data.records');
+        //     setTableData(data.records);
+        //   });
+        // }
+        getAccountList({ page: 1, pageSize: 30 })
+          .then((result) => setTableData(result['records']))
+          .then(() => {
+            reload().then(() => {
+              const data = getRawDataSource();
+              console.log(data.records, 'data.records');
+              setTableData(data.records);
+            });
           });
-        }
       }
 
       function handleSelect(deptId = '') {

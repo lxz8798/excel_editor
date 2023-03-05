@@ -27,6 +27,7 @@ import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
 import { h, toRaw } from 'vue';
 import { getTeams, delTeam } from '/@/api/sys/team';
+import { getSkills, delSkills } from '/@/api/sys/skills';
 import { getOwnerProjectList, addProject } from '/@/api/sys/project';
 import { getAccountList } from '/@/api/demo/system';
 interface UserState {
@@ -187,7 +188,6 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null;
       // const userStore = useUserStore();
       const userInfo = await getUserInfo();
-      console.log(this.getRoleList.values(), 'this.getRoleList');
       const { roles = [] } = userInfo;
       if (isArray(roles)) {
         const roleList = roles.map((item) => item.value) as RoleEnum[];
@@ -253,6 +253,10 @@ export const useUserStore = defineStore({
     // 删除团队
     async delTeamItem(params) {
       return await delTeam(params);
+    },
+    // 删除技能
+    async delSkillsItem(params) {
+      return await delSkills(params);
     },
     // 得到项目列表
     async setProjectList(params) {

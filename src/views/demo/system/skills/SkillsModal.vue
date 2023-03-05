@@ -8,7 +8,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { accountFormSchema } from './skills.data';
-  import { addTeamItem } from '/@/api/sys/team';
+  import { addSkillsItem } from '/@/api/sys/skills';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStore } from '/@/store/modules/user';
   const { createMessage } = useMessage();
@@ -51,10 +51,21 @@
           const values = await validate();
           setModalProps({ confirmLoading: true });
           // TODO custom api
-          addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) => {
-              emit('success', { isUpdate: unref(isUpdate), values: values });
-            },
-          );
+          if (!unref(isUpdate)) {
+            addSkillsItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) => {
+                emit('success', { isUpdate: unref(isUpdate), values: values });
+              },
+            );
+          } else {
+            userStore.delSkillsItem({ id: rowId.value }).then(() => {
+              let timer = null;
+              if (timer) clearTimeout(timer);
+              addSkillsItem(Object.assign(values, { userId: userStore.getUserInfo.userId }));
+              setTimeout(() => {
+                emit('success', { isUpdate: unref(isUpdate), values: values });
+              }, 300);
+            });
+          }
           closeModal();
         } finally {
           setModalProps({ confirmLoading: false });

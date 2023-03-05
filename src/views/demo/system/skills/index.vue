@@ -131,7 +131,7 @@
           return;
         }
         const { id } = record;
-        userStore.delTeamItem({ id: id }).then((res) => {
+        userStore.delSkillsItem({ id: id }).then((res) => {
           createMessage.success(res);
           openModal1(false);
           userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });

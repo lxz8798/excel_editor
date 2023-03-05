@@ -1,15 +1,23 @@
+import { h } from 'vue';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-
+import { Icon } from '/@/components/Icon';
 export const columns: BasicColumn[] = [
   {
     title: '图标',
     dataIndex: 'icon',
     width: 100,
+    customRender: ({ record }) => {
+      return h(Icon, { icon: record['icon'] });
+    },
   },
   {
     title: '技能名称',
     dataIndex: 'label',
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
   },
 ];
 
@@ -33,7 +41,6 @@ export const accountFormSchema: FormSchema[] = [
     field: 'icon',
     label: '图标',
     component: 'IconPicker',
-    required: true,
   },
   {
     field: 'label',

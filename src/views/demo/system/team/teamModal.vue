@@ -8,7 +8,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { accountFormSchema } from './team.data';
-  import { addTeamItem, editTeamItem } from '/@/api/sys/team';
+  import { addTeamItem, delTeam } from '/@/api/sys/team';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStore } from '/@/store/modules/user';
   const { createMessage } = useMessage();
@@ -52,10 +52,16 @@
           setModalProps({ confirmLoading: true });
           // TODO custom api
           if (!unref(isUpdate)) {
-            addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) =>  emit('success', { isUpdate: unref(isUpdate), values: values }));
+            addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then(() =>  emit('success', { isUpdate: unref(isUpdate), values: values }));
           } else {
-            console.log(values, 'values');
-            // editTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then((res) => emit('success', { isUpdate: unref(isUpdate), values: values }));
+            userStore.delTeamItem({ id: rowId.value }).then(() => {
+              let timer = null;
+              if (timer) clearTimeout(timer);
+              addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId }))
+              setTimeout(() => {
+                emit('success', { isUpdate: unref(isUpdate), values: values });
+              }, 300);
+            });
           }
           closeModal();
         } finally {

@@ -146,6 +146,7 @@ export const accountFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: ({ formModel, formActionType }) => {
       const options = computed(() => toRaw(skillsStore.getSkillsUserList));
+      console.log(options, 'options');
       return {
         mode: 'multiple',
         placeholder: '请选择你的技能',
@@ -174,12 +175,12 @@ export const accountFormSchema: FormSchema[] = [
   },
   {
     label: '角色',
-    field: 'role',
+    field: 'roleId',
     component: 'ApiSelect',
     componentProps: {
       api: getRoles,
       labelField: 'roleName',
-      valueField: 'roleValue',
+      valueField: 'roleId',
     },
     ifShow: () => {
       if (!Object.keys(userStore.getUserInfo).length) return;
