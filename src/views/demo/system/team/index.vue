@@ -36,7 +36,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, computed } from "vue";
+  import { defineComponent, reactive, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getTeams } from '/@/api/sys/team';
@@ -65,7 +65,7 @@ import { defineComponent, reactive, onMounted, computed } from "vue";
 
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
-          title: '技能列表',
+          title: '团队列表',
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },

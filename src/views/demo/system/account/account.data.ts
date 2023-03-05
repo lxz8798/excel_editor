@@ -1,4 +1,4 @@
-import { computed, h, toRaw } from "vue";
+import { computed, h, toRaw } from 'vue';
 
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
@@ -7,7 +7,7 @@ import { useUserStore } from '/@/store/modules/user';
 import { useSkillsStore } from '/@/store/modules/skills';
 import { useTeamsStore } from '/@/store/modules/teams';
 import { getRoles } from '/@/api/sys/user';
-import { getAllSkills } from "/@/api/sys/skills";
+import { Icon } from '/@/components/Icon';
 const userStore = useUserStore();
 const skillsStore = useSkillsStore();
 const teamStore = useTeamsStore();
@@ -16,6 +16,16 @@ export const columns: BasicColumn[] = [
     title: '用户名',
     dataIndex: 'name',
     width: 160,
+    customRender: ({ record }) => {
+      return h(
+        'div',
+        { style: { display: 'flex', justifyContent: 'center', alignItems: 'center' } },
+        [
+          h(Icon, { icon: record['avatar'] }),
+          h('p', { style: { marginBottom: '0', marginLeft: '5px' } }, record['name']),
+        ],
+      );
+    },
   },
   {
     title: '真实名字',

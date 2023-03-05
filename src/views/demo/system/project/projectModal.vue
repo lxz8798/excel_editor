@@ -4,7 +4,7 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref, toRaw } from 'vue';
+  import { defineComponent, ref, computed, unref, toRaw } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { projectFormSchema } from './project.data';
@@ -64,21 +64,23 @@ import { defineComponent, ref, computed, unref, toRaw } from 'vue';
       async function handleSubmit() {
         try {
           const values = await validate();
-          const { name, daysLeft, projectAdminId } = values;
+          const { name, daysLeft, projectAdminId, id } = values;
           const params = {
             name: name,
             targetTime: new Date(daysLeft).toLocaleString().replace(/\/+/g, '-'),
-            createUserId: projectAdminId,
+            createUserId: toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'],
             templateIds: getMenuIds.value,
+            userId: userStore.getUserInfo.userId,
+            id: rowId.value,
           };
-          console.log(params, 'params');
           setModalProps({ confirmLoading: true });
           // TODO custom api
-          addProject(Object.assign(params, { userId: userStore.getUserInfo.userId })).then((res) => {
-              emit('success', { isUpdate: unref(isUpdate), values: values });
-              createMessage.success(res);
-            },
-          );
+          if (!unref(isUpdate)) {
+            addProject(params).then((res) => createMessage.success(res));
+          } else {
+            editProject(params).then((res) => createMessage.success(res));
+          }
+          emit('success', { isUpdate: unref(isUpdate), values: values });
           closeModal();
         } finally {
           setModalProps({ confirmLoading: false });
@@ -89,3 +91,8 @@ import { defineComponent, ref, computed, unref, toRaw } from 'vue';
     },
   });
 </script>
+<style lang="less">
+  .ant-row {
+    height: 70%;
+  }
+</style>

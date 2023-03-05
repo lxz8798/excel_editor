@@ -36,7 +36,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, computed } from "vue";
+  import { defineComponent, reactive, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getSkills } from '/@/api/sys/skills';
@@ -131,7 +131,7 @@ import { defineComponent, reactive, onMounted, computed } from "vue";
           return;
         }
         const { id } = record;
-        userStore.delTeamItem({id: id}).then((res) => {
+        userStore.delTeamItem({ id: id }).then((res) => {
           createMessage.success(res);
           openModal1(false);
           userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });

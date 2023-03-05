@@ -44,7 +44,8 @@ export function getOwnerProjectList(params: ProjectParamsModel) {
 export function editProject(params) {
   return defHttp.put<ProjectItemModel>(
     {
-      url: `${Api.PUT_PROJECT}/${params.id}`,
+      url: Api.PUT_PROJECT,
+      params,
     },
     {},
   );

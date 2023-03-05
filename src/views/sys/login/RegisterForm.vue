@@ -102,7 +102,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, unref, computed, toRaw } from "vue";
+  import { reactive, ref, unref, computed, toRaw } from 'vue';
   import LoginFormTitle from './LoginFormTitle.vue';
   import { Form, Input, Button, Checkbox, Select } from 'ant-design-vue';
   import { StrengthMeter } from '/@/components/StrengthMeter';

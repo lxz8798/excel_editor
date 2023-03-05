@@ -1,11 +1,15 @@
+import { h } from 'vue';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-
+import { Icon } from '/@/components/Icon';
 export const columns: BasicColumn[] = [
   {
     title: '图标',
     dataIndex: 'icon',
     width: 100,
+    customRender: ({ record }) => {
+      return h(Icon, { icon: record['icon'] });
+    },
   },
   {
     title: '团队名称',
@@ -54,11 +58,11 @@ export const accountFormSchema: FormSchema[] = [
 
 export const teamFormSchema: BasicColumn[] = [
   {
-    title: '技能名称',
+    title: '团队名称',
     dataIndex: 'name',
   },
   {
-    title: '技能',
+    title: '团队',
     dataIndex: 'skills',
   },
   {

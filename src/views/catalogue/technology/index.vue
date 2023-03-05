@@ -343,6 +343,7 @@
   .form_wrap {
     display: flex;
     flex-direction: column;
+    flex: 1;
     .form {
       //margin-bottom: 30px;
       width: 100%;

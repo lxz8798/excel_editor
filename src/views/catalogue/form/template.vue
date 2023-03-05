@@ -21,7 +21,8 @@
       <template #title>
         <div class="form_title" v-if="currTempDetail.name">
           <!--{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}-->
-          <span>{{ currTempDetail.name.split('源数据-')[0] }}【</span>
+          {{ currTempDetail.name.split('-').slice(currTempDetail.name.split('-').length - 2, currTempDetail.name.split('-').length).join('-') }}
+          <!--<span>{{ currTempDetail.name.split('源数据-')[0] }}【</span>
           <span v-if="!projectNames.length || addProjectNameFlag"
             ><a-input
               size="small"
@@ -49,74 +50,79 @@
               </template>
             </a-select>
           </span>
-          <span>】-{{ currTempDetail.name.split('源数据-')[1] }}</span>
+          <span>】-{{ currTempDetail.name.split('源数据-')[1] }}</span>-->
           <!--<a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
         </div>
         <div class="form_title" v-else>暂无名称</div>
       </template>
-      <div class="form">
-        <div
-          v-if="mergeForm.length"
-          class="form_item"
-          v-for="(form, index) in mergeForm"
-          :key="index"
-        >
-          <div class="row">{{ form.label }}</div>
-          <template v-if="isAdmin || isLeader">
+      <div class="container_wrap">
+        <div class="left">
+          <div class="form">
             <div
-              class="column"
-              v-for="(input, key) in form.inputs"
-              :key="key"
-              :class="input.type === 'add' && 'add_icon'"
-              :data-input="JSON.stringify(input)"
-              @click="clickInputItem($event, input, form, key, index)"
+              v-if="mergeForm.length"
+              class="form_item"
+              v-for="(form, index) in mergeForm"
+              :key="index"
             >
-              <Input
-                size="large"
-                v-model:value="input.value"
-                :item="input"
-                v-if="input.type === 'input'"
-                @change="changeInputeValue($event, input, key, index)"
-              />
-              <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+              <div class="row">{{ form.label }}</div>
+              <template v-if="isAdmin || isLeader">
+                <div
+                  class="column"
+                  v-for="(input, key) in form.inputs"
+                  :key="key"
+                  :class="input.type === 'add' && 'add_icon'"
+                  :data-input="JSON.stringify(input)"
+                  @click="clickInputItem($event, input, form, key, index)"
+                >
+                  <Input
+                    size="large"
+                    v-model:value="input.value"
+                    :item="input"
+                    v-if="input.type === 'input'"
+                    @change="changeInputeValue($event, input, key, index)"
+                  />
+                  <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  class="column"
+                  v-for="(input, key) in form.inputs"
+                  :key="key"
+                  :class="input.type === 'add' && 'add_icon'"
+                  :data-input="JSON.stringify(input)"
+                  @click="clickInputItem($event, input, form, key, index)"
+                  @mouseenter="displayEnterHandler"
+                  @mouseleave="displayLeaveHandler"
+                >
+                  <Input
+                    size="large"
+                    v-model:value="input.value"
+                    :item="input"
+                    v-if="input.type === 'input'"
+                    @change="changeInputeValue($event, input, key, index)"
+                  />
+                  <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+                </div>
+              </template>
             </div>
-          </template>
-          <template v-else>
-            <div
-              class="column"
-              v-for="(input, key) in form.inputs"
-              :key="key"
-              :class="input.type === 'add' && 'add_icon'"
-              :data-input="JSON.stringify(input)"
-              @click="clickInputItem($event, input, form, key, index)"
-              @mouseenter="displayEnterHandler"
-              @mouseleave="displayLeaveHandler"
-            >
-              <Input
-                size="large"
-                v-model:value="input.value"
-                :item="input"
-                v-if="input.type === 'input'"
-                @change="changeInputeValue($event, input, key, index)"
-              />
-              <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
-            </div>
-          </template>
+          </div>
+          <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" v-show="isAdmin || isLeader" />
+          <BasicForm
+            @register="register"
+            @submit="handleSubmit"
+            @save="saveFormDatas"
+            style="margin-top: 25px"
+            v-show="isAdmin || isLeader"
+          >
+            <template #advanceAfter>
+              <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>
+            </template>
+          </BasicForm>
         </div>
+        <!--<div class="right"></div>-->
       </div>
-      <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" v-show="isAdmin || isLeader" />
-      <BasicForm
-        @register="register"
-        @submit="handleSubmit"
-        @save="saveFormDatas"
-        style="margin-top: 25px"
-        v-show="isAdmin || isLeader"
-      >
-        <template #advanceAfter>
-          <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>
-        </template>
-      </BasicForm>
     </CollapseContainer>
     <!--弹窗-->
     <Modal1
@@ -187,7 +193,7 @@
       // formStore.setCurrTemp(state.currTempDetail.id as string);
       // STATE
       const state = reactive({
-        server: wsUrl + userStore.userInfo.userId,
+        server: wsUrl + userStore.getUserInfo.userId,
         sendValue: '',
         recordList: [] as { id: number; time: number; res: string }[],
         sendParams: {
@@ -286,6 +292,14 @@
       }
       function changeInputeValue(e, input, key, index) {
         input.value = e.target.value;
+        // let msgObj = {
+        //   type: '5',
+        //   fromId: userStore.getUserInfo.userId,
+        //   toId: '',
+        //   boradFlag: '',
+        //   msg: input,
+        // };
+        // send(JSON.stringify(msgObj));
         let _columnIndex = index - 1;
         if (index < 1) return;
         if (e.target.value !== '') {
@@ -660,108 +674,121 @@
   .form_wrap {
     display: flex;
     flex-direction: column;
-    .form {
-      //margin-bottom: 30px;
-      width: 100%;
+
+    .container_wrap {
       display: flex;
-      flex-direction: row;
-      .form_item {
+      height: 60%;
+      .left {
         flex: 3;
-        border: 1px solid #ddd;
-        .row {
-          padding: 8px 0;
-          text-align: center;
-          border-bottom: 1px solid #ddd;
-          background: #4dc6cb;
-          color: #085053;
-          font-weight: bold;
-          font-size: 16px;
-        }
-        .column {
-          position: relative;
-          input {
-            color: #626262;
-            font-size: 14px;
-            width: 100%;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding-left: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            &:hover {
-              background: #eee;
-            }
-          }
-          &:hover {
-            &:before {
-              position: absolute;
-              top: 0;
-              right: 0;
-              content: '删除这一行';
-              width: 80px;
-              height: 100%;
-              line-height: 24px;
-              cursor: pointer;
-              text-align: center;
-              color: rgba(255, 0, 0, 0.86);
-              font-size: 12px;
-              transition: 0.3s;
-            }
-          }
-        }
-        .column:nth-child(odd) {
-          input {
-            background: #eee;
-          }
-        }
-        .column.add_icon {
+
+        .form {
+          //margin-bottom: 30px;
           width: 100%;
-          height: 24px;
+          display: flex;
+          flex-direction: row;
+          .form_item {
+            flex: 3;
+            border: 1px solid #ddd;
+            .row {
+              padding: 8px 0;
+              text-align: center;
+              border-bottom: 1px solid #ddd;
+              background: #4dc6cb;
+              color: #085053;
+              font-weight: bold;
+              font-size: 16px;
+            }
+            .column {
+              position: relative;
+              input {
+                color: #626262;
+                font-size: 14px;
+                width: 100%;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                padding-left: 8px;
+                cursor: pointer;
+                transition: 0.3s;
+                &:hover {
+                  background: #eee;
+                }
+              }
+              &:hover {
+                &:before {
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  content: '删除这一行';
+                  width: 80px;
+                  height: 100%;
+                  line-height: 24px;
+                  cursor: pointer;
+                  text-align: center;
+                  color: rgba(255, 0, 0, 0.86);
+                  font-size: 12px;
+                  transition: 0.3s;
+                }
+              }
+            }
+            .column:nth-child(odd) {
+              input {
+                background: #eee;
+              }
+            }
+            .column.add_icon {
+              width: 100%;
+              height: 24px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              &:hover {
+                background: #eee;
+                cursor: pointer;
+              }
+            }
+          }
+          .form_item:nth-child(1) {
+            flex: 1;
+            .column {
+              input {
+                text-align: center;
+              }
+            }
+          }
+        }
+        .add_icon {
+          width: 100%;
           display: flex;
           justify-content: center;
           align-items: center;
+          padding: 8px 0;
+          border: 1px solid #ddd;
+          transition: 0.3s;
           &:hover {
-            background: #eee;
-            cursor: pointer;
+            background: rgba(0, 0, 0, 0.1);
+          }
+        }
+        .form_title {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          height: 28px;
+          .ant-select-arrow {
+            display: flex;
+            align-items: center;
+          }
+          > .ant-input-lg {
+            border: none;
+            background: none;
+            outline: none;
+            height: 100%;
           }
         }
       }
-      .form_item:nth-child(1) {
+      .right {
         flex: 1;
-        .column {
-          input {
-            text-align: center;
-          }
-        }
-      }
-    }
-    .add_icon {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 8px 0;
-      border: 1px solid #ddd;
-      transition: 0.3s;
-      &:hover {
-        background: rgba(0, 0, 0, 0.1);
-      }
-    }
-    .form_title {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      height: 28px;
-      .ant-select-arrow {
-        display: flex;
-        align-items: center;
-      }
-      > .ant-input-lg {
-        border: none;
-        background: none;
-        outline: none;
-        height: 100%;
+
       }
     }
   }
