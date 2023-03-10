@@ -3,10 +3,13 @@ import { defHttp } from '/@/utils/http/axios';
 import { SkillsItemModel, SkillsParams } from './model/skillsModel';
 
 enum Api {
+  // 管理员技能列表
   GET_ALL_SKILLS = '/user/skill',
+  // 普通用户技能列表
   GET_SKILLS_LIST = '/sysUserSkill/list',
   ADD_SKILLS = '/sysUserSkill/add',
-  DEL_SKILLS = '/sysUserSkill/del',
+  // 管理员删除技能
+  DEL_SKILLS = '/sysUserSkill/delSteam',
   UPDATA_SKILLS = '/sysUserTeam/update',
 }
 

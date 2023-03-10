@@ -17,11 +17,11 @@ export const settingList = [
     name: '基本设置',
     component: 'BaseSetting',
   },
-  {
-    key: '2',
-    name: '安全设置',
-    component: 'SecureSetting',
-  },
+  // {
+  //   key: '2',
+  //   name: '安全设置',
+  //   component: 'SecureSetting',
+  // },
   // {
   //   key: '3',
   //   name: '账号绑定',

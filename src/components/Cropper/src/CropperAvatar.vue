@@ -97,6 +97,7 @@
 
       function handleUploadSuccess({ source, data }) {
         updateAvatar({ avatarUrl: userAvatar.value, userId: userStore.getUserInfo.userId }).then((res) => {
+            console.log(source,'source');
             sourceValue.value = source;
             emit('change', { source, data });
             createMessage.success(t('component.cropper.uploadSuccess'));

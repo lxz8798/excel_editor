@@ -53,7 +53,7 @@ export const columns: BasicColumn[] = [
     title: '激活状态',
     width: 100,
     customRender: ({ record }) => {
-      return h('span', { style: `color: ${record['status'] === 1 ? 'green' : 'red'}` },record['status'] ? '已激活' : '末激活');
+      return h('span', { style: `color: ${record['activeFlag'] ? 'green' : 'red'}` },record['activeFlag'] ? '已激活' : '末激活');
     },
   },
   {
@@ -160,7 +160,7 @@ export const accountFormSchema: FormSchema[] = [
     component: 'DatePicker',
     ifShow: () => {
       if (!Object.keys(userStore.getUserInfo).length) return;
-      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
     },
     componentProps: ({ formModel, formActionType }) => {
       return {

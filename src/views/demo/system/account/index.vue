@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+        <a-button type="primary" v-if="isNormal && !isNormal" @click="handleCreate">新增账号</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -49,7 +49,6 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useSkillsStore } from '/@/store/modules/skills';
   import { useTeamsStore } from '/@/store/modules/teams';
-  import { getRoles } from '/@/api/sys/user';
   const userStore = useUserStore();
   const { createMessage } = useMessage();
   const skillsStore = useSkillsStore();
@@ -62,6 +61,8 @@
       const [registerModal, { openModal }] = useModal();
       const searchInfo = reactive<Recordable>({});
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '用户列表',
@@ -88,8 +89,8 @@
         });
 
       // INIT
-      skillsStore.setSkillsUserList();
-      teamStore.setTeamsUserList();
+      isAdmin.value ? skillsStore.setSkillsUserList() : skillsStore.setSkillsUserList();
+      isAdmin.value ? teamStore.setTeamsUserList() : teamStore.setTeamsUserList();
       // getRoles().then((roles) => {
       //   userStore.setRoleList(roles);
       // });
@@ -106,7 +107,7 @@
 
       function handleCreate() {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openModal(true, {
@@ -124,7 +125,7 @@
 
       function handleEdit(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         record['password'] = '';
@@ -136,7 +137,7 @@
 
       function handleDelete(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         userStore.deleteUser({ userId: record.id }).then((res) => {
@@ -190,6 +191,7 @@
         handleSelect,
         handleView,
         searchInfo,
+        isNormal,
       };
     },
   });

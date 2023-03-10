@@ -2,7 +2,7 @@
   <div>
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增菜单 </a-button>
+        <a-button type="primary" v-if="isNormal && !isNormal" @click="handleCreate"> 新增菜单 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -76,10 +76,10 @@
       });
 
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
-
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       function handleCreate() {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openDrawer(true, {
@@ -89,7 +89,7 @@
 
       function handleEdit(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openDrawer(true, {
@@ -100,7 +100,7 @@
 
       function handleDelete(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         deleteMenu({ menuId: record.menuId }).then((res) => {
@@ -127,6 +127,7 @@
         handleDelete,
         handleSuccess,
         onFetchSuccess,
+        isNormal,
       };
     },
   });

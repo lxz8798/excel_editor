@@ -21,8 +21,7 @@
       <template #title>
         <div class="form_title" v-if="currTempDetail.name">
           <!--{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}-->
-          {{ currTempDetail.name.split('-').slice(currTempDetail.name.split('-').length - 2, currTempDetail.name.split('-').length).join('-') }}
-          <!--<span>{{ currTempDetail.name.split('源数据-')[0] }}【</span>
+          <span>{{ currTempDetail.name.split('源数据-')[0] }}【</span>
           <span v-if="!projectNames.length || addProjectNameFlag"
             ><a-input
               size="small"
@@ -50,7 +49,7 @@
               </template>
             </a-select>
           </span>
-          <span>】-{{ currTempDetail.name.split('源数据-')[1] }}</span>-->
+          <span>】-{{ currTempDetail.name.split('源数据-')[1] }}</span>
           <!--<a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
         </div>
@@ -67,42 +66,26 @@
             >
               <div class="row">{{ form.label }}</div>
               <template v-if="isAdmin || isLeader">
+                <!-- @click="clickInputItem($event, input, form, key, index)"-->
                 <div
                   class="column"
                   v-for="(input, key) in form.inputs"
                   :key="key"
                   :class="input.type === 'add' && 'add_icon'"
                   :data-input="JSON.stringify(input)"
-                  @click="clickInputItem($event, input, form, key, index)"
                 >
                   <Input
                     size="large"
                     v-model:value="input.value"
                     :item="input"
                     v-if="input.type === 'input'"
+                    :class="`input_cell` + `_${index}_${key}`"
                     @change="changeInputeValue($event, input, key, index)"
                   />
-                  <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
-                </div>
-              </template>
-              <template v-else>
-                <div
-                  class="column"
-                  v-for="(input, key) in form.inputs"
-                  :key="key"
-                  :class="input.type === 'add' && 'add_icon'"
-                  :data-input="JSON.stringify(input)"
-                  @click="clickInputItem($event, input, form, key, index)"
-                  @mouseenter="displayEnterHandler"
-                  @mouseleave="displayLeaveHandler"
-                >
-                  <Input
-                    size="large"
-                    v-model:value="input.value"
-                    :item="input"
-                    v-if="input.type === 'input'"
-                    @change="changeInputeValue($event, input, key, index)"
-                  />
+                  <div v-show="(index == 2 || index == 3 || index == 4 ) && (isAdmin || isLeader)">
+                    <Icon icon="icon-park-outline:view-grid-detail" title="详情" class="edit"  @click="clickDetailItem($event, input, form, key, index)"></Icon>
+                    <Icon icon='material-symbols:delete-outline' title="删除这一行" class="del" @click="clickInputItem($event, input, form, key, index)"></Icon>
+                  </div>
                   <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
                 </div>
               </template>
@@ -121,7 +104,9 @@
             </template>
           </BasicForm>
         </div>
-        <!--<div class="right"></div>-->
+        <div class="right">
+          <Conversation v-for="item in recordList" :userMsg="item" />
+        </div>
       </div>
     </CollapseContainer>
     <!--弹窗-->
@@ -147,6 +132,7 @@
   } from 'vue';
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
   import { CollapseContainer } from '/@/components/Container';
+  import { Conversation } from '/@/components/Conversation';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { PageWrapper } from '/@/components/Page';
   import { BasicUpload } from '/@/components/Upload';
@@ -177,6 +163,7 @@
       BasicForm,
       CollapseContainer,
       PageWrapper,
+      Conversation,
       ApiSelect,
       ASelect: Select,
       ASelectOption: Select.Option,
@@ -263,8 +250,10 @@
       watchEffect(() => {
         if (data.value) {
           try {
+            state.recordList = [];
+            state.recordList.length = 0;
             const res = JSON.parse(data.value);
-            state.recordList.push(res);
+            state.recordList.push(res[0]);
           } catch (error) {
             state.recordList.push({
               res: data.value,
@@ -292,14 +281,14 @@
       }
       function changeInputeValue(e, input, key, index) {
         input.value = e.target.value;
-        // let msgObj = {
-        //   type: '5',
-        //   fromId: userStore.getUserInfo.userId,
-        //   toId: '',
-        //   boradFlag: '',
-        //   msg: input,
-        // };
-        // send(JSON.stringify(msgObj));
+        let msgObj = {
+          type: '5',
+          fromId: userStore.getUserInfo.userId,
+          toId: '',
+          boradFlag: '',
+          msg: input,
+        };
+        send(JSON.stringify(msgObj));
         let _columnIndex = index - 1;
         if (index < 1) return;
         if (e.target.value !== '') {
@@ -386,35 +375,16 @@
         state.addProjectNameFlag = true;
         state.projectNameDefalutValue = '';
       }
-      function clickInputItem(e, input, form, key, columnType) {
-        if (e.target.tagName === 'DIV' && e.target.className === 'column') {
-          const { createConfirm } = useMessage();
-          createConfirm({
-            iconType: 'warning',
-            title: () => h('span', '删除有风险!'),
-            content: () => h('span', '是否确认删除？'),
-            onOk: async () => {
-              mergeForm.value.map((i) => {
-                i.inputs.splice(key, 1);
-                return i;
-              });
-              const params = {
-                // importFlag: '0',
-                templateId: currentRoute.value.meta.templateId,
-                columnIndex: key,
-                columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
-              };
-              formStore.setDeleteTemplateRow(params);
-              formStore
-                .saveForm(mergeForm.value.slice(1, 5))
-                .then((res) => createMessage.success('保存成功。'));
-            },
-          });
+
+      function clickDetailItem(e, input, form, key, columnType) {
+        let $dom = null;
+        if (e.target.tagName !== 'DIV' && e.target.className !== 'column') {
+          // $dom = e.target.parentNode.children[0];
+          $dom = document.querySelector('.input_cell' + `_${columnType}_${key}`);
         }
-        if (e.target.tagName === 'INPUT' && e.target.value !== '') {
-          let _columnIndex = columnType - 1;
-          if (columnType <= '0' || columnType <= '1') return;
+        if ($dom.className.includes('input_cell')) {
           openModal1(true);
+          let _columnIndex = columnType - 1;
           if (!input.hasOwnProperty('inputs')) {
             formStore.setTemplateEcho(formStore.getTemplateEcho[0].templateId);
             fillForm({
@@ -438,6 +408,37 @@
             formStore.setColumnList(params);
           }
         }
+      }
+      function clickInputItem(e, input, form, key, columnType) {
+        // let $dom = null;
+        // if (e.target.tagName == 'path') {
+        //   $dom = document.querySelector('.input_cell' + `_${columnType}_${key}`);
+        //   console.log($dom, '$dom');
+        // }
+        // if (e.target.tagName === 'DIV' && e.target.className === 'column') {
+        const { createConfirm } = useMessage();
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '删除有风险!'),
+          content: () => h('span', '是否确认删除？'),
+          onOk: async () => {
+            mergeForm.value.map((i) => {
+              i.inputs.splice(key, 1);
+              return i;
+            });
+            const params = {
+              // importFlag: '0',
+              templateId: currentRoute.value.meta.templateId,
+              columnIndex: key,
+              columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
+            };
+            formStore.setDeleteTemplateRow(params);
+            formStore
+              .saveForm(mergeForm.value.slice(1, 5))
+              .then((res) => createMessage.success('保存成功。'));
+          },
+        });
+        // }
         if (input.type !== 'add') return;
         // if (!formStore.getTemplateEcho.map((i) => i.inputs).some((i) => i.length)) {
         //   createMessage.info('您需要先上传一个EXCEL!');
@@ -654,6 +655,7 @@
         changeShowProjectName,
         delProjectName,
         changeAddProjectNameFlagState,
+        clickDetailItem,
         clickInputItem,
         displayEnterHandler,
         displayLeaveHandler,
@@ -674,6 +676,8 @@
   .form_wrap {
     display: flex;
     flex-direction: column;
+
+    min-height: 720px;
 
     .container_wrap {
       display: flex;
@@ -699,41 +703,59 @@
               font-size: 16px;
             }
             .column {
+              width: 100%;
               position: relative;
-              input {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              > input {
+                flex: 1;
                 color: #626262;
                 font-size: 14px;
-                width: 100%;
                 border-top: 1px solid #ddd;
                 border-bottom: 1px solid #ddd;
                 padding-left: 8px;
                 cursor: pointer;
+                box-sizing: border-box;
                 transition: 0.3s;
+                background: none;
+              }
+              span {
+                cursor: pointer;
+                font-size: 12px;
+                transition: 1s;
+              }
+              .edit {
+                color: #0a6cd5;
                 &:hover {
-                  background: #eee;
+                  color: darken(#0a6cd5, 30);
                 }
               }
-              &:hover {
-                &:before {
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  content: '删除这一行';
-                  width: 80px;
-                  height: 100%;
-                  line-height: 24px;
-                  cursor: pointer;
-                  text-align: center;
-                  color: rgba(255, 0, 0, 0.86);
-                  font-size: 12px;
-                  transition: 0.3s;
+              .del {
+                color: #faa19d;
+                &:hover {
+                  color: darken(#faa19d, 30);
                 }
               }
+              //&:hover {
+              //  &:before {
+              //    position: absolute;
+              //    top: 0;
+              //    right: 0;
+              //    content: '删除这一行';
+              //    width: 80px;
+              //    height: 100%;
+              //    line-height: 24px;
+              //    cursor: pointer;
+              //    text-align: center;
+              //    color: rgba(255, 0, 0, 0.86);
+              //    font-size: 12px;
+              //    transition: 0.3s;
+              //  }
+              //}
             }
             .column:nth-child(odd) {
-              input {
-                background: #eee;
-              }
+              background: #eee;
             }
             .column.add_icon {
               width: 100%;
@@ -788,7 +810,16 @@
       }
       .right {
         flex: 1;
+        margin-left: 8px;
+        background: #f4f4f4;
+        border-radius: 5px;
+        padding: 8px 0 8px 0;
 
+        ::v-deep(.p-2) {
+          background: #000;
+          height: 800px !important;
+          height: 100%;
+        }
       }
     }
   }

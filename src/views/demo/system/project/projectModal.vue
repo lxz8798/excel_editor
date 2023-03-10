@@ -25,6 +25,10 @@
       const isUpdate = ref(true);
       const rowId = ref('');
 
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+
       const [registerForm, { setFieldsValue, updateSchema, resetFields, validate }] = useForm({
         labelWidth: 100,
         baseColProps: { span: 24 },
@@ -68,7 +72,7 @@
           const params = {
             name: name,
             targetTime: new Date(daysLeft).toLocaleString().replace(/\/+/g, '-'),
-            createUserId: toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'],
+            createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
             templateIds: getMenuIds.value,
             userId: userStore.getUserInfo.userId,
             id: rowId.value,

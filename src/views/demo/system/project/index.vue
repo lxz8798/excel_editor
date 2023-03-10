@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增项目</a-button>
+        <a-button type="primary" v-if="isNormal && !isNormal" @click="handleCreate">新增项目</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -16,7 +16,7 @@
               },
               {
                 icon: 'fluent:people-team-add-24-filled',
-                tooltip: '添加成员',
+                tooltip: '编辑项目成员',
                 onClick: addProjectMebers.bind(null, record),
               },
               {
@@ -72,6 +72,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       const [registerModal2, { openModal: openModal2, setModalProps }] = useModal();
       const searchInfo = reactive<Recordable>({});
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
 
       userStore.setUserList({ page: 1, pageSize: 10 });
       permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
@@ -113,7 +114,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
 
       function handleCreate() {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openModal1(true, {
@@ -123,7 +124,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
 
       function addProjectMebers(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openModal2(true, {
@@ -134,10 +135,9 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
 
       function handleEdit(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
-        console.log(record, 'record');
         record['password'] = '';
         openModal1(true, {
           record,
@@ -147,7 +147,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
 
       function handleDelete(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         // userStore.deleteUser({ userId: record.id }).then((res) => {
@@ -217,6 +217,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
         handleSelect,
         handleView,
         searchInfo,
+        isNormal,
       };
     },
   });

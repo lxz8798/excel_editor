@@ -25,13 +25,15 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue";
+  import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { useFormStore } from '/@/store/modules/form';
   import { PlusSquareOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
   import { useUserStore } from '/@/store/modules/user';
   import { changeInfoInputVlaueApi } from '/@/api/demo/form';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useWebSocket } from '@vueuse/core';
+  import { useGlobSetting } from "/@/hooks/setting";
   const { createMessage, createConfirm } = useMessage();
   export default defineComponent({
     components: { BasicModal, PlusSquareOutlined, CloseCircleOutlined },
@@ -41,11 +43,18 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
       const userStore = useUserStore();
       const loading = ref(true);
       const lines = ref(10);
+      const { wsUrl } = useGlobSetting();
       const [register, { setModalProps, redoModalHeight }] = useModalInner();
       const getColumnDetail = computed(() => formStore.getColumnDetail);
       const state = reactive({
+        server: wsUrl + userStore.getUserInfo.userId,
         datas: [],
         copyObj: {},
+      });
+      // 使用websocket
+      const { status, data, send, close, open } = useWebSocket(state.server, {
+        autoReconnect: false,
+        heartbeat: true,
       });
       function handleShow(visible: boolean) {
         if (visible) {
@@ -94,6 +103,14 @@ import { defineComponent, reactive, ref, computed, h, toRaw, toRefs } from "vue"
         //   saveAddInputs(JSON.parse(JSON.stringify(filterList))).then((res) => createMessage.success(res));
         // }
         setModalProps({ visible: false });
+        let msgObj = {
+          type: '6',
+          fromId: userStore.getUserInfo.userId,
+          toId: '',
+          boradFlag: '',
+          msg: JSON.stringify(state.datas),
+        };
+        send(JSON.stringify(msgObj));
       }
 
       function showIocn(input) {

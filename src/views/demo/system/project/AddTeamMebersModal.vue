@@ -25,8 +25,8 @@
 </template>
 <script lang="ts">
   import { AutoComplete } from 'ant-design-vue';
-  import { BasicForm, FormSchema, ApiTransfer, useForm } from '/@/components/Form/index';
-  import { defineComponent, ref, computed, unref, toRaw } from 'vue';
+  import { BasicForm, ApiTransfer, useForm } from '/@/components/Form/index';
+  import { defineComponent, ref, computed, toRaw } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { projectFormSchema } from './project.data';
   import { projectInviteUsers } from '/@/api/sys/project';
@@ -43,7 +43,7 @@
   const projectStore = useProjectStore();
 
   const userList = computed(() => userStore.getUserList);
-  const originTargetKeys = userList.value.map((i) => i['id']);
+  const originTargetKeys = computed(() => userList.value.map((i) => i['id']));
   const targetKeys = ref<string[]>(originTargetKeys);
   const disabled = ref<boolean>(false);
   const showSearch = ref<boolean>(true);
@@ -75,8 +75,7 @@
         // resetFields();
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-        projectData.value = data['project'];
-
+        transferRightKeys = data.project['teamUsers'].map((i) => i['id']);
         // if (unref(isUpdate)) {
         //   rowId.value = data.record.id;
         //   setFieldsValue({
@@ -96,12 +95,11 @@
         //   },
         // ]);
       });
-      const getTitle = computed(() => '添加成员');
+      const getTitle = computed(() => '编辑项目成员');
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const projectUserList = computed(() => toRaw(projectStore.getProjectUserList).map((i) => ({ value: i['name'] })));
 
       function getProjectAdminId(value) {
-        console.log(value, 'value');
         if (!value) return;
         return toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === value)[0]['id'];
       }

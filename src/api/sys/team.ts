@@ -4,7 +4,9 @@ import { TeamItemModel, TeamParams } from './model/teamModel';
 import { SkillsItemModel } from '/@/api/sys/model/skillsModel';
 
 enum Api {
+  // 管理员
   GET_ALL_TEAMS = '/user/teams',
+  // 普通用户
   GET_TEAM_LIST = '/sysUserTeam/list',
   ADD_TEAM = '/sysUserTeam/add',
   DEL_TEAM = '/sysUserTeam/del',

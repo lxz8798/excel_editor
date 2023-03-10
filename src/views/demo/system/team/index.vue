@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增团队</a-button>
+        <a-button type="primary" v-if="isNormal && !isNormal" @click="handleCreate">新增团队</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -39,14 +39,13 @@
   import { defineComponent, reactive, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getTeams } from '/@/api/sys/team';
+  import { getAllTeams, getTeams } from '/@/api/sys/team';
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
   import TeamModal from './TeamModal.vue';
   import AddTeamMebersModal from './AddTeamMebersModal.vue';
   import { columns, searchFormSchema } from './team.data';
-  import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   const userStore = useUserStore();
@@ -56,20 +55,20 @@
     // AccountModal,
     components: { BasicTable, PageWrapper, TeamModal, AddTeamMebersModal, TableAction },
     setup() {
-      const go = useGo();
       const [registerModal1, { openModal: openModal1 }] = useModal();
       const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       userStore.setUserList({ page: 1, pageSize: 10 });
-
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '团队列表',
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },
-          api: getTeams,
+          api: isAdmin.value ? getAllTeams : getTeams,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -105,7 +104,7 @@
 
       function handleCreate() {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openModal1(true, {
@@ -115,7 +114,7 @@
 
       function handleEdit(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         record['password'] = '';
@@ -127,11 +126,11 @@
 
       function handleDelete(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         const { id } = record;
-        userStore.delTeamItem({id: id}).then((res) => {
+        userStore.delTeamItem({ id: id }).then((res) => {
           createMessage.success(res);
           openModal1(false);
           userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
@@ -176,6 +175,7 @@
         handleSelect,
         addTeamMebers,
         searchInfo,
+        isNormal,
       };
     },
   });

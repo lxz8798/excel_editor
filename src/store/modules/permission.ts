@@ -310,9 +310,40 @@ export const usePermissionStore = defineStore({
             },
             children: [
               {
+                path: 'project',
+                name: 'ProjectManagement',
+                meta: {
+                  icon: 'fluent-mdl2:new-team-project',
+                  title: t('routes.demo.system.project'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/project/index.vue',
+              },
+              {
+                path: 'team',
+                name: 'TeamManagement',
+                meta: {
+                  icon: 'fluent:people-team-16-filled',
+                  title: t('routes.demo.system.team'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/team/index.vue',
+              },
+              {
+                path: 'skills',
+                name: 'SkillsManagement',
+                meta: {
+                  icon: 'foundation:social-skillshare',
+                  title: t('routes.demo.system.skills'),
+                  ignoreKeepAlive: false,
+                },
+                component: '/demo/system/skills/index.vue',
+              },
+              {
                 path: 'account',
                 name: 'AccountManagement',
                 meta: {
+                  icon: 'game-icons:skills',
                   title: t('routes.demo.system.account'),
                   ignoreKeepAlive: false,
                 },
@@ -331,36 +362,10 @@ export const usePermissionStore = defineStore({
                 component: '/demo/system/account/AccountDetail.vue',
               },
               {
-                path: 'team',
-                name: 'TeamManagement',
-                meta: {
-                  title: t('routes.demo.system.team'),
-                  ignoreKeepAlive: false,
-                },
-                component: '/demo/system/team/index.vue',
-              },
-              {
-                path: 'project',
-                name: 'ProjectManagement',
-                meta: {
-                  title: t('routes.demo.system.project'),
-                  ignoreKeepAlive: false,
-                },
-                component: '/demo/system/project/index.vue',
-              },
-              {
-                path: 'skills',
-                name: 'SkillsManagement',
-                meta: {
-                  title: t('routes.demo.system.skills'),
-                  ignoreKeepAlive: false,
-                },
-                component: '/demo/system/skills/index.vue',
-              },
-              {
                 path: 'menu',
                 name: 'MenuManagement',
                 meta: {
+                  icon: 'material-symbols:menu-book',
                   title: t('routes.demo.system.menu'),
                   ignoreKeepAlive: true,
                 },

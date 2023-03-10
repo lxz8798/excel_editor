@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate">新增技能</a-button>
+        <a-button type="primary" v-if="isNormal && !isNormal" @click="handleCreate">新增技能</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -39,7 +39,7 @@
   import { defineComponent, reactive, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getSkills } from '/@/api/sys/skills';
+  import { getAllSkills, getSkills } from '/@/api/sys/skills';
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
@@ -61,6 +61,8 @@
       const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       userStore.setUserList({ page: 1, pageSize: 10 });
 
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
@@ -69,7 +71,7 @@
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },
-          api: getSkills,
+          api: isAdmin.value ? getAllSkills : getSkills,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -105,7 +107,7 @@
 
       function handleCreate() {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         openModal1(true, {
@@ -115,7 +117,7 @@
 
       function handleEdit(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         record['password'] = '';
@@ -127,7 +129,7 @@
 
       function handleDelete(record: Recordable) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         const { id } = record;
@@ -141,7 +143,7 @@
 
       function handleSuccess({ isUpdate, values }) {
         if (!isActive.value) {
-          createMessage.info('当前账户末激活!');
+          createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
         userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
@@ -180,6 +182,7 @@
         handleSelect,
         addTeamMebers,
         searchInfo,
+        isNormal,
       };
     },
   });

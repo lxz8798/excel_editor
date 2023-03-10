@@ -62,7 +62,7 @@ export const projectFormSchema: FormSchema[] = [
       },
     ],
     show: ({ values }) => {
-      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');
+      return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin');
     },
     componentProps: ({ formModel, formActionType }) => {
       return {

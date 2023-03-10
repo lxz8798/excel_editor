@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
-import { getAllSkills } from '/@/api/sys/skills';
+import { getAllSkills, getSkills } from '/@/api/sys/skills';
 interface SkillsState {
   menuIds?: string[];
   getUserSkillsList: [];
