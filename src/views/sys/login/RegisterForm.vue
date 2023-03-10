@@ -1,6 +1,22 @@
 <template>
   <template v-if="getShow">
-    <img :alt="title" src="../../../assets/svg/login-box-bg.svg" class="w-1/2 -mt-16 -enter-x" style="visibility:hidden;" />
+    <!--<img :alt="title" src="../../../assets/svg/login-box-bg.svg" class="w-1/2 -mt-16 -enter-x" style="visibility:hidden;" />-->
+    <div class="ps_box">
+      <section>
+        <b>注册时需要选择角色,【项目长】的权限：</b>
+        <p>1. 拥有创建项目,团队,技术,专业技能等功能;</p>
+        <p>2. 可以对项目,团队,技术,专业技能,表单进行编辑;</p>
+        <p>3. 可以在项目邀请成员,设置项目到期的天数指标等;</p>
+        <b>注册时需要选择角色,【普通用户】的权限：</b>
+        <p>1. 只拥有访问权限,被邀请后才拥有编辑功能;</p>
+      </section>
+      <section style="margin-left: 10px;">
+        <b>添加团队需要注意：</b>
+        <p>默认会返在列表里面返回系统中已经存在的所有团队，如果不是您所理想的，可以自己创建一个，点击右侧"+"号，输入团队名称，特别注意<span style="color: red;">需要按一下回车确定添加</span></p>
+        <b>添加技能需要注意：</b>
+        <p>添加技能的操作与团队相同</p>
+      </section>
+    </div>
     <LoginFormTitle class="enter-x" />
     <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
       <!-- 角色选择 -->
@@ -276,6 +292,29 @@
   }
 </script>
 <style lang="less" scoped>
+  .ps_box {
+    width: 100%;
+    margin-bottom: 15px;
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    > section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      > p {
+        padding: 2px 0;
+        margin-bottom: 0;
+        font-size: 12px;
+        color: #aaa;
+      }
+    }
+    > section:first-child {
+      flex: 1;
+    }
+  }
   .role_wrap {
     ::v-deep(.ant-form-item-control-input-content) {
       display: flex;
