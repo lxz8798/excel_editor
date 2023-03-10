@@ -97,7 +97,7 @@
 
       function getTableRawData() {
         createMessage.info('请在控制台查看！');
-        console.log(getRawDataSource());
+        console.log();
       }
 
       function getPagination() {

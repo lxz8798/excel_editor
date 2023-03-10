@@ -3,7 +3,7 @@ import { ProjectParamsModel } from './model/projectModel';
 import { ProjectItemModel } from '/@/api/sys/model/projectModel';
 
 enum Api {
-  ADD_PROJECT = 'examContract/add',
+  ADD_PROJECT = '/examContract/add',
   GET_PROJECT_LIST = '/examContract/list',
   GET_OWNER_PROJECT_LIST = '/examContract/listOwner',
   DEL_PROJECT = '/examContract/del',

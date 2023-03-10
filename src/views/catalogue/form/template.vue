@@ -223,6 +223,7 @@
       });
 
       const uplpdaNum = computed(() => userStore.getTemplateUpdate);
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
       const getIsOpen = computed(() => status.value === 'OPEN');
@@ -295,6 +296,10 @@
         }
       }
       function changeInputeValue(e, input, key, index) {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
         input.value = e.target.value;
         let columnIndex = key + 1,
           _columnType = index - 1;
@@ -328,6 +333,10 @@
         }
       }
       function changeProjectName(e) {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
         // state.projectNameValue = e.target.value;
         createConfirm({
           iconType: 'info',
@@ -363,6 +372,10 @@
         });
       }
       function changeShowProjectName(id) {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
         const item = state.projectNames.filter((i) => i.id == id)[0];
         const params = {
           id: currentRoute.value.meta.templateId,
@@ -395,6 +408,10 @@
       }
 
       function clickDetailItem(e, input, form, key, columnType) {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
         let $dom = null;
         if (e.target.tagName !== 'DIV' && e.target.className !== 'column') {
           // $dom = e.target.parentNode.children[0];
@@ -428,6 +445,10 @@
         }
       }
       function clickInputItem(e, input, form, key, columnType) {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
         // let $dom = null;
         // if (e.target.tagName == 'path') {
         //   $dom = document.querySelector('.input_cell' + `_${columnType}_${key}`);
@@ -482,6 +503,10 @@
         sheet.insertRule('.column:hover::before{display:block;}');
       }
       function addInputRow() {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
         formStore.setFormDataState({ templateId: currentRoute.value.meta.templateId }).then((res) => {
             if (!res) {
               createMessage.info('您需要先上传一个EXCEL模板才能继续!');
@@ -694,6 +719,7 @@
         editTemplateTitle,
         isAdmin,
         isLeader,
+        isActive,
       };
     },
   });
@@ -731,7 +757,7 @@
             }
             .column {
               width: 100%;
-              position: relative;
+              //position: relative;
               display: flex;
               flex-direction: row;
               align-items: center;
@@ -817,23 +843,6 @@
             background: rgba(0, 0, 0, 0.1);
           }
         }
-        .form_title {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          height: 28px;
-          .ant-select-arrow {
-            display: flex;
-            align-items: center;
-          }
-          > .ant-input-lg {
-            border: none;
-            background: none;
-            outline: none;
-            height: 100%;
-          }
-        }
       }
       .right {
         flex: 1;
@@ -866,6 +875,23 @@
             margin-bottom: 0;
           }
         }
+      }
+    }
+    .form_title {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      height: 28px;
+      .ant-select-arrow {
+        display: flex;
+        align-items: center;
+      }
+      > .ant-input-lg {
+        border: none;
+        background: none;
+        outline: none;
+        height: 100%;
       }
     }
   }

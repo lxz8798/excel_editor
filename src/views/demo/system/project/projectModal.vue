@@ -73,18 +73,41 @@
             name: name,
             targetTime: new Date(daysLeft).toLocaleString().replace(/\/+/g, '-'),
             createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
-            templateIds: getMenuIds.value,
+            // templateIds: getMenuIds.value,
+            menuIds: getMenuIds.value,
             userId: userStore.getUserInfo.userId,
             id: rowId.value,
           };
           setModalProps({ confirmLoading: true });
           // TODO custom api
           if (!unref(isUpdate)) {
-            addProject(params).then((res) => createMessage.success(res));
+            addProject(params).then((res) => {
+              createMessage.success(res);
+              userStore
+                .setProjectList({
+                  page: 1,
+                  pageSize: 10,
+                  userId: userStore.getUserInfo.userId,
+                })
+                .then((res) => {
+                  emit('success', { isUpdate: unref(isUpdate), values: res['records'] });
+                });
+            });
           } else {
-            editProject(params).then((res) => createMessage.success(res));
+            editProject(params).then((res) => {
+              createMessage.success(res);
+              userStore
+                .setProjectList({
+                  page: 1,
+                  pageSize: 10,
+                  userId: userStore.getUserInfo.userId,
+                })
+                .then((res) => {
+                  emit('success', { isUpdate: unref(isUpdate), values: res['records'] });
+                });
+            });
           }
-          emit('success', { isUpdate: unref(isUpdate), values: values });
+          // emit('success', { isUpdate: unref(isUpdate), values: values });
           closeModal();
         } finally {
           setModalProps({ confirmLoading: false });

@@ -34,7 +34,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted, computed } from 'vue';
+import { defineComponent, reactive, onMounted, computed, ref } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getAccountList } from '/@/api/demo/system';
@@ -60,9 +60,10 @@
       const go = useGo();
       const [registerModal, { openModal }] = useModal();
       const searchInfo = reactive<Recordable>({});
+      const isNormal = ref(false);
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
-      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+      isNormal.value = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '用户列表',

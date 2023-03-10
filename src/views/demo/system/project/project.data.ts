@@ -1,4 +1,4 @@
-import { h, toRaw } from 'vue';
+import { computed, h, toRaw } from "vue";
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { usePermissionStore } from '/@/store/modules/permission';
@@ -14,6 +14,13 @@ export const columns: BasicColumn[] = [
   {
     title: '项目名称',
     dataIndex: 'name',
+  },
+  {
+    title: '关联技术',
+    dataIndex: 'contracts',
+    customRender: ({ record }) => {
+      return h('span', record['contracts'].map((i) => i && i['menuName']).toString());
+    },
   },
   {
     title: '项目长',
@@ -84,7 +91,9 @@ export const projectFormSchema: FormSchema[] = [
     componentProps: ({ formModel, formActionType }) => {
       const permissionStore = usePermissionStore();
       const _technology = toRaw(permissionStore.getTechnologyTree);
+      const menuId = computed(() => toRaw(formModel));
       return {
+        mode: 'multiple',
         allowClear: true,
         showSearch: true,
         placeholder: '请先择技术在绑定',
@@ -99,19 +108,23 @@ export const projectFormSchema: FormSchema[] = [
           value: 'menuId',
         },
         onChange: (id) => {
-          _technology.forEach((m) => {
-            let _node: object = {},
-              _technologyIds: string[] = [];
-            if (m.hasOwnProperty('children') && m['children']) {
-              _node = m.children.filter((i) => i['menuId'] === id)[0];
-              if (_node) {
-                _technologyIds = _node['children'][0]['children'].map((i) => i['menuId']); // 只取第一个源数据的所有表单
-                projectStore.setMenuIds(_technologyIds);
-              } else {
-                createMessage.warning('请选择技术本身而不是其父级或子级!');
-              }
-            }
-          });
+          const _arr = [];
+          if (!_arr.includes(id)) {
+            _arr.push(id);
+            projectStore.setMenuIds(_arr);
+          }
+          // _technology.forEach((m) => {
+          //   let _node: object = {}, _technologyIds: string[] = [];
+          //   if (m.hasOwnProperty('children') && m['children']) {
+          //     _node = m.children.filter((i) => i['menuId'] === id)[0];
+          //     if (_node) {
+          //       _technologyIds = _node['children'][0]['children'].map((i) => i['menuId']); // 只取第一个源数据的所有表单
+          //       projectStore.setMenuIds(_technologyIds);
+          //     } else {
+          //       createMessage.warning('请选择技术本身而不是其父级或子级!');
+          //     }
+          //   }
+          // });
         },
       };
     },

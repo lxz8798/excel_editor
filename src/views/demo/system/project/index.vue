@@ -46,7 +46,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, h, computed } from "vue";
+import { defineComponent, reactive, onMounted, h, computed, toRaw, unref } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getOwnerProjectList, delProject } from '/@/api/sys/project';
@@ -77,7 +77,7 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
       userStore.setUserList({ page: 1, pageSize: 10 });
       permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
 
-      const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
+      const [registerTable, { reload, updateTableDataRecord, getDataSource, getRawDataSource, setTableData }] =
         useTable({
           title: '项目列表',
           api: getOwnerProjectList,
@@ -101,6 +101,15 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
             // slots: { customRender: 'action' },
           },
         });
+
+      onMounted(() => {
+        let timer = null;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          const data = getRawDataSource();
+          setTableData(data.records);
+        }, 1000);
+      });
 
       // mounted
       // let timer = null;
@@ -164,23 +173,22 @@ import { defineComponent, reactive, onMounted, h, computed } from "vue";
           content: () => h('span', '是否确认删除？'),
           onOk: async () => {
             delProject({ id: record['id'] }).then((result) => {
-              console.log(result, 'result');
-              reload();
               createMessage.success(result);
+              getOwnerProjectList({
+                page: 1,
+                pageSize: 10,
+                userId: userStore.getUserInfo.userId,
+              }).then((res) => {
+                setTableData(res['records']);
+              });
             });
           },
         });
       }
 
       function handleSuccess({ isUpdate, values }) {
-        getOwnerProjectList({
-          page: 1,
-          pageSize: 10,
-          userId: userStore.getUserInfo.userId,
-        }).then((res) => {
-          setTableData(res);
-          reload();
-        });
+        setTableData(values);
+
         // if (isUpdate) {
         //   // 演示不刷新表格直接更新内部数据。
         //   // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
