@@ -33,7 +33,7 @@
   import { changeInfoInputVlaueApi } from '/@/api/demo/form';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useWebSocket } from '@vueuse/core';
-  import { useGlobSetting } from "/@/hooks/setting";
+  import { useGlobSetting } from '/@/hooks/setting';
   const { createMessage, createConfirm } = useMessage();
   export default defineComponent({
     components: { BasicModal, PlusSquareOutlined, CloseCircleOutlined },
@@ -50,6 +50,7 @@
         server: wsUrl + userStore.getUserInfo.userId,
         datas: [],
         copyObj: {},
+        editInput: {},
       });
       // 使用websocket
       const { status, data, send, close, open } = useWebSocket(state.server, {
@@ -91,6 +92,8 @@
 
       function changeInfoInputVlaue(e, input, index) {
         input.headFlag = !index ? true : false;
+        input.no = index;
+        state.editInput = input;
         changeInfoInputVlaueApi(input).then((res) => {
           emit('editDone');
           createMessage.success(res);
@@ -108,7 +111,7 @@
           fromId: userStore.getUserInfo.userId,
           toId: '',
           boradFlag: '',
-          msg: JSON.stringify(state.datas),
+          msg: state.editInput,
         };
         send(JSON.stringify(msgObj));
       }

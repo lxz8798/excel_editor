@@ -12,6 +12,8 @@ import {
   getProjectList,
   addProjectItem,
   delProjectItem,
+  haveData,
+  queryFormHistory,
 } from '/@/api/demo/form';
 import { getMenuChildren } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -31,6 +33,8 @@ interface formState {
   templateTitle: '';
   projectName: '';
   projectNameList: [];
+  isFormHasData: boolean;
+  isFormHistory: [];
 }
 const { createMessage } = useMessage();
 export const useFormStore = defineStore({
@@ -49,6 +53,8 @@ export const useFormStore = defineStore({
     templateTitle: '',
     projectName: '',
     projectNameList: [],
+    isFormHasData: false,
+    isFormHistory: [],
   }),
   getters: {
     getTempList(): any[] {
@@ -90,6 +96,12 @@ export const useFormStore = defineStore({
     getProjectNamesList(): [] {
       return this.projectNameList;
     },
+    getFormDataState() {
+      return this.isFormHasData;
+    },
+    getFormHistory() {
+      return this.isFormHistory;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -106,6 +118,14 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setFormHistory(params) {
+      this.isFormHistory = await queryFormHistory(params);
+      return this.isFormHistory;
+    },
+    async setFormDataState(params) {
+      this.isFormHasData = await haveData(params);
+      return this.isFormHasData;
     },
     async setTemplateTitle(params: object) {
       this.templateTitle = await editTemplateTitle(params);

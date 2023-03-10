@@ -3,10 +3,12 @@
     <div class="left">
       <div class="avatar"><img :src="avatarImg"></div>
       <div class="name">{{ nameText }}</div>
-      <div class="introductionText">{{ introductionText }}</div>
+      <!--<div class="introductionText">{{ introductionText }}</div>-->
     </div>
-    <div class="right">
-      <div class="content">{{ userMsg.value }}</div>
+    <div class="right" v-if="userMsg.content">
+      <div class="title">{{ msgTitle }}</div>
+      <div class="content">{{ msgContent }}</div>
+      <div class="sub">{{ msgSub }}</div>
     </div>
   </div>
 </template>
@@ -14,7 +16,7 @@
 <script lang="ts">
   import { defineComponent, computed } from 'vue';
   import { useUserStore } from '/@/store/modules/user';
-
+  import headerImg from '/@/assets/images/header.jpg';
   const userStore = useUserStore();
   export default defineComponent({
     name: 'Conversation',
@@ -22,14 +24,18 @@
       userMsg: {},
     },
     setup(props, { slots }) {
-      const avatarImg = computed(() => userStore.getUserInfo.avatar);
-      const nameText = computed(() => userStore.getUserInfo.userName);
-      const introductionText = computed(() => userStore.getUserInfo.introduction);
+      const avatarImg = computed(() => props.userMsg.formAvatar ? props.userMsg.formAvatar : headerImg);
+      const nameText = computed(() => props.userMsg.formName);
+      const msgTitle = computed(() => props.userMsg.content.split(',')[0]);
+      const msgContent = computed(() => props.userMsg.content.split(',')[1]);
+      const msgSub = computed(() => props.userMsg.content.split(',')[2]);
 
       return {
         avatarImg,
         nameText,
-        introductionText,
+        msgTitle,
+        msgContent,
+        msgSub,
       };
     },
   });
@@ -37,6 +43,7 @@
 
 <style lang="less" scoped>
   div.conversation_wrap {
+    overflow: hidden;
     display: flex;
     align-items: center;
 
@@ -48,11 +55,12 @@
       align-items: center;
 
       > div.avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-
+        width: 35px;
+        height: 35px;
         > img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
           object-fit: cover;
         }
       }
@@ -70,10 +78,12 @@
       height: 100%;
 
       > div.title {
-        font-size: 16px;
+        font-size: 13px;
+        font-weight: bold;
       }
-      > div.content {
-        font-size: 14px;
+      > div.content,
+      > div.sub {
+        font-size: 12px;
         color: #bbb;
       }
     }

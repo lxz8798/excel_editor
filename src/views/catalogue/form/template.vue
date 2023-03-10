@@ -65,33 +65,31 @@
               :key="index"
             >
               <div class="row">{{ form.label }}</div>
-              <template v-if="isAdmin || isLeader">
-                <!-- @click="clickInputItem($event, input, form, key, index)"-->
-                <div
-                  class="column"
-                  v-for="(input, key) in form.inputs"
-                  :key="key"
-                  :class="input.type === 'add' && 'add_icon'"
-                  :data-input="JSON.stringify(input)"
-                >
-                  <Input
-                    size="large"
-                    v-model:value="input.value"
-                    :item="input"
-                    v-if="input.type === 'input'"
-                    :class="`input_cell` + `_${index}_${key}`"
-                    @change="changeInputeValue($event, input, key, index)"
-                  />
-                  <div v-show="(index == 2 || index == 3 || index == 4 ) && (isAdmin || isLeader)">
-                    <Icon icon="icon-park-outline:view-grid-detail" title="详情" class="edit"  @click="clickDetailItem($event, input, form, key, index)"></Icon>
-                    <Icon icon='material-symbols:delete-outline' title="删除这一行" class="del" @click="clickInputItem($event, input, form, key, index)"></Icon>
-                  </div>
-                  <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+              <!-- @click="clickInputItem($event, input, form, key, index)"-->
+              <div
+                class="column"
+                v-for="(input, key) in form.inputs"
+                :key="key"
+                :class="input.type === 'add' && 'add_icon'"
+                :data-input="JSON.stringify(input)"
+              >
+                <Input
+                  size="large"
+                  v-model:value="input.value"
+                  :item="input"
+                  v-if="input.type === 'input'"
+                  :class="`input_cell` + `_${index}_${key}`"
+                  @change="changeInputeValue($event, input, key, index)"
+                />
+                <div v-show="index == 2 || index == 3 || index == 4">
+                  <Icon icon="icon-park-outline:view-grid-detail" title="详情" class="edit"  @click="clickDetailItem($event, input, form, key, index)"></Icon>
+                  <Icon icon='material-symbols:delete-outline' title="删除这一行" class="del" @click="clickInputItem($event, input, form, key, index)"></Icon>
                 </div>
-              </template>
+                <!--<PlusSquareOutlined style="cursor: pointer" v-else-if="input.type === 'add'" />-->
+              </div>
             </div>
           </div>
-          <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" v-show="isAdmin || isLeader" />
+          <PlusSquareOutlined class="add_icon" style="cursor: pointer" @click="addInputRow" />
           <BasicForm
             @register="register"
             @submit="handleSubmit"
@@ -105,7 +103,11 @@
           </BasicForm>
         </div>
         <div class="right">
-          <Conversation v-for="item in recordList" :userMsg="item" />
+          <div class="history_box">
+            <template v-if="recordList.length">
+              <Conversation v-for="item in recordList" :userMsg="item" />
+            </template>
+          </div>
         </div>
       </div>
     </CollapseContainer>
@@ -219,9 +221,19 @@
         autoReconnect: false,
         heartbeat: true,
       });
+
       const uplpdaNum = computed(() => userStore.getTemplateUpdate);
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
+      const getIsOpen = computed(() => status.value === 'OPEN');
+      const getTagColor = computed(() => (getIsOpen.value ? 'success' : 'red'));
+      const mergeForm = computed(() => [...state.basicFormHeader, ...state.dynamicFormHeader]);
+      state.projectNameValue = computed(() => formStore.getTemplateProjectName);
+      state.projectNames = computed(() => formStore.getProjectNamesList);
+      // state.currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
+      const getList = computed(() => {
+        return [...state.recordList].reverse();
+      });
       watch(
         uplpdaNum,
         () => {
@@ -239,8 +251,10 @@
                   } else {
                     state.addProjectNameFlag = true;
                   }
-                  state.projectNames = computed(() => list);
-                  state.projectOptionsValue = list.filter((i) => i.name == res.projectName)[0].id;
+                  if (res !== '') {
+                    state.projectNames = computed(() => list);
+                    state.projectOptionsValue = toRaw(list).filter((i) => i.name == res.projectName)[0].id;
+                  }
                 });
               });
           }
@@ -250,10 +264,14 @@
       watchEffect(() => {
         if (data.value) {
           try {
-            state.recordList = [];
-            state.recordList.length = 0;
-            const res = JSON.parse(data.value);
-            state.recordList.push(res[0]);
+            // state.recordList = [];
+            // state.recordList.length = 0;
+            // const res = JSON.parse(data.value);
+            // state.recordList.push(res[0]);
+            formStore.setFormHistory({templateId: currentRoute.value.meta.templateId}).then((res) => {
+                const { records } = res;
+                state.recordList = records;
+              });
           } catch (error) {
             state.recordList.push({
               res: data.value,
@@ -263,15 +281,12 @@
           }
         }
       });
-      const getIsOpen = computed(() => status.value === 'OPEN');
-      const getTagColor = computed(() => (getIsOpen.value ? 'success' : 'red'));
-      const mergeForm = computed(() => [...state.basicFormHeader, ...state.dynamicFormHeader]);
-      state.projectNameValue = computed(() => formStore.getTemplateProjectName);
-      state.projectNames = computed(() => formStore.getProjectNamesList);
-      // state.currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
-      const getList = computed(() => {
-        return [...state.recordList].reverse();
+
+      formStore.setFormHistory({templateId: currentRoute.value.meta.templateId}).then((res) => {
+        const { records } = res;
+        state.recordList = records;
       });
+
       function toggle() {
         if (getIsOpen.value) {
           close();
@@ -281,7 +296,11 @@
       }
       function changeInputeValue(e, input, key, index) {
         input.value = e.target.value;
+        let columnIndex = key + 1,
+          _columnType = index - 1;
         let msgObj = {
+          columnIndex: columnIndex,
+          columnType: _columnType,
           type: '5',
           fromId: userStore.getUserInfo.userId,
           toId: '',
@@ -289,12 +308,11 @@
           msg: input,
         };
         send(JSON.stringify(msgObj));
-        let _columnIndex = index - 1;
         if (index < 1) return;
         if (e.target.value !== '') {
           const params = {
-            columnIndex: key + 1,
-            columnType: _columnIndex,
+            columnIndex: columnIndex,
+            columnType: _columnType,
             templateId: input.templateId,
             value: e.target.value,
           };
@@ -464,20 +482,28 @@
         sheet.insertRule('.column:hover::before{display:block;}');
       }
       function addInputRow() {
-        mergeForm.value.map((i) => {
-          i.inputs.push({
-            type: 'input',
-            value: '',
+        formStore.setFormDataState({ templateId: currentRoute.value.meta.templateId }).then((res) => {
+            if (!res) {
+              createMessage.info('您需要先上传一个EXCEL模板才能继续!');
+              console.log('删除成功');
+              return;
+            } else {
+              mergeForm.value.map((i) => {
+                i.inputs.push({
+                  type: 'input',
+                  value: '',
+                });
+                return i;
+              });
+              state.basicFormHeader[0].inputs[state.no].value = state.no++;
+              formStore.saveForm(mergeForm.value.slice(1, 5)).then(() =>
+                fillForm({
+                  id: currentRoute.value.meta.templateId,
+                  name: currentRoute.value.meta.title,
+                }),
+              );
+            }
           });
-          return i;
-        });
-        state.basicFormHeader[0].inputs[state.no].value = state.no++;
-        formStore.saveForm(mergeForm.value.slice(1, 5)).then(() =>
-          fillForm({
-            id: currentRoute.value.meta.templateId,
-            name: currentRoute.value.meta.title,
-          }),
-        );
       }
       const n = ref(1);
       // 进入页面获得回显的数据
@@ -682,6 +708,7 @@
     .container_wrap {
       display: flex;
       height: 60%;
+
       .left {
         flex: 3;
 
@@ -810,15 +837,34 @@
       }
       .right {
         flex: 1;
+        max-height: 660px;
         margin-left: 8px;
-        background: #f4f4f4;
         border-radius: 5px;
-        padding: 8px 0 8px 0;
+        padding-bottom: 8px;
 
         ::v-deep(.p-2) {
           background: #000;
           height: 800px !important;
           height: 100%;
+        }
+
+        .history_box {
+          height: 660px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          .conversation_wrap {
+            padding: 8px;
+            margin-bottom: 8px;
+            margin-top: 8px;
+            background: #eee;
+            border-radius: 5px;
+          }
+          .conversation_wrap:first-child {
+            margin-top: 0;
+          }
+          .conversation_wrap:last-child {
+            margin-bottom: 0;
+          }
         }
       }
     }

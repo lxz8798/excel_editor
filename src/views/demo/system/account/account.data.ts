@@ -8,6 +8,7 @@ import { useSkillsStore } from '/@/store/modules/skills';
 import { useTeamsStore } from '/@/store/modules/teams';
 import { getRoles } from '/@/api/sys/user';
 import { Icon } from '/@/components/Icon';
+import headerImg from '/@/assets/images/header.jpg';
 const userStore = useUserStore();
 const skillsStore = useSkillsStore();
 const teamStore = useTeamsStore();
@@ -21,7 +22,7 @@ export const columns: BasicColumn[] = [
         'div',
         { style: { display: 'flex', justifyContent: 'center', alignItems: 'center' } },
         [
-          h(Icon, { icon: record['avatar'] }),
+          h('img', { src: toRaw(record)['avatar'] ? toRaw(record)['avatar'] : headerImg, width: '20', height: '20', style: 'object-fit: cover; border-radius: 50%' }),
           h('p', { style: { marginBottom: '0', marginLeft: '5px' } }, record['name']),
         ],
       );
