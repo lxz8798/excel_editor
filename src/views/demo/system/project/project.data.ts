@@ -108,23 +108,28 @@ export const projectFormSchema: FormSchema[] = [
           value: 'menuId',
         },
         onChange: (id) => {
-          const _arr = [];
-          if (!_arr.includes(id)) {
-            _arr.push(id);
-            projectStore.setMenuIds(_arr);
-          }
-          // _technology.forEach((m) => {
-          //   let _node: object = {}, _technologyIds: string[] = [];
-          //   if (m.hasOwnProperty('children') && m['children']) {
-          //     _node = m.children.filter((i) => i['menuId'] === id)[0];
-          //     if (_node) {
-          //       _technologyIds = _node['children'][0]['children'].map((i) => i['menuId']); // 只取第一个源数据的所有表单
-          //       projectStore.setMenuIds(_technologyIds);
-          //     } else {
-          //       createMessage.warning('请选择技术本身而不是其父级或子级!');
-          //     }
-          //   }
-          // });
+          // const _arr = [];
+          // if (!_arr.includes(id)) {
+          //   _arr.push(id);
+          //   projectStore.setMenuIds(_arr);
+          // }
+          _technology.forEach((m) => {
+            const _arr = [];
+            let _node: object = {}, _technologyIds: string[] = [];
+            if (m.hasOwnProperty('children') && m['children']) {
+              _node = m.children.filter((i) => i['menuId'] === id)[0];
+              if (_node) {
+                if (!_arr.includes(id)) {
+                  _arr.push(id);
+                  projectStore.setMenuIds(_arr);
+                }
+                // _technologyIds = _node['children'][0]['children'].map((i) => i['menuId']); // 只取第一个源数据的所有表单
+                // projectStore.setMenuIds(_technologyIds);
+              } else {
+                createMessage.warning('请选择技术本身而不是其父级或子级!');
+              }
+            }
+          });
         },
       };
     },

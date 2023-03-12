@@ -22,7 +22,7 @@
           </a-col>-->
         </a-row>
       </a-col>
-      <a-col :span="10" :class="`${prefixCls}-col`">
+      <a-col :span="6" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpan="false">
           <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
             <Icon :icon="team.icon" :color="team.color" />
@@ -30,7 +30,12 @@
           </div>
         </CollapseContainer>
       </a-col>
-      <a-col :span="8" :class="`${prefixCls}-col`">
+      <a-col :span="6" :class="`${prefixCls}-col`">
+        <CollapseContainer :class="`${prefixCls}-top__team`" title="技能" :canExpan="false">
+
+        </CollapseContainer>
+      </a-col>
+      <a-col :span="6" :class="`${prefixCls}-col`">
         <CollapseContainer title="标签" :canExpan="false">
           <template v-for="tag in tagList" :key="tag">
             <a-input v-if="tag.label == 'add'" v-model:value="addTagValue" style="margin-top: 10px;">

@@ -83,7 +83,7 @@
       function handleChange(keys: string[], direction: TransferDirection, moveKeys: string[]) {
         _targetKeys.value = keys;
         const filterSource = getdataSource.value.filter((i) => keys.includes(i['key']));
-        emit('change', { keys: keys, source: filterSource, direction: direction });
+        emit('change', { keys: keys, source: filterSource, direction: direction, moveKeys: moveKeys });
       }
 
       watchEffect(() => {

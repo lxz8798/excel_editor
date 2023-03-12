@@ -8,7 +8,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { accountFormSchema } from './account.data';
-  import { regUser, editUser } from '/@/api/sys/user';
+  import { regUser, editUserPermissions } from '/@/api/sys/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useSkillsStore } from '/@/store/modules/skills';
   import { useTeamsStore } from '/@/store/modules/teams';
@@ -80,7 +80,7 @@
             regUser(values).then((res) => createMessage.success(res));
           } else {
             values.id = rowId.value;
-            editUser(values).then((res) => createMessage.success('更新成功'));
+            editUserPermissions(values).then((res) => createMessage.success('更新成功'));
           }
           emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
           closeModal();

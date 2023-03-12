@@ -9,6 +9,7 @@
       <div class="title">{{ msgTitle }}</div>
       <div class="content">{{ msgContent }}</div>
       <div class="sub">{{ msgSub }}</div>
+      <div class="sub">{{ msgCreateTime }}</div>
     </div>
   </div>
 </template>
@@ -29,6 +30,7 @@
       const msgTitle = computed(() => props.userMsg.content.split(',')[0]);
       const msgContent = computed(() => props.userMsg.content.split(',')[1]);
       const msgSub = computed(() => props.userMsg.content.split(',')[2]);
+      const msgCreateTime = computed(() => props.userMsg.createTime);
 
       return {
         avatarImg,
@@ -36,6 +38,7 @@
         msgTitle,
         msgContent,
         msgSub,
+        msgCreateTime,
       };
     },
   });

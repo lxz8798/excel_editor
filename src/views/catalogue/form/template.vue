@@ -21,35 +21,36 @@
       <template #title>
         <div class="form_title" v-if="currTempDetail.name">
           <!--{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}-->
-          <span>{{ currTempDetail.name.split('源数据-')[0] }}【</span>
-          <span v-if="!projectNames.length || addProjectNameFlag"
-            ><a-input
+          <!--<span>{{ currTempDetail.name.split('源始数据-')[0] }}【</span>-->
+          <span class="project_name_wrap" v-if="addProjectNameFlag">
+            <a-input
               size="small"
               placeholder="请输入项目名称"
               v-model:value="projectNameDefalutValue"
             >
-              <template #suffix>
+              <!--<template #suffix>
                 <Icon  icon="line-md:confirm-circle" @click="changeProjectName" title="添加项目名称" />
-              </template> </a-input
-          ></span>
-          <span v-else>
-            <a-select v-model:value="projectOptionsValue" size="small" style="min-width: 200px" @change="changeShowProjectName">
+              </template>-->
+            </a-input>
+          </span>
+          <span class="project_name_wrap" v-else>
+            【<a-select v-model:value="projectOptionsValue" size="small" @change="changeShowProjectName">
               <a-select-option v-for="item in projectNames" :key="item.id">
                 <div style="display: flex; align-items: center; justify-content: space-between">
                   <span>{{ item.name }}</span>
-                  <Icon icon="material-symbols:delete-forever-outline" style="color: red" @click="delProjectName($event, item)" title="删除项目名称" v-if="isAdmin || isLeader"></Icon>
+                  <!--<Icon icon="material-symbols:delete-forever-outline" style="color: red" @click="delProjectName($event, item)" title="删除项目名称" v-if="isAdmin || isLeader"></Icon>-->
                 </div>
               </a-select-option>
-              <template #suffixIcon>
+              <!--<template #suffixIcon>
                 <Icon
                   icon="material-symbols:add-circle-outline"
                   @click="changeAddProjectNameFlagState"
                   title="新增项目名称"
                 />
-              </template>
-            </a-select>
+              </template>-->
+            </a-select>】
           </span>
-          <span>】-{{ currTempDetail.name.split('源数据-')[1] }}</span>
+          <span>{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}</span>
           <!--<a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
         </div>
@@ -230,7 +231,7 @@
       const getTagColor = computed(() => (getIsOpen.value ? 'success' : 'red'));
       const mergeForm = computed(() => [...state.basicFormHeader, ...state.dynamicFormHeader]);
       state.projectNameValue = computed(() => formStore.getTemplateProjectName);
-      state.projectNames = computed(() => formStore.getProjectNamesList);
+      state.projectNames = computed(() => (formStore.getProjectNamesList['records'] && formStore.getProjectNamesList['records'].length) && toRaw(formStore.getProjectNamesList['records']));
       // state.currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
       const getList = computed(() => {
         return [...state.recordList].reverse();
@@ -245,16 +246,18 @@
             });
             formStore.setTemplateProjectName({ templateId: currentRoute.value.meta.templateId })
               .then((res) => {
-                state.projectNameDefalutValue = res.projectName;
+                state.projectNameDefalutValue = res;
                 formStore.setProjectNamesList().then((list) => {
-                  if (list.length) {
+                  if (list['records'].length) {
                     state.addProjectNameFlag = false;
                   } else {
                     state.addProjectNameFlag = true;
                   }
                   if (res !== '') {
-                    state.projectNames = computed(() => list);
-                    state.projectOptionsValue = toRaw(list).filter((i) => i.name == res.projectName)[0].id;
+                    state.projectNames = computed(() => list['records']);
+                    if (state.projectNames && state.projectNames.length) {
+                      state.projectOptionsValue = toRaw(list['records']).filter((i) => i.name == res)[0].id;
+                    }
                   }
                 });
               });
@@ -273,6 +276,14 @@
                 const { records } = res;
                 state.recordList = records;
               });
+            let timer = null;
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+              fillForm({
+                id: currentRoute.value.meta.templateId,
+                name: currentRoute.value.meta.title,
+              });
+            }, 600);
           } catch (error) {
             state.recordList.push({
               res: data.value,
@@ -892,6 +903,14 @@
         background: none;
         outline: none;
         height: 100%;
+      }
+      > .project_name_wrap {
+        .ant-select {
+          .ant-select-selector {
+            border: none;
+            background: none;
+          }
+        }
       }
     }
   }

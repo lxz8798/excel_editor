@@ -10,6 +10,7 @@ enum Api {
   PUT_PROJECT = '/examContract/edit',
   INVITE_USER = '/inviteUser',
   PROJECT_USER_LIST = '/user/projectUsers',
+  REMOVE_PROJECT_MEMBERS = '/removeTeamUser',
 }
 
 export function addProject(params) {
@@ -78,3 +79,14 @@ export function getProjectUserList() {
     {},
   );
 }
+
+export function removeProjectMembers(params) {
+  return defHttp.post(
+    {
+      url: Api.REMOVE_PROJECT_MEMBERS,
+      params,
+    },
+    {},
+  );
+}
+

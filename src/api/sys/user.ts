@@ -11,6 +11,7 @@ enum Api {
   TestRetry = '/testRetry',
   register = '/user/add',
   editUserInfo = '/user/editPwd',
+  EDIT_USER_PERMISSION = '/user/editUser',
   deleteUser = '/user/del/',
   GET_USER_TAG = '/sysUserLabel/list',
   ADD_USER_TAG = '/sysUserLabel/add',
@@ -67,6 +68,10 @@ export function regUser(params) {
 
 export function editUser(params) {
   return defHttp.put({ url: Api.editUserInfo, params });
+}
+
+export function editUserPermissions(params) {
+  return defHttp.put({ url: Api.EDIT_USER_PERMISSION, params });
 }
 
 export function activeUser(params) {

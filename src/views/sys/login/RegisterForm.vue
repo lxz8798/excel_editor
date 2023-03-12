@@ -40,14 +40,14 @@
       <!--新增表单-->
       <FormItem name="team" class="enter-x role_wrap">
         <a-select v-model:value="state.teamValue" mode="multiple" class="select-wrap" :placeholder="t('sys.login.team')" v-if="state['teamState']" @change="getTeamOptionItem">
-          <a-select-option v-for="(item, key) in state.teamOptions" :value="key">{{item.label}}</a-select-option>
+          <a-select-option v-for="item in state.teamOptions" :value="item.id">{{item.label}}</a-select-option>
         </a-select>
         <a-input v-model:value="state.teamValue" placeholder="输入完成后回车添加" @pressEnter="addTeam" v-else />
         <Icon icon="material-symbols:add-box-outline" title="我的团队" size="32" class="add_button" @click="clickTeamOptionItem" />
       </FormItem>
       <FormItem name="skills" class="enter-x role_wrap">
         <a-select v-model:value="state.skillValue" mode="multiple" class="select-wrap" :placeholder="t('sys.login.skills')" v-if="state['skillState']" @change="getSkillOptionItem">
-          <a-select-option v-for="(item, key) in state.skillOptions" :value="key">{{item.label}}</a-select-option>
+          <a-select-option v-for="(item, key) in state.skillOptions" :value="item.id">{{item.label}}</a-select-option>
         </a-select>
         <a-input v-model:value="state.skillValue" placeholder="输入完成后回车添加" @pressEnter="addSkills" v-else />
         <Icon icon="material-symbols:add-box-outline" title="添加技能" size="32" class="add_button" @click="clickSkillsOptionItem" />
@@ -203,16 +203,18 @@
       createMessage.info('已存在相同团队，请直接选择。');
     }
     state['teamState'] = true;
-    state['teamValue'] = state.teamOptions;
+    // state['teamValue'] = state.teamOptions;
   }
 
-  function getTeamOptionItem(e) {
-    state['teamValue'] = toRaw(state.teamValue).map((i,k) => ({ icon: state.teamOptions[k]['icon'], label: state.teamOptions[k]['label'] }));
+  function getTeamOptionItem(value, option) {
+    state['teamValue'] = option;
   }
 
   function clickTeamOptionItem() {
     if (state['teamState']) {
       state['teamValue'] = '';
+    } else {
+      addTeam();
     }
     state.teamState = !state.teamState;
   }
@@ -228,12 +230,11 @@
       createMessage.info('已存在相同技能，请直接选择。');
     }
     state['skillState'] = true;
-    state['skillValue'] = state.skillOptions;
+    // state['skillValue'] = state.skillOptions;
   }
 
   function getSkillOptionItem(value, option) {
-    // state['skillValue'] = option;
-    state['skillValue'] = toRaw(state.skillValue).map((i,k) => ({ icon: state.skillOptions[k]['icon'], label: state.skillOptions[k]['label'] }));
+    state['skillValue'] = option;
   }
 
   function clickSkillsOptionItem() {
@@ -248,8 +249,8 @@
   async function handleRegister() {
     const data = await validForm();
     data['roleId'] = formData.roleId;
-    data['teamName'] = state['teamValue'];
-    data['skills'] = state['skillValue'];
+    data['teamName'] = toRaw(state['teamValue']);
+    data['skills'] = toRaw(state['skillValue']);
     const { account, phone, password, policy, realName, sms } = data;
     formData.account = account;
     formData.teamName = state.teamValue;

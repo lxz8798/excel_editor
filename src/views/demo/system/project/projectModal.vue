@@ -71,7 +71,7 @@
           const { name, daysLeft, projectAdminId, id } = values;
           const params = {
             name: name,
-            targetTime: new Date(daysLeft).toLocaleString().replace(/\/+/g, '-'),
+            targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,
             createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
             // templateIds: getMenuIds.value,
             menuIds: getMenuIds.value,

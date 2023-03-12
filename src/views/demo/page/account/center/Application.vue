@@ -66,7 +66,7 @@
       }
       getOwnerProjectList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId }).then(
         (result) => {
-          result.forEach((t) => {
+          result['records'].forEach((t) => {
             state.formList<ProjectCarModel>.push({
               id: t['id'],
               title: t['name'],

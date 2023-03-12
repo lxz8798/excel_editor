@@ -1,7 +1,7 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" width="70%">
     <div class="admin_dispatch" v-if="isAdmin">
-      <div>指定项目长：</div>
+      <div>项目负责人：</div>
       <AutoComplete
         allowClear
         v-model:value="projectAdminId"
@@ -11,10 +11,12 @@
         :filter-option="filterOption"
         @change="getProjectAdminId"
       />
+      <span style="margin-left: 15px; color: red; font-size: 12px;">如果项目中有多个项目长，需要确定项目负责人！</span>
     </div>
     <ApiTransfer
       :data-source="userList"
       :target-keys="targetKeys"
+      :value="transferRightKeys"
       :show-search="showSearch"
       :filter-option="(inputValue, item) => item.title.indexOf(inputValue) !== -1"
       :show-select-all="false"
@@ -45,6 +47,7 @@
   const userList = computed(() => userStore.getUserList);
   const originTargetKeys = computed(() => userList.value.map((i) => i['id']));
   const targetKeys = ref<string[]>(originTargetKeys);
+  // const rightKeys = ref<string[]>()
   const disabled = ref<boolean>(false);
   const showSearch = ref<boolean>(true);
   export default defineComponent({
@@ -56,8 +59,9 @@
       const projectData = ref({});
       const rowId = ref('');
       const projectAdminId = ref('');
+      const transferRightKeys = ref([]);
 
-      let transferRightDatas = [], transferRightKeys = [];
+      let transferRightDatas = [];
 
       projectStore.setProjectUserList();
 
@@ -74,8 +78,10 @@
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         // resetFields();
         setModalProps({ confirmLoading: false });
+        rowId.value = data.project.id;
+        // projectAdminId.value = computed(() => projectUserList.value.filter((i) => i['value'] === data.project.createUserId)[0]);
         isUpdate.value = !!data?.isUpdate;
-        transferRightKeys = data.project['teamUsers'].map((i) => i['id']);
+        transferRightKeys.value = data.project['teamUsers'].map((i) => i['id']);
         // if (unref(isUpdate)) {
         //   rowId.value = data.record.id;
         //   setFieldsValue({
@@ -105,8 +111,18 @@
       }
 
       function transferHandler(data) {
-        transferRightKeys = data['keys'];
+        transferRightKeys.value = data['keys'];
         transferRightDatas = data['source'];
+        if (data.direction.toUpperCase() === 'LEFT') {
+          const { moveKeys } = data;
+          const params = {
+            contractId: rowId.value,
+            removeUserIds: moveKeys,
+          };
+          projectStore.removeProjectMembers(params).then((res) => {
+            createMessage.success(res);
+          });
+        }
       }
 
       function filterOption(input: string, option: Option) {
@@ -114,15 +130,20 @@
       }
 
       async function handleSubmit() {
+        if (projectAdminId.value === '' && isAdmin.value) {
+          createMessage.info('需要指定一个项目负责人!');
+          return;
+        }
         try {
           // TODO custom api
           const params: ProjectParamsModel = {
-            contractIds: ['1630229585536770050'],
-            inviteUserId: transferRightKeys,
+            contractId: rowId.value,
+            inviteUserId: transferRightKeys.value,
             projectAdminId: isAdmin.value ? getProjectAdminId(projectAdminId.value) : null,
           };
           projectInviteUsers(params).then((res) => {
-            console.log(res, 'res');
+            createMessage.success(res);
+            emit('success');
           });
           closeModal();
         } finally {
@@ -130,7 +151,7 @@
         }
       }
 
-      return { registerModal, registerForm, getTitle, handleSubmit, userList, targetKeys, disabled, showSearch, transferHandler, transferRightDatas, filterOption, isAdmin, projectUserList, getProjectAdminId, projectAdminId };
+      return { registerModal, registerForm, getTitle, handleSubmit, userList, targetKeys, disabled, showSearch, transferHandler, transferRightDatas, filterOption, isAdmin, projectUserList, getProjectAdminId, projectAdminId, transferRightKeys };
     },
   });
 </script>

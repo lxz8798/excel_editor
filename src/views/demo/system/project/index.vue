@@ -16,12 +16,12 @@
               },
               {
                 icon: 'fluent:people-team-add-24-filled',
-                tooltip: '编辑项目成员',
+                tooltip: '邀请成员',
                 onClick: addProjectMebers.bind(null, record),
               },
               {
                 icon: 'clarity:note-edit-line',
-                tooltip: '编辑',
+                tooltip: '编辑项目',
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -42,11 +42,11 @@
     <!--  新增和编辑  -->
     <ProjectModal @register="registerModal1" @success="handleSuccess" />
     <!--  添加成员  -->
-    <AddProjectMebersModal @register="registerModal2" />
+    <AddProjectMebersModal :rightKeys="rightKeys" @register="registerModal2" @success="handleSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, h, computed, toRaw, unref } from "vue";
+  import { defineComponent, reactive, onMounted, h, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getOwnerProjectList, delProject } from '/@/api/sys/project';
@@ -188,7 +188,6 @@ import { defineComponent, reactive, onMounted, h, computed, toRaw, unref } from 
 
       function handleSuccess({ isUpdate, values }) {
         setTableData(values);
-
         // if (isUpdate) {
         //   // 演示不刷新表格直接更新内部数据。
         //   // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
