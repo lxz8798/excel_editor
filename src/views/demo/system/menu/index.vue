@@ -2,7 +2,7 @@
   <div>
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
-        <a-button type="primary" v-if="!isNormal" @click="handleCreate"> 新增菜单 </a-button>
+        <a-button type="primary" v-if="!isNormal" @click="handleCreate"> 新增技术 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -51,14 +51,14 @@
       const permissionStore = usePermissionStore();
       const [registerDrawer, { openDrawer }] = useDrawer();
       const [registerTable, { reload, expandAll }] = useTable({
-        title: '菜单列表',
+        title: '技术列表',
         api: getMenuList,
         columns,
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
         },
-        isTreeTable: true,
+        // isTreeTable: true,
         pagination: false,
         striped: false,
         useSearchForm: true,

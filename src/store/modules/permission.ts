@@ -1,10 +1,9 @@
 import type { AppRouteRecordRaw, Menu } from '/@/router/types';
-import { router } from '/@/router';
-import { getParentLayout, LAYOUT } from '/@/router/constant';
+import { LAYOUT } from '/@/router/constant';
 
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
-import { t, useI18n } from '/@/hooks/web/useI18n';
+import { useI18n } from '/@/hooks/web/useI18n';
 import { useUserStore } from './user';
 
 import { useAppStoreWithOut } from './app';
@@ -21,7 +20,7 @@ import { ERROR_LOG_ROUTE, PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
 import { filter } from '/@/utils/helper/treeHelper';
 
-import { getMenuList, getMenuChildren, getTechnologyTree } from "/@/api/sys/menu";
+import { getMenuList, getMenuChildren, getTechnologyTree } from '/@/api/sys/menu';
 import { getPermCode } from '/@/api/sys/user';
 
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -38,12 +37,15 @@ interface PermissionState {
   // 触发菜单更新
   lastBuildMenuTime: number;
   // Backstage menu list
+  // 接口返回没处理时的数据
+  apiBackMenuList: [];
   // 后台菜单列表
   backMenuList: Menu[];
   // 菜单列表
   frontMenuList: Menu[];
   addMenuShowCategory: boolean;
   technologyTree: Menu[];
+  cascadeTree: [];
 }
 
 export const usePermissionStore = defineStore({
@@ -58,6 +60,7 @@ export const usePermissionStore = defineStore({
     // 触发菜单更新
     lastBuildMenuTime: 0,
     // Backstage menu list
+    apiBackMenuList: [],
     // 后台菜单列表
     backMenuList: [],
     // menu List
@@ -65,6 +68,7 @@ export const usePermissionStore = defineStore({
     frontMenuList: [],
     addMenuShowCategory: false,
     technologyTree: [],
+    cascadeTree: [],
   }),
   getters: {
     getPermCodeList(): string[] | number[] {
@@ -88,8 +92,14 @@ export const usePermissionStore = defineStore({
     getTechnologyTree(): Menu[] {
       return this.technologyTree;
     },
+    getApiBackMenuList(): Menu[] {
+      return this.apiBackMenuList;
+    },
   },
   actions: {
+    setApiBackMenuList(list: Menu[]) {
+      this.apiBackMenuList = list;
+    },
     setPermCodeList(codeList: string[]) {
       this.permCodeList = codeList;
     },
@@ -320,6 +330,16 @@ export const usePermissionStore = defineStore({
                 component: '/demo/system/project/index.vue',
               },
               {
+                path: 'menu',
+                name: 'MenuManagement',
+                meta: {
+                  icon: 'material-symbols:menu-book',
+                  title: t('routes.demo.system.menu'),
+                  ignoreKeepAlive: true,
+                },
+                component: '/demo/system/menu/index.vue',
+              },
+              {
                 path: 'team',
                 name: 'TeamManagement',
                 meta: {
@@ -361,16 +381,6 @@ export const usePermissionStore = defineStore({
                 },
                 component: '/demo/system/account/AccountDetail.vue',
               },
-              {
-                path: 'menu',
-                name: 'MenuManagement',
-                meta: {
-                  icon: 'material-symbols:menu-book',
-                  title: t('routes.demo.system.menu'),
-                  ignoreKeepAlive: true,
-                },
-                component: '/demo/system/menu/index.vue',
-              },
               // {
               //   path: 'changePassword',
               //   name: 'ChangePassword',
@@ -394,6 +404,7 @@ export const usePermissionStore = defineStore({
           try {
             // await this.changePermissionCode();
             routeList = (await getMenuList()) as AppRouteRecordRaw[];
+            this.setApiBackMenuList(routeList);
           } catch (error) {
             console.error(error);
           }

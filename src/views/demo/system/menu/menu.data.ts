@@ -1,7 +1,9 @@
+
+import type { Menu } from '/@/router/types';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-import { h, ref, reactive } from 'vue';
-import { Tag, Input, Select, SelectOption, Form, Checkbox } from 'ant-design-vue';
+import { h, ref, reactive, warn, toRaw } from "vue";
+import { Tag, Input, Select, SelectOption, Form, Checkbox, Cascader } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
 import { getCategory } from '/@/api/sys/menu';
 import { usePermissionStore } from '/@/store/modules/permission';
@@ -80,11 +82,18 @@ export const searchFormSchema: FormSchema[] = [
     colProps: { span: 8 },
   },
 ];
-
+const cascadePrefix = ref(''), cascadeSuffix = ref('');
 const isShowCategory = ref(false);
 const state = reactive({
   categoryOptions: [],
 });
+const validCascader = (rule, value, callback) => {
+  if (cascadePrefix.value === '' || !cascadePrefix.value) {
+    return callback(new Error('路由地址必须填写!'));
+  } else {
+    return callback();
+  }
+};
 export const formSchema: FormSchema[] = [
   {
     field: 'type',
@@ -165,12 +174,56 @@ export const formSchema: FormSchema[] = [
     required: true,
     ifShow: ({ values }) => !isButton(values.type),
   },
-
   {
     field: 'path',
     label: '路由地址',
     component: 'Input',
+    // componentProps: ({ formModel }) => {
+    //   return {
+    //     placeholder: '极联选择器',
+    //   };
+    // },
+    rules: [{ required: true, validator: validCascader, trigger: 'change' }],
     ifShow: ({ values }) => !isButton(values.type),
+    render: ({ model, field }) => {
+      const transformMenu = (list) => {
+        return list.map(({ menuId: value, menuName: label, children }) => {
+          if (children && children.length > 0) {
+            children = transformMenu(children);
+          }
+          return { value, label, children };
+        });
+      };
+      return h('div', { class: 'cascaderBox' }, [
+        h(Cascader, {
+          allowClear: true,
+          changeOnSelect: true,
+          placeholder: '请选择路由前缀',
+          options: transformMenu(toRaw(permissionStore.getApiBackMenuList) as Menu[]),
+          style: {
+            width: '60%',
+          },
+          onChange: (e) => {
+            if (e) {
+              cascadePrefix.value = e.length ? e.toString().replace(',', '/') : '';
+            } else {
+              cascadePrefix.value = '';
+            }
+            model[field] = cascadePrefix.value + cascadeSuffix.value;
+          },
+        }),
+        h(Input, {
+          placeholder: '请输入访问地址',
+          style: {
+            width: '40%',
+          },
+          onChange: (e) => {
+            cascadeSuffix.value = '/' + e.target.value;
+            model[field] = cascadePrefix.value + cascadeSuffix.value;
+          },
+        }),
+      ]);
+    },
   },
   {
     field: 'component',

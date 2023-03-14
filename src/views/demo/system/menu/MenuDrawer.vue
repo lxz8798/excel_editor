@@ -62,7 +62,7 @@
         });
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增菜单' : '编辑菜单'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增技术' : '编辑技术'));
 
       async function handleSubmit() {
         try {
