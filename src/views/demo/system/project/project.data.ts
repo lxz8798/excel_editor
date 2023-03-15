@@ -16,7 +16,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'name',
   },
   {
-    title: '关联技术',
+    title: '关联内容',
     dataIndex: 'contracts',
     customRender: ({ record }) => {
       return h('span', record['contracts'].map((i) => i && i['menuName']).toString());
@@ -32,7 +32,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'teamUsers',
     width: 300,
     customRender: ({ record }) => {
-      return h('span', record['teamUsers'].map((i) => i['name']).toString());
+      return h('span', record['teamUsers'].map((i) => i && i['name']).toString());
     },
   },
   {
@@ -108,26 +108,26 @@ export const projectFormSchema: FormSchema[] = [
           value: 'menuId',
         },
         onChange: (id) => {
-          // const _arr = [];
-          // if (!_arr.includes(id)) {
-          //   _arr.push(id);
-          //   projectStore.setMenuIds(_arr);
-          // }
-          _technology.forEach((m) => {
-            const _arr = [];
-            let _node: object = {};
-            if (m.hasOwnProperty('children') && m['children']) {
-              _node = m.children.filter((i) => i['menuId'] === id)[0];
-              if (_node) {
-                if (!_arr.includes(id)) {
-                  _arr.push(id);
-                  projectStore.setMenuIds(_arr);
-                }
-              } else {
-                createMessage.warning('请选择技术本身而不是其父级或子级!');
-              }
-            }
-          });
+          const _arr = [];
+          if (!_arr.includes(id)) {
+            _arr.push(id);
+            projectStore.setMenuIds(_arr);
+          }
+          // _technology.forEach((m) => {
+          //   const _arr = [];
+          //   let _node: object = {};
+          //   if (m.hasOwnProperty('children') && m['children']) {
+          //     _node = m.children.filter((i) => i['menuId'] === id)[0];
+          //     if (_node) {
+          //       if (!_arr.includes(id)) {
+          //         _arr.push(id);
+          //         projectStore.setMenuIds(_arr);
+          //       }
+          //     } else {
+          //       createMessage.warning('请选择技术本身而不是其父级或子级!');
+          //     }
+          //   }
+          // });
         },
       };
     },

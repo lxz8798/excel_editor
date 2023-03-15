@@ -2,7 +2,7 @@
   <div>
     <BasicTable @register="registerTable" @fetch-success="onFetchSuccess">
       <template #toolbar>
-        <a-button type="primary" v-if="!isNormal" @click="handleCreate"> 新增技术 </a-button>
+        <a-button type="primary" v-if="!isNormal" @click="handleCreate"> 创建 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">

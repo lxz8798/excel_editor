@@ -25,11 +25,11 @@ export const columns: BasicColumn[] = [
       return h(Icon, { icon: record.icon });
     },
   },
-  {
-    title: '权限标识',
-    dataIndex: 'permission',
-    width: 180,
-  },
+  // {
+  //   title: '权限标识',
+  //   dataIndex: 'permission',
+  //   width: 180,
+  // },
   {
     title: '组件',
     dataIndex: 'component',
@@ -103,8 +103,8 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       options: [
         { label: '目录', value: '0' },
-        // { label: '菜单', value: '1' },
-        // { label: '按钮', value: '2' },
+        { label: '项目', value: '1' },
+        { label: '技术', value: '2' },
       ],
     },
     colProps: { lg: 24, md: 24 },
@@ -115,16 +115,16 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
     // rules: [{ required: true }],
     render: ({ model, field }) => h('div', { class: 'menuNameBox' }, [
-        h(
-          Select,
-          {
-            style: isShowCategory.value ? 'display: block;' : 'display: none;',
-            placeholder: '请选择分类',
-          },
-          state.categoryOptions.map((i) =>
-            h(SelectOption, { label: i.menuName.split('-')[i.menuName.split('-').length - 1], value: i.menuName.split('-')[i.menuName.split('-').length - 1] }),
-          ),
-        ),
+        // h(
+        //   Select,
+        //   {
+        //     style: isShowCategory.value ? 'display: block;' : 'display: none;',
+        //     placeholder: '请选择分类',
+        //   },
+        //   state.categoryOptions.map((i) =>
+        //     h(SelectOption, { label: i.menuName.split('-')[i.menuName.split('-').length - 1], value: i.menuName.split('-')[i.menuName.split('-').length - 1] }),
+        //   ),
+        // ),
         h(Input, {
           placeholder: '请输入名称',
           value: model[field],
@@ -174,69 +174,69 @@ export const formSchema: FormSchema[] = [
     required: true,
     ifShow: ({ values }) => !isButton(values.type),
   },
-  {
-    field: 'path',
-    label: '路由地址',
-    component: 'Input',
-    // componentProps: ({ formModel }) => {
-    //   return {
-    //     placeholder: '极联选择器',
-    //   };
-    // },
-    rules: [{ required: true, validator: validCascader, trigger: 'change' }],
-    ifShow: ({ values }) => !isButton(values.type),
-    render: ({ model, field }) => {
-      const transformMenu = (list) => {
-        return list.map(({ menuId: value, menuName: label, children }) => {
-          if (children && children.length > 0) {
-            children = transformMenu(children);
-          }
-          return { value, label, children };
-        });
-      };
-      return h('div', { class: 'cascaderBox' }, [
-        h(Cascader, {
-          allowClear: true,
-          changeOnSelect: true,
-          placeholder: '请选择路由前缀',
-          options: transformMenu(toRaw(permissionStore.getApiBackMenuList) as Menu[]),
-          style: {
-            width: '60%',
-          },
-          onChange: (e) => {
-            if (e) {
-              cascadePrefix.value = e.length ? e.toString().replace(',', '/') : '';
-            } else {
-              cascadePrefix.value = '';
-            }
-            model[field] = cascadePrefix.value + cascadeSuffix.value;
-          },
-        }),
-        h(Input, {
-          placeholder: '请输入访问地址',
-          style: {
-            width: '40%',
-          },
-          onChange: (e) => {
-            cascadeSuffix.value = '/' + e.target.value;
-            model[field] = cascadePrefix.value + cascadeSuffix.value;
-          },
-        }),
-      ]);
-    },
-  },
-  {
-    field: 'component',
-    label: '组件路径',
-    component: 'Input',
-    ifShow: ({ values }) => isMenu(values.type),
-  },
-  {
-    field: 'permission',
-    label: '权限标识',
-    component: 'Input',
-    ifShow: ({ values }) => !isDir(values.type),
-  },
+  // {
+  //   field: 'path',
+  //   label: '路由地址',
+  //   component: 'Input',
+  //   // componentProps: ({ formModel }) => {
+  //   //   return {
+  //   //     placeholder: '极联选择器',
+  //   //   };
+  //   // },
+  //   rules: [{ required: true, validator: validCascader, trigger: 'change' }],
+  //   ifShow: ({ values }) => !isButton(values.type),
+  //   render: ({ model, field }) => {
+  //     const transformMenu = (list) => {
+  //       return list.map(({ menuId: value, menuName: label, children }) => {
+  //         if (children && children.length > 0) {
+  //           children = transformMenu(children);
+  //         }
+  //         return { value, label, children };
+  //       });
+  //     };
+  //     return h('div', { class: 'cascaderBox' }, [
+  //       h(Cascader, {
+  //         allowClear: true,
+  //         changeOnSelect: true,
+  //         placeholder: '请选择路由前缀',
+  //         options: transformMenu(toRaw(permissionStore.getApiBackMenuList) as Menu[]),
+  //         style: {
+  //           width: '60%',
+  //         },
+  //         onChange: (e) => {
+  //           if (e) {
+  //             cascadePrefix.value = e.length ? e.toString().replace(',', '/') : '';
+  //           } else {
+  //             cascadePrefix.value = '';
+  //           }
+  //           model[field] = cascadePrefix.value + cascadeSuffix.value;
+  //         },
+  //       }),
+  //       h(Input, {
+  //         placeholder: '请输入访问地址',
+  //         style: {
+  //           width: '40%',
+  //         },
+  //         onChange: (e) => {
+  //           cascadeSuffix.value = '/' + e.target.value;
+  //           model[field] = cascadePrefix.value + cascadeSuffix.value;
+  //         },
+  //       }),
+  //     ]);
+  //   },
+  // },
+  // {
+  //   field: 'component',
+  //   label: '组件路径',
+  //   component: 'Input',
+  //   ifShow: ({ values }) => isMenu(values.type),
+  // },
+  // {
+  //   field: 'permission',
+  //   label: '权限标识',
+  //   component: 'Input',
+  //   // ifShow: ({ values }) => !isDir(values.type),
+  // },
   {
     field: 'status',
     label: '状态',

@@ -62,7 +62,7 @@
         });
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增技术' : '编辑技术'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '创建' : '编辑'));
 
       async function handleSubmit() {
         try {
@@ -72,11 +72,12 @@
             // 添加菜单
             setDrawerProps({ confirmLoading: true });
             // TODO custom api
-            if (type == 0 && permissionStore.getAddMenuShowCategory) {
-              formDatas['childFlag'] = true;
-            } else {
-              formDatas['childFlag'] = false;
-            }
+            // if (type == 0 && permissionStore.getAddMenuShowCategory) {
+            //   formDatas['childFlag'] = true;
+            // } else {
+            //   formDatas['childFlag'] = false;
+            // }
+            formDatas['childFlag'] = toRaw(permissionStore.getAddMenuShowCategory);
             const addResult = await addMenu(formDatas);
             createMessage.success(addResult);
           } else {
