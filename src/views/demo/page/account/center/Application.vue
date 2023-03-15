@@ -4,7 +4,7 @@
       <template v-for="item in list" :key="item.title">
         <a-col :span="6">
           <ListItem>
-            <Card :hoverable="true" :class="`${prefixCls}__card`" @click="clickHandler(item)">
+            <Card :hoverable="true" :class="`${prefixCls}__card`">
               <div :class="`${prefixCls}__card-title`">
                 <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
                 <span :style="{ color: item.color }">{{ item.title }}</span>
@@ -16,7 +16,8 @@
                 参与人员：<span>{{ item.teams ?? '暂无' }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
-                完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue' }">&nbsp;{{ item.day }}&nbsp;</span>天到期
+                <span>完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue'  }">&nbsp;{{ item.day <= 0 ? '0' : item.day }}&nbsp;</span>天到期</span>
+                <Icon icon="material-symbols:arrow-circle-right-rounded" title="开始工作" @click="enterProject(item)" />
               </div>
             </Card>
           </ListItem>
@@ -26,17 +27,20 @@
   </List>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, computed } from 'vue';
+  import { defineComponent, reactive } from 'vue';
   import { List, Card, Row, Col } from 'ant-design-vue';
   import Icon from '/@/components/Icon/index';
   import { useFormStore } from '/@/store/modules/form';
   import { useGlobSetting } from '/@/hooks/setting';
   import { getOwnerProjectList } from '/@/api/sys/project';
   import { useUserStore } from '/@/store/modules/user';
+  import { getProjectPath } from '/@/api/demo/form';
+
   const { apiUrl } = useGlobSetting();
   // 使用表单
   const formStore = useFormStore();
   const userStore = useUserStore();
+  import { useGo } from '/@/hooks/web/usePage';
   interface ProjectCarModel {
     id?: number | string;
     title: string;
@@ -54,6 +58,7 @@
       [Col.name]: Col,
     },
     setup() {
+      const go = useGo();
       const state = reactive({
         formList: [],
       });
@@ -82,8 +87,9 @@
           });
         },
       );
-      function clickHandler(form) {
-        // window.location.href = apiUrl + '/form/template/' + form.id;
+      function enterProject(item) {
+        const { id } = item;
+        getProjectPath({ contractId: id }).then((res) => go(res));
       }
       async function downloadExcel(form) {
         const a = document.createElement('a');
@@ -95,7 +101,7 @@
       }
       return {
         downloadExcel,
-        clickHandler,
+        enterProject,
         prefixCls: 'account-center-application',
         list: state.formList,
       };
@@ -113,6 +119,17 @@
             .ant-card-body {
               .account-center-application__card-num {
                 margin-left: 0;
+
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .app-iconify {
+                  transition: .3s;
+                  &:hover {
+                    color: #0960bd;
+                  }
+                }
               }
             }
           }

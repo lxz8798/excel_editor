@@ -58,11 +58,10 @@
       const [registerModal1, { openModal: openModal1 }] = useModal();
       const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
-      const isNormal = ref(false);
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       userStore.setUserList({ page: 1, pageSize: 10 });
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
-      isNormal.value = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '团队列表',

@@ -16,6 +16,10 @@ export const columns: BasicColumn[] = [
     dataIndex: 'label',
   },
   {
+    title: '团队成员',
+    dataIndex: 'label',
+  },
+  {
     title: '创建时间',
     dataIndex: 'createTime',
   },

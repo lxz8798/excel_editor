@@ -23,6 +23,7 @@ enum Api {
   DEL_PROJECT_ITEM = '/examContract/del',
   HAVE_DATA = '/template/haveData',
   QUERY_FORM_HISTORY = '/dymcRecord/pages',
+  GET_PROJECT_PATH = '/examContract/getRoute',
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -47,3 +48,4 @@ export const addProjectItem = (params) => defHttp.post({ url: Api.ADD_PROJECT_IT
 export const delProjectItem = ({ id }) => defHttp.delete({ url: `${Api.DEL_PROJECT_ITEM}?id=${id}` });
 export const haveData = (params) => defHttp.get({ url: Api.HAVE_DATA, params });
 export const queryFormHistory = (params) => defHttp.get({ url: Api.QUERY_FORM_HISTORY, params });
+export const getProjectPath = (params) => defHttp.get({ url: Api.GET_PROJECT_PATH, params });

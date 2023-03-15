@@ -4,24 +4,33 @@ import { getAllSkills, getSkills } from '/@/api/sys/skills';
 interface SkillsState {
   menuIds?: string[];
   getUserSkillsList: [];
+  getSkillsList: [];
 }
 
 export const useSkillsStore = defineStore({
   id: 'app-skills',
   state: (): SkillsState => ({
-    getUserSkillsList: [],
+    userSkillsList: [],
+    skillsList: [],
   }),
   getters: {
     getSkillsUserList(): [] {
-      return this.getUserSkillsList;
+      return this.userSkillsList;
+    },
+    getSkillsList(): [] {
+      return this.skillsList;
     },
   },
   actions: {
     // sync
     // async
     async setSkillsUserList() {
-      this.getUserSkillsList = await getAllSkills();
-      return this.getUserSkillsList.map((i, k) => i['value'] = k);
+      this.userSkillsList = await getAllSkills();
+      return this.userSkillsList.map((i, k) => i['value'] = k);
+    },
+    async setSkillsList(params) {
+      this.skillsList = await getSkills(params);
+      return this.skillsList;
     },
   },
 });

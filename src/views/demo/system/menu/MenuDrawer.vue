@@ -34,6 +34,8 @@
         datas: {},
       });
       let formDatas = {};
+      // 进入页面取消勾选
+      permissionStore.setAddMenuShowCategory(false);
       const [
         registerForm,
         { resetFields, getFieldsValue, setFieldsValue, updateSchema, validate },

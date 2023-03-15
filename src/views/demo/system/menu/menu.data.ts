@@ -132,21 +132,30 @@ export const formSchema: FormSchema[] = [
             model[field] = e.target.value;
           },
         }),
+        h(Checkbox, {
+          style: {
+            marginLeft: '8px',
+          },
+          onChange: (e) => {
+            // isShowCategory.value = e.target.checked;
+            permissionStore.setAddMenuShowCategory(e.target.checked);
+          },
+        }),
       ]),
   },
   {
     field: 'parentMenu',
     label: '上级菜单',
     component: 'TreeSelect',
-    suffix: (recoder) =>
-      h(FormItemRest, {}, [
-        h(Checkbox, {
-          onChange: (e) => {
-            isShowCategory.value = e.target.checked;
-            permissionStore.setAddMenuShowCategory(e.target.checked);
-          },
-        }),
-      ]),
+    // suffix: (recoder) =>
+    //   h(FormItemRest, {}, [
+    //     h(Checkbox, {
+    //       onChange: (e) => {
+    //         isShowCategory.value = e.target.checked;
+    //         permissionStore.setAddMenuShowCategory(e.target.checked);
+    //       },
+    //     }),
+    //   ]),
     componentProps: {
       fieldNames: {
         label: 'name',

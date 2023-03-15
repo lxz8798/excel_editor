@@ -32,7 +32,10 @@
       </a-col>
       <a-col :span="6" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team`" title="技能" :canExpan="false">
-
+          <div v-for="(team, index) in skills" :key="index" :class="`${prefixCls}-top__team-item`">
+            <Icon :icon="team.icon" :color="team.color" />
+            <span :style="{ color: team.color }">{{ team.label }}</span>
+          </div>
         </CollapseContainer>
       </a-col>
       <a-col :span="6" :class="`${prefixCls}-col`">
@@ -70,8 +73,8 @@
 
 <script lang="ts">
   import { Tag, Tabs, Row, Col } from 'ant-design-vue';
-  import { BasicModal, useModalInner } from '/@/components/Modal';
-  import { defineComponent, computed, onMounted, ref, h } from 'vue';
+  import { useModalInner } from '/@/components/Modal';
+  import { defineComponent, computed, ref, h } from 'vue';
   import { CollapseContainer } from '/@/components/Container/index';
   import Icon from '/@/components/Icon/index';
   import Article from './Article.vue';
@@ -81,6 +84,7 @@
   import { tags, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useSkillsStore } from '/@/store/modules/skills';
 
   export default defineComponent({
     components: {
@@ -97,6 +101,7 @@
     },
     setup() {
       const userStore = useUserStore();
+      const skillsStore = useSkillsStore();
       const { createConfirm, createMessage } = useMessage();
 
       const showDeleteIcon = ref(false);
@@ -104,12 +109,14 @@
 
       userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
       userStore.setTeamList({ userId: userStore.getUserInfo.userId });
+      skillsStore.setSkillsList({ userId: userStore.getUserInfo.userId });
 
       const avatar = computed(() => userStore.getUserInfo.avatar || userStore.getUserAvatar);
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
       const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
       const tagList = computed(() => userStore.getUserTagsList || []);
       const teams = computed(() => userStore.getTeamList || []);
+      const skills = computed(() => skillsStore.getSkillsList || []);
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
       // 添加TAG
@@ -154,6 +161,7 @@
         tags,
         tagList,
         teams,
+        skills,
         details,
         achieveList,
         showDeleteIcon,

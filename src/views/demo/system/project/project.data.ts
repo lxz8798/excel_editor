@@ -28,7 +28,7 @@ export const columns: BasicColumn[] = [
     width: 120,
   },
   {
-    title: '团队成员',
+    title: '项目成员',
     dataIndex: 'teamUsers',
     width: 300,
     customRender: ({ record }) => {
@@ -86,18 +86,21 @@ export const projectFormSchema: FormSchema[] = [
   },
   {
     field: 'menuName',
-    label: '技术',
+    label: '选择内容',
     component: 'TreeSelect',
     componentProps: ({ formModel, formActionType }) => {
       const permissionStore = usePermissionStore();
       const _technology = toRaw(permissionStore.getTechnologyTree);
       const menuId = computed(() => toRaw(formModel));
+
       return {
         mode: 'multiple',
         allowClear: true,
         showSearch: true,
         placeholder: '请先择技术在绑定',
-        treeData: _technology,
+        treeData: _technology.map((item) => {
+          return { ...item, children: [] };
+        }),
         filterTreeNode: (str, node) => {
           return node['menuName'].includes(str);
         },
