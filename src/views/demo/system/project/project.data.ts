@@ -19,7 +19,7 @@ export const columns: BasicColumn[] = [
     title: '关联内容',
     dataIndex: 'contracts',
     customRender: ({ record }) => {
-      return h('span', record['contracts'].map((i) => i && i['menuName']).toString());
+      return h('span', record['contracts'].map((i) => i && i['menuName'].split('-')[i['menuName'].split('-').length - 1]).toString());
     },
   },
   {

@@ -249,7 +249,6 @@ export const useUserStore = defineStore({
     // 得到团队列表
     async setTeamList(params) {
       this.teamList = await getTeams(params);
-      console.log(this.teamList, 'this.teamList');
     },
     // 删除团队
     async delTeamItem(params) {

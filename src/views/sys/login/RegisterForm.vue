@@ -40,14 +40,14 @@
       <!--新增表单-->
       <FormItem name="team" class="enter-x role_wrap">
         <a-select v-model:value="state.teamValue" mode="multiple" class="select-wrap" :placeholder="t('sys.login.team')" v-if="state['teamState']" @change="getTeamOptionItem">
-          <a-select-option v-for="item in state.teamOptions" :value="item.id">{{item.label}}</a-select-option>
+          <a-select-option v-for="item in state.teamOptions" :label="item.label" :value="item.id">{{item.label}}</a-select-option>
         </a-select>
         <a-input v-model:value="state.teamValue" placeholder="输入完成后回车添加" @pressEnter="addTeam" v-else />
         <Icon icon="material-symbols:add-box-outline" title="我的团队" size="32" class="add_button" @click="clickTeamOptionItem" />
       </FormItem>
       <FormItem name="skills" class="enter-x role_wrap">
         <a-select v-model:value="state.skillValue" mode="multiple" class="select-wrap" :placeholder="t('sys.login.skills')" v-if="state['skillState']" @change="getSkillOptionItem">
-          <a-select-option v-for="(item, key) in state.skillOptions" :value="item.id">{{item.label}}</a-select-option>
+          <a-select-option v-for="(item, key) in state.skillOptions" :label="item.label" :value="item.id">{{item.label}}</a-select-option>
         </a-select>
         <a-input v-model:value="state.skillValue" placeholder="输入完成后回车添加" @pressEnter="addSkills" v-else />
         <Icon icon="material-symbols:add-box-outline" title="添加技能" size="32" class="add_button" @click="clickSkillsOptionItem" />
@@ -249,8 +249,16 @@
   async function handleRegister() {
     const data = await validForm();
     data['roleId'] = formData.roleId;
-    data['teamName'] = toRaw(state['teamValue']);
-    data['skills'] = toRaw(state['skillValue']);
+      if (typeof toRaw(state['teamValue']) === 'string') {
+        data['teamName'] = [{label: toRaw(state['teamValue'])}];
+      } else {
+        data['teamName'] = toRaw(state['teamValue']);
+      }
+      if (typeof toRaw(state['skillValue']) === 'string') {
+        data['skills'] = [{label: toRaw(state['skillValue'])}];
+      } else {
+        data['skills'] = toRaw(state['skillValue']);
+      }
     const { account, phone, password, policy, realName, sms } = data;
     formData.account = account;
     formData.teamName = state.teamValue;

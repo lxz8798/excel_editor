@@ -88,6 +88,7 @@
       }
 
       function handleEdit(record: Recordable) {
+        record['name'] = record['menuName'] = record['menuName'].split('-')[record['menuName'].split('-').length - 1];
         if (!isActive.value) {
           createMessage.info('当前账户末激活或者没有权限!');
           return;

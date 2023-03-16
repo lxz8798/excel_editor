@@ -58,11 +58,21 @@
           });
         }
         const treeData = await getMenuList();
+        treeData.forEach((i) => processName(i));
         updateSchema({
           field: 'parentMenu',
           componentProps: { treeData },
         });
       });
+
+      function processName(node) {
+        const parts = node.name.split('-');
+        const lastPart = parts[parts.length - 1];
+        node.menuName = node.name = lastPart;
+        if (node.children) {
+          node.children.forEach((child) => processName(child));
+        }
+      }
 
       const getTitle = computed(() => (!unref(isUpdate) ? '创建' : '编辑'));
 

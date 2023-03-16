@@ -1,8 +1,7 @@
-
 import type { Menu } from '/@/router/types';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-import { h, ref, reactive, warn, toRaw } from "vue";
+import { h, ref, reactive, warn, toRaw } from 'vue';
 import { Tag, Input, Select, SelectOption, Form, Checkbox, Cascader } from 'ant-design-vue';
 import { Icon } from '/@/components/Icon';
 import { getCategory } from '/@/api/sys/menu';
@@ -82,7 +81,8 @@ export const searchFormSchema: FormSchema[] = [
     colProps: { span: 8 },
   },
 ];
-const cascadePrefix = ref(''), cascadeSuffix = ref('');
+const cascadePrefix = ref(''),
+  cascadeSuffix = ref('');
 const isShowCategory = ref(false);
 const state = reactive({
   categoryOptions: [],
@@ -114,7 +114,8 @@ export const formSchema: FormSchema[] = [
     label: '菜单名称',
     component: 'Input',
     // rules: [{ required: true }],
-    render: ({ model, field }) => h('div', { class: 'menuNameBox' }, [
+    render: ({ model, field }) =>
+      h('div', { class: 'menuNameBox' }, [
         // h(
         //   Select,
         //   {
@@ -147,6 +148,7 @@ export const formSchema: FormSchema[] = [
     field: 'parentMenu',
     label: '上级菜单',
     component: 'TreeSelect',
+    required: true,
     // suffix: (recoder) =>
     //   h(FormItemRest, {}, [
     //     h(Checkbox, {
@@ -158,15 +160,15 @@ export const formSchema: FormSchema[] = [
     //   ]),
     componentProps: {
       fieldNames: {
-        label: 'name',
+        label: 'menuName',
         value: 'menuId',
         key: 'menuId',
       },
-      onChange: (id) => {
-        getCategory({ menuId: id }).then((res) => {
-          state.categoryOptions = res;
-        });
-      },
+      // onChange: (id) => {
+      //   getCategory({ menuId: id }).then((res) => {
+      //     state.categoryOptions = res;
+      //   });
+      // },
       getPopupContainer: () => document.body,
     },
   },
