@@ -21,7 +21,7 @@
               },
               {
                 icon: 'clarity:note-edit-line',
-                tooltip: '编辑项目',
+                tooltip: '关联内容',
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -42,7 +42,7 @@
     <!--  新增和编辑  -->
     <ProjectModal @register="registerModal1" @success="handleSuccess" />
     <!--  添加成员  -->
-    <AddProjectMebersModal @register="registerModal2" @success="handleSuccess" />
+    <AddProjectMebersModal @register="registerModal2" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -110,7 +110,7 @@
         timer = setTimeout(() => {
           const data = getRawDataSource();
           setTableData(data.records);
-        }, 1000);
+        }, 1500);
       });
 
       // mounted
@@ -149,7 +149,6 @@
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
-        record['password'] = '';
         openModal1(true, {
           record,
           isUpdate: true,

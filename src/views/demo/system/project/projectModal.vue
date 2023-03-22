@@ -79,7 +79,7 @@
         // ]);
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增项目' : '编辑项目'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增项目' : '关联内容'));
       const getMenuIds = computed(() => toRaw(projectStore.getMenuIds));
 
       async function handleSubmit() {

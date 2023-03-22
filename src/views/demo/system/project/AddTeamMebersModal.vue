@@ -142,7 +142,7 @@
           };
           projectInviteUsers(params).then((res) => {
             createMessage.success(res);
-            emit('success');
+            window.location.reload();
           });
           closeModal();
         } finally {

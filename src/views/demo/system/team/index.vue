@@ -158,6 +158,7 @@
           teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
         } else {
           teamStore.setTeamsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+          console.log('是项目长');
         }
         reload();
         // if (isUpdate) {

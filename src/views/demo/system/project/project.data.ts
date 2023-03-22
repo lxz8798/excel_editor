@@ -114,7 +114,6 @@ export const projectFormSchema: FormSchema[] = [
     field: 'menuName',
     label: '关联内容',
     component: 'TreeSelect',
-    required: true,
     componentProps: ({ formModel, formActionType }) => {
       const permissionStore = usePermissionStore();
       const _technology = toRaw(permissionStore.getTechnologyTree);
