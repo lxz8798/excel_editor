@@ -93,9 +93,7 @@
 </script>
 <style lang="less">
   .ant-transfer-list {
-    width: 50%;
-  }
-  .ant-transfer-list {
-    height: 100%;
+    width: 50% !important;
+    height: 100% !important;
   }
 </style>

@@ -3,6 +3,20 @@
     <template v-if="!getCollapse">
       <div :class="`${prefixCls}-submenu-title`" @click.stop="handleClick" :style="getItemStyle">
         <slot name="title"></slot>
+        <a-dropdown :trigger="['contextmenu']" v-if="openRightButton && !isNormal">
+          <div class="drop_box"></div>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item @click="addMenu(item)">创建内容</a-menu-item>
+              <a-menu-item @click="editName(item)">修改名称</a-menu-item>
+              <!--<a-menu-item @click="transformThchnologyMenu(item)">转成技术</a-menu-item>-->
+              <!--<a-menu-item @click="invitationMember(item)">邀请成员</a-menu-item>-->
+              <a-menu-item @click="transformProjectMenu(item)">关联项目</a-menu-item>
+              <!--<a-menu-item @click="startWorking(item)">开始工作</a-menu-item>-->
+              <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
         <Icon
           icon="eva:arrow-ios-downward-outline"
           :size="14"
@@ -52,6 +66,8 @@
         </div>
       </template>
     </Popover>
+    <!--  添加成员  -->
+    <AddProjectMebersModal @register="registerModal" />
   </li>
 </template>
 
@@ -68,26 +84,45 @@
     provide,
     onBeforeMount,
     inject,
+    ref,
+    h,
+    toRaw,
   } from 'vue';
+  import AddProjectMebersModal from '/@/views/demo/system/project/AddTeamMebersModal.vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { propTypes } from '/@/utils/propTypes';
   import { useMenuItem } from './useMenu';
   import { useSimpleRootMenuContext } from './useSimpleMenuContext';
   import { CollapseTransition } from '/@/components/Transition';
   import Icon from '/@/components/Icon';
-  import { Popover } from 'ant-design-vue';
+  import { Popover, Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
   import { isBoolean, isObject } from '/@/utils/is';
   import mitt from '/@/utils/mitt';
-  import { useRouter } from 'vue-router';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { useFormStore } from '/@/store/modules/form';
+  import { usePermissionStore } from '/@/store/modules/permission';
+  import { useModal } from '/@/components/Modal';
+  import { useUserStore } from '/@/store/modules/user';
   const DELAY = 200;
+  const ADropdown = Dropdown;
+  const AMenu = Menuu;
+  const AMenuItem = Menuu.Item;
   export default defineComponent({
     name: 'SubMenu',
     components: {
       Icon,
       CollapseTransition,
       Popover,
+      ADropdown,
+      AMenu,
+      AMenuItem,
+      AddProjectMebersModal,
     },
     props: {
+      item: {
+        type: Object,
+        default: {},
+      },
       name: {
         type: [String, Number] as PropType<string | number>,
         required: true,
@@ -97,7 +132,11 @@
     },
     setup(props) {
       const instance = getCurrentInstance();
-      const { currentRoute } = useRouter();
+      const { createMessage, createConfirm } = useMessage();
+      const formStore = useFormStore();
+      const permissionStore = usePermissionStore();
+      const userStore = useUserStore();
+
       const state = reactive({
         active: false,
         opened: false,
@@ -109,6 +148,9 @@
         isChild: false,
       });
 
+      userStore.setUserList({ page: 1, pageSize: 10 });
+      permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
+
       const { getParentSubMenu, getItemStyle, getParentMenu, getParentList } =
         useMenuItem(instance);
 
@@ -117,6 +159,8 @@
       const subMenuEmitter = mitt();
 
       const { rootMenuEmitter } = useSimpleRootMenuContext();
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+      const [registerModal, { openModal }] = useModal();
 
       const {
         addSubMenu: parentAddSubmenu,
@@ -146,7 +190,8 @@
       const getAccordion = computed(() => rootProps.accordion);
       const getCollapse = computed(() => rootProps.collapse);
       const getTheme = computed(() => rootProps.theme);
-
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
+      const openRightButton = computed(() => !props.item.name.includes('管理') && !props.item.name.includes('个人') && !props.item.name.includes('原始数据录入') && !props.item.name.includes('数据处理过程') && !props.item.name.includes('计算结果展示') && !props.item.name.includes('结果现象图形化'))
       const getOverlayStyle = computed((): CSSProperties => {
         return {
           minWidth: '200px',
@@ -183,7 +228,7 @@
         };
       }
 
-      function handleClick() {
+      function handleClick(e) {
         const { disabled } = props;
         if (disabled || unref(getCollapse)) return;
         const opened = state.opened;
@@ -312,6 +357,198 @@
         props: rootProps,
       });
 
+      // 添加菜单
+      function addMenu(item) {
+        const inputValue = ref('');
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '创建内容!'),
+          content: () => {
+            return h('div', [
+              h('label', '内容名称'),
+              h(
+                Input,
+                {
+                  onChange: (e) => {
+                    inputValue.value = e.target.value;
+                  },
+                },
+                inputValue,
+              ),
+            ]);
+          },
+          onOk: () => {
+            const params = {
+              type: '0',
+              menuName: inputValue.value,
+              parentMenu: item.id,
+              icon: 'ant-design:appstore-outlined',
+              childFlag: false,
+            };
+            formStore.setNewMenu(params).then((res) => {
+              createMessage.success(res);
+              permissionStore.buildRoutesAction();
+              permissionStore.setLastBuildMenuTime();
+            });
+          },
+        });
+      }
+      // 修改名称
+      function editName(item) {
+        const inputValue = ref(item.name);
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '修改名称!'),
+          content: () => {
+            return h('div', [
+              h('label', '请输入名称!'),
+              h(
+                Input,
+                {
+                  value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+                  onChange: (e) => {
+                    inputValue.value = e.target.value;
+                  },
+                },
+                inputValue,
+              ),
+            ]);
+          },
+          onOk: () => {
+            const params = {
+              menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+              menuId: item.id,
+            };
+            formStore.setEditMenu(params).then((res) => {
+              createMessage.success(res);
+              permissionStore.setLastBuildMenuTime();
+              permissionStore.buildRoutesAction();
+            });
+          },
+        });
+      }
+      // 转换成技术
+      function transformThchnologyMenu(item) {
+        const inputValue = ref(item.name);
+        const params = {
+          type: '2',
+          menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+          menuId: item.id,
+        };
+        formStore.setEditMenu(params).then((res) => {
+          createMessage.success(res);
+          permissionStore.buildRoutesAction();
+          permissionStore.setLastBuildMenuTime();
+        });
+        // createConfirm({
+        //   iconType: 'warning',
+        //   title: () => h('span', '创建内容!'),
+        //   content: () => {
+        //     return h('div', [
+        //       h('label', '内容名称'),
+        //       h(
+        //         Input,
+        //         {
+        //           value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+        //           onChange: (e) => {
+        //             inputValue.value = e.target.value;
+        //           },
+        //         },
+        //         inputValue,
+        //       ),
+        //     ]);
+        //   },
+        //   onOk: () => {
+        //     const params = {
+        //       type: '2',
+        //       menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+        //       menuId: item.id,
+        //     };
+        //     formStore.setEditMenu(params).then((res) => {
+        //       createMessage.success(res);
+        //       permissionStore.buildRoutesAction();
+        //       permissionStore.setLastBuildMenuTime();
+        //     });
+        //   },
+        // });
+      }
+      // 邀请成员
+      function invitationMember(item) {
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
+        openModal(true, {
+          isUpdate: false,
+          project: item,
+        });
+      }
+      // 转换成项目
+      function transformProjectMenu(item) {
+        const inputValue = ref(item.name);
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '创建内容!'),
+          content: () => {
+            return h('div', [
+              h('label', '内容名称'),
+              h(
+                Input,
+                {
+                  value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+                  onChange: (e) => {
+                    inputValue.value = e.target.value;
+                  },
+                },
+                inputValue,
+              ),
+            ]);
+          },
+          onOk: () => {
+            const params = {
+              type: '1',
+              menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+              menuId: item.id,
+            };
+            formStore.setEditMenu(params).then((res) => {
+              createMessage.success(res);
+              permissionStore.buildRoutesAction();
+              permissionStore.setLastBuildMenuTime();
+            });
+          },
+        });
+      }
+      // 开始工作
+      function startWorking(item) {
+        const { id, name } = toRaw(item);
+        const params = { menuId: id, menuName: name };
+        formStore.setBasicSubMenu(params).then((res) => {
+          if (res) {
+            createMessage.success('创建成功!');
+            permissionStore.buildRoutesAction();
+            permissionStore.setLastBuildMenuTime();
+            window.location.reload();
+          } else {
+            createMessage.error('创建失败，请检查后重试!');
+          }
+        });
+      }
+      // 删除菜单
+      function deleteMenu(item) {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '删除有风险!'),
+          content: () => h('span', '是否确认删除？'),
+          onOk: () => {
+            formStore.setDeleteMenu({ menuId: item.id }).then((res) => {
+              createMessage.success(res);
+              permissionStore.buildRoutesAction();
+              permissionStore.setLastBuildMenuTime();
+            });
+          },
+        });
+      }
+
       return {
         getClass,
         prefixCls,
@@ -320,14 +557,51 @@
         handleClick,
         handleVisibleChange,
         getParentSubMenu,
+        openRightButton,
         getOverlayStyle,
         getTheme,
         getIsOpend,
+        isNormal,
         getEvents,
         getSubClass,
+        addMenu,
+        editName,
+        transformProjectMenu,
+        transformThchnologyMenu,
+        invitationMember,
+        startWorking,
+        deleteMenu,
+        registerModal,
         ...toRefs(state),
         ...toRefs(data),
       };
     },
   });
 </script>
+<style lang="less">
+  .vben-menu-dark.vben-menu-vertical .vben-menu-item-active:not(.vben-menu-submenu), .vben-menu-dark.vben-menu-vertical .vben-menu-submenu-title-active:not(.vben-menu-submenu) {
+    background: #0656859e !important;
+  }
+  li.vben-menu-submenu {
+    .vben-menu-submenu-title {
+      position: relative;
+      &:hover {
+        background: #0656859e !important;
+      }
+      .drop_box {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .vben-menu {
+      .vben-menu-item {
+        &:hover {
+          background: #0656859e !important;
+        }
+      }
+    }
+  }
+</style>

@@ -20,17 +20,12 @@
     >
       <template #title>
         <div class="form_title" v-if="currTempDetail.name">
-          <!--{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}-->
-          <!--<span>{{ currTempDetail.name.split('源始数据-')[0] }}【</span>-->
-          <span class="project_name_wrap" v-if="addProjectNameFlag">
+          <!--<span class="project_name_wrap" v-if="addProjectNameFlag">
             <a-input
               size="small"
               placeholder="请输入项目名称"
               v-model:value="projectNameDefalutValue"
             >
-              <!--<template #suffix>
-                <Icon  icon="line-md:confirm-circle" @click="changeProjectName" title="添加项目名称" />
-              </template>-->
             </a-input>
           </span>
           <span class="project_name_wrap" v-else>
@@ -38,21 +33,17 @@
               <a-select-option v-for="item in projectNames" :key="item.id">
                 <div style="display: flex; align-items: center; justify-content: space-between">
                   <span>{{ item.name }}</span>
-                  <!--<Icon icon="material-symbols:delete-forever-outline" style="color: red" @click="delProjectName($event, item)" title="删除项目名称" v-if="isAdmin || isLeader"></Icon>-->
                 </div>
               </a-select-option>
-              <!--<template #suffixIcon>
-                <Icon
-                  icon="material-symbols:add-circle-outline"
-                  @click="changeAddProjectNameFlagState"
-                  title="新增项目名称"
-                />
-              </template>-->
             </a-select>】
-          </span>
-          <span>{{ currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1] }}</span>
+          </span>-->
+          <span>表单名称：{{ currTempDetail['name'].split('-')[currTempDetail['name'].split('-').length - 1] }}</span>
           <!--<a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
+          <span>所属项目：{{ projectInfo['examContract'] && projectInfo['examContract'].name }}</span>
+          <span>关联内容：{{ projectInfo['technologys'] && projectInfo['technologys'].map((i) => i['menuName']).toString() }}</span>
+          <span>项目负责人：{{ projectInfo['leaderUser'] && projectInfo['leaderUser'].name }}</span>
+          <span>参与成员：{{ projectInfo['user'] && projectInfo['user'].map((i) => i['name']).toString() }}</span>
         </div>
         <div class="form_title" v-else>暂无名称</div>
       </template>
@@ -82,7 +73,7 @@
                   :class="`input_cell` + `_${index}_${key}`"
                   @change="changeInputeValue($event, input, key, index)"
                 />
-                <div v-show="index == 2 || index == 3 || index == 4">
+                <div v-show="index == 4">
                   <Icon icon="icon-park-outline:view-grid-detail" title="详情" class="edit"  @click="clickDetailItem($event, input, form, key, index)"></Icon>
                   <Icon icon='material-symbols:delete-outline' title="删除这一行" class="del" @click="clickInputItem($event, input, form, key, index)"></Icon>
                 </div>
@@ -204,6 +195,7 @@
         editTitleFlag: true,
         titleValue: '',
         currTemp: {},
+        projectInfo: {},
         projectNameDefalutValue: '',
         projectNames: [],
         projectOptionsValue: '',
@@ -246,7 +238,9 @@
             });
             formStore.setTemplateProjectName({ templateId: currentRoute.value.meta.templateId })
               .then((res) => {
-                state.projectNameDefalutValue = res;
+                const { examContract, technologys, leaderUser, user }  = toRaw(res);
+                state.projectInfo = ({ examContract, technologys, leaderUser, user });
+                state.projectNameDefalutValue = examContract.name;
                 formStore.setProjectNamesList().then((list) => {
                   if (list['records'].length) {
                     state.addProjectNameFlag = false;
@@ -256,7 +250,7 @@
                   if (res !== '') {
                     state.projectNames = computed(() => list['records']);
                     if (state.projectNames && state.projectNames.length) {
-                      state.projectOptionsValue = toRaw(list['records']).filter((i) => i.name == res)[0].id;
+                      state.projectOptionsValue = toRaw(state.projectNames).filter((i) => i.name == examContract.name)[0].id;
                     }
                   }
                 });
@@ -321,6 +315,7 @@
           fromId: userStore.getUserInfo.userId,
           toId: '',
           boradFlag: '',
+          delFlag: false,
           msg: input,
         };
         send(JSON.stringify(msgObj));
@@ -445,7 +440,7 @@
                 .findIndex((idx) => idx.id === input.id) + 1;
             const params = {
               columnIndex: !input.importFlag ? key + 1 : importCurrColumnIndex,
-              columnType: _columnIndex,
+              columnType: 1,
               importFlag: input.importFlag,
               templateId: form.templateId,
               value: input.value,
@@ -467,6 +462,7 @@
         // }
         // if (e.target.tagName === 'DIV' && e.target.className === 'column') {
         const { createConfirm } = useMessage();
+        const _columnType = columnType - 1 < 1 ? '-1' : columnType - 1;
         createConfirm({
           iconType: 'warning',
           title: () => h('span', '删除有风险!'),
@@ -480,8 +476,19 @@
               // importFlag: '0',
               templateId: currentRoute.value.meta.templateId,
               columnIndex: key,
-              columnType: columnType - 1 < 1 ? '-1' : columnType - 1,
+              columnType: _columnType,
             };
+            let msgObj = {
+              columnIndex: key,
+              columnType: _columnType,
+              type: '5',
+              fromId: userStore.getUserInfo.userId,
+              toId: '',
+              boradFlag: '',
+              delFlag: false,
+              msg: input,
+            };
+            send(JSON.stringify(msgObj));
             formStore.setDeleteTemplateRow(params);
             formStore
               .saveForm(mergeForm.value.slice(1, 5))
@@ -611,12 +618,12 @@
               },
               {
                 templateId: id,
-                label: '计量数量',
+                label: '测量方法',
                 inputs: [],
               },
               {
                 templateId: id,
-                label: '测量方法',
+                label: '计量数量',
                 inputs: [],
               },
             ];
@@ -741,6 +748,10 @@
     flex-direction: column;
 
     min-height: 720px;
+
+    .vben-collapse-container__header {
+      height: 160px !important;
+    }
 
     .container_wrap {
       display: flex;
@@ -890,10 +901,15 @@
     }
     .form_title {
       display: flex;
-      flex-direction: row;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-start;
       align-items: center;
-      height: 28px;
+
+      > span {
+        padding: 2px 0;
+        font-size: 14px;
+        align-self: flex-start;
+      }
       .ant-select-arrow {
         display: flex;
         align-items: center;
@@ -905,7 +921,9 @@
         height: 100%;
       }
       > .project_name_wrap {
+        min-width: 160px;
         .ant-select {
+          min-width: 160px;
           .ant-select-selector {
             border: none;
             background: none;

@@ -13,6 +13,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { usePermissionStore } from '/@/store/modules/permission';
   import { useProjectStore } from '/@/store/modules/project';
+  import { getMenuList } from '/@/api/demo/system';
   const { createMessage } = useMessage();
   const userStore = useUserStore();
   const permissionStore = usePermissionStore();
@@ -49,6 +50,22 @@
             ...data.record,
           });
         }
+
+        const treeData = await getMenuList();
+        treeData.forEach((i) => processName(i));
+        updateSchema({
+          field: 'parentMenu',
+          componentProps: { treeData },
+        });
+
+        function processName(node) {
+          const parts = node.name.split('-');
+          const lastPart = parts[parts.length - 1];
+          node.menuName = node.name = lastPart;
+          if (node.children) {
+            node.children.forEach((child) => processName(child));
+          }
+        }
         // const treeData = await getDeptList();
         // updateSchema([
         //   {
@@ -68,13 +85,13 @@
       async function handleSubmit() {
         try {
           const values = await validate();
-          const { name, daysLeft, projectAdminId, id } = values;
+          const { name, daysLeft, projectAdminId, id, parentMenu } = values;
           const params = {
             name: name,
-            targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,
             createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
-            // templateIds: getMenuIds.value,
+            parentMenu: parentMenu,
             menuIds: getMenuIds.value,
+            targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,
             userId: userStore.getUserInfo.userId,
             id: rowId.value,
           };

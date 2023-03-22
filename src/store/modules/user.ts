@@ -26,8 +26,8 @@ import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
 import { h, toRaw } from 'vue';
-import { getTeams, delTeam } from '/@/api/sys/team';
-import { getSkills, delSkills } from '/@/api/sys/skills';
+import { getTeams, delTeam, deleteTeam } from '/@/api/sys/team';
+import { getSkills, delSkills, deleteSkills } from '/@/api/sys/skills';
 import { getOwnerProjectList, addProject } from '/@/api/sys/project';
 import { getAccountList } from '/@/api/demo/system';
 import { haveData } from '/@/api/demo/form';
@@ -250,13 +250,20 @@ export const useUserStore = defineStore({
     async setTeamList(params) {
       this.teamList = await getTeams(params);
     },
-    // 删除团队
+    // 踢出团队
     async delTeamItem(params) {
       return await delTeam(params);
     },
-    // 删除技能
+    // 删除团队
+    async deleteTeamItem(params) {
+      return await deleteTeam(params);
+    },
+    // 删除技能关系
     async delSkillsItem(params) {
       return await delSkills(params);
+    },
+    async deleteSkillsItem(params) {
+      return await deleteSkills(params);
     },
     // 得到项目列表
     async setProjectList(params) {
@@ -268,7 +275,7 @@ export const useUserStore = defineStore({
     },
     // 删除项目
     async delProjectItem(params) {
-      return await delTeam(params);
+      // return await delTeam(params);
     },
     /**
      * @description: Confirm before logging out

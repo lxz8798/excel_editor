@@ -123,11 +123,11 @@ export const accountFormSchema: FormSchema[] = [
       placeholder: '如果不需要修改密码则不填',
     },
   },
-  {
-    label: '邮箱',
-    field: 'email',
-    component: 'Input',
-  },
+  // {
+  //   label: '邮箱',
+  //   field: 'email',
+  //   component: 'Input',
+  // },
   {
     field: 'teamName',
     label: '所属团队',

@@ -85,6 +85,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useSkillsStore } from '/@/store/modules/skills';
+  import { useTeamsStore } from '/@/store/modules/teams';
 
   export default defineComponent({
     components: {
@@ -102,21 +103,30 @@
     setup() {
       const userStore = useUserStore();
       const skillsStore = useSkillsStore();
+      const teamStore = useTeamsStore();
       const { createConfirm, createMessage } = useMessage();
 
       const showDeleteIcon = ref(false);
       const addTagValue = ref('');
-
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
-      userStore.setTeamList({ userId: userStore.getUserInfo.userId });
-      skillsStore.setSkillsList({ userId: userStore.getUserInfo.userId });
+      if (isAdmin.value) {
+        teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      } else {
+        teamStore.setTeamsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      }
+      if (isAdmin.value) {
+        skillsStore.setSkillsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      } else {
+        skillsStore.setSkillsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      }
 
       const avatar = computed(() => userStore.getUserInfo.avatar || userStore.getUserAvatar);
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
       const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
       const tagList = computed(() => userStore.getUserTagsList || []);
-      const teams = computed(() => userStore.getTeamList || []);
-      const skills = computed(() => skillsStore.getSkillsList || []);
+      const teams = computed(() => isAdmin.value ? teamStore.getTeamsUserList : userStore.getTeamList);
+      const skills = computed(() => isAdmin.value ? skillsStore.getSkillsUserList :  skillsStore.getSkillsList);
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
       // 添加TAG

@@ -34,7 +34,7 @@
       alwaysLoad: propTypes.bool.def(false),
       afterFetch: { type: Function as PropType<Fn> },
       resultField: propTypes.string.def(''),
-      labelField: propTypes.string.def('name'),
+      labelField: propTypes.string.def('realName'),
       valueField: propTypes.string.def('id'),
       showSearch: { type: Boolean, default: false },
       disabled: { type: Boolean, default: false },

@@ -8,8 +8,10 @@ enum Api {
   // 普通用户技能列表
   GET_SKILLS_LIST = '/sysUserSkill/list',
   ADD_SKILLS = '/sysUserSkill/add',
-  // 管理员删除技能
-  DEL_SKILLS = '/sysUserSkill/delSteam',
+  // 管理员删除技能，传skillsId
+  DELETE_SKILLS = '/sysUserSkill/delSkill',
+  // 删除技能关系，只取消技能关系，非管理员使用
+  DEL_SKILLS = '/sysUserSkill/del',
   UPDATA_SKILLS = '/sysUserTeam/update',
 }
 
@@ -50,11 +52,21 @@ export function editSkillsItem(params) {
     {},
   );
 }
-
+// 删除技能关系，只取消技能关系，非管理员使用
 export function delSkills(params) {
   return defHttp.delete<SkillsItemModel>(
     {
       url: `${Api.DEL_SKILLS}/${params.id}`,
+    },
+    {},
+  );
+}
+
+// 管理员删除技能，传skillsId
+export function deleteSkills(params) {
+  return defHttp.delete<SkillsItemModel>(
+    {
+      url: `${Api.DELETE_SKILLS}/${params.id}`,
     },
     {},
   );

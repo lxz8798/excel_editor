@@ -1,7 +1,7 @@
 <template>
   <div :class="`${prefixCls}-dom`" :style="getDomStyle"></div>
+  <!--  v-click-outside="handleClickOutside"-->
   <div
-    v-click-outside="handleClickOutside"
     :style="getWrapStyle"
     :class="[
       prefixCls,
@@ -21,7 +21,7 @@
       <ul :class="`${prefixCls}-module`">
         <li
           :class="[
-            `${prefixCls}-module__item `,
+            `${prefixCls}-module__item`,
             {
               [`${prefixCls}-module__item--active`]: item.path === activePath,
             },
@@ -39,6 +39,14 @@
           <p :class="`${prefixCls}-module__name`">
             {{ t(item.name) }}
           </p>
+          <a-dropdown :trigger="['contextmenu']" v-if="item.name.includes('工程') && !isNormal">
+            <div></div>
+            <template #overlay>
+              <a-menu>
+                <a-menu-item key="1" @click="addMenu(item)">创建类型</a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
         </li>
       </ul>
     </ScrollContainer>
@@ -81,7 +89,7 @@
 <script lang="ts">
   import type { Menu } from '/@/router/types';
   import type { CSSProperties } from 'vue';
-  import { computed, defineComponent, onMounted, ref, toRaw, unref, watch } from 'vue';
+  import { computed, defineComponent, h, onMounted, ref, unref, watch } from 'vue';
   import type { RouteLocationNormalized } from 'vue-router';
   import { ScrollContainer } from '/@/components/Container';
   import { SimpleMenu, SimpleMenuTag } from '/@/components/SimpleMenu';
@@ -103,7 +111,11 @@
   import LayoutTrigger from '../trigger/index.vue';
   import { useUserStore } from '/@/store/modules/user';
   import { useRouter } from 'vue-router';
-  import { useMessage } from "/@/hooks/web/useMessage";
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
+  const ADropdown = Dropdown;
+  const AMenu = Menuu;
+  const AMenuItem = Menuu.Item;
   // import { LAYOUT } from '/@/router/constant';
   export default defineComponent({
     name: 'LayoutMixSider',
@@ -114,6 +126,9 @@
       Icon,
       LayoutTrigger,
       SimpleMenuTag,
+      ADropdown,
+      AMenu,
+      AMenuItem,
     },
     directives: {
       clickOutside,
@@ -149,7 +164,7 @@
 
       const { title } = useGlobSetting();
       const permissionStore = usePermissionStore();
-      const { createMessage } = useMessage();
+      const { createMessage, createConfirm } = useMessage();
       useDragLine(sideRef, dragBarRef, true);
 
       const getMenuStyle = computed((): CSSProperties => {
@@ -188,9 +203,9 @@
       const getMenuEvents = computed(() => {
         return !unref(getMixSideFixed)
           ? {
-              onMouseleave: () => {
-                setActive(true);
-                closeMenu();
+              onMouseleave: (e) => {
+                // setActive(true);
+                // closeMenu();
               },
             }
           : {};
@@ -198,6 +213,7 @@
 
       const getShowDragBar = computed(() => unref(getCanDrag));
       const currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
+      const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       onMounted(async () => {
         menuModules.value = await getShallowMenus();
       });
@@ -302,7 +318,7 @@
         go(path);
       }
 
-      function handleClickOutside() {
+      function handleClickOutside(e) {
         setActive(true);
         closeMenu();
       }
@@ -335,6 +351,42 @@
         }
       }
 
+      function addMenu(item) {
+        const inputValue = ref('');
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '创建类型!'),
+          content: () => {
+            return h('div', [
+              h('label', '类型名称'),
+              h(
+                Input,
+                {
+                  onChange: (e) => {
+                    inputValue.value = e.target.value;
+                  },
+                },
+                inputValue,
+              ),
+            ]);
+          },
+          onOk: () => {
+            const params = {
+              type: '0',
+              menuName: inputValue.value,
+              parentMenu: item.id,
+              icon: 'ant-design:appstore-outlined',
+              childFlag: false,
+            };
+            formStore.setNewMenu(params).then((res) => {
+              createMessage.success(res);
+              permissionStore.buildRoutesAction();
+              permissionStore.setLastBuildMenuTime();
+            });
+          },
+        });
+      }
+
       return {
         t,
         prefixCls,
@@ -349,6 +401,7 @@
         sideRef,
         dragBarRef,
         title,
+        isNormal,
         openMenu,
         getMenuTheme,
         getItemEvents,
@@ -358,6 +411,7 @@
         getMixSideFixed,
         getWrapStyle,
         getCollapsed,
+        addMenu,
       };
     },
   });
@@ -606,6 +660,16 @@
       border-top: none;
       border-bottom: none;
       box-shadow: 0 0 4px 0 rgb(28 36 56 / 15%);
+    }
+  }
+  .vben-layout-mix-sider-module__item {
+    position: relative;
+    .ant-dropdown-trigger {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
     }
   }
 </style>

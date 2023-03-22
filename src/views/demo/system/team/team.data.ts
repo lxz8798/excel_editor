@@ -17,7 +17,10 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '团队成员',
-    dataIndex: 'label',
+    dataIndex: 'sysUsers',
+    customRender: ({ record }) => {
+      return h('span', record['sysUsers'] && record['sysUsers'].map((i) => i.name).toString());
+    },
   },
   {
     title: '创建时间',

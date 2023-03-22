@@ -42,20 +42,21 @@
     <!--  新增和编辑  -->
     <ProjectModal @register="registerModal1" @success="handleSuccess" />
     <!--  添加成员  -->
-    <AddProjectMebersModal :rightKeys="rightKeys" @register="registerModal2" @success="handleSuccess" />
+    <AddProjectMebersModal @register="registerModal2" @success="handleSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
   import { defineComponent, reactive, onMounted, h, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getOwnerProjectList, delProject } from '/@/api/sys/project';
+  import { getProjects, getOwnerProjectList, delProject, getProjects } from "/@/api/sys/project";
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
   import ProjectModal from './projectModal.vue';
   import AddProjectMebersModal from './AddTeamMebersModal.vue';
   import { columns, searchFormSchema } from './project.data';
+
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -71,6 +72,7 @@
       const [registerModal1, { openModal: openModal1 }] = useModal();
       const [registerModal2, { openModal: openModal2, setModalProps }] = useModal();
       const searchInfo = reactive<Recordable>({});
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
 
@@ -80,7 +82,7 @@
       const [registerTable, { reload, updateTableDataRecord, getDataSource, getRawDataSource, setTableData }] =
         useTable({
           title: '项目列表',
-          api: getOwnerProjectList,
+          api: isAdmin.value ? getProjects : getOwnerProjectList,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -201,6 +203,7 @@
         //     }).then((res) => setTableData(res));
         //   });
         // }
+        reload();
       }
 
       function handleSelect(deptId = '') {

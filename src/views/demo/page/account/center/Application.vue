@@ -17,7 +17,10 @@
               </div>
               <div :class="`${prefixCls}__card-num`">
                 <span>完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue'  }">&nbsp;{{ item.day <= 0 ? '0' : item.day }}&nbsp;</span>天到期</span>
-                <Icon icon="material-symbols:arrow-circle-right-rounded" title="开始工作" @click="enterProject(item)" />
+                <!--<span>
+                  <span>快速工作入口</span>
+                  <Icon icon="material-symbols:arrow-circle-right-rounded" title="开始工作" @click="enterProject(item)" />
+                </span>-->
               </div>
             </Card>
           </ListItem>

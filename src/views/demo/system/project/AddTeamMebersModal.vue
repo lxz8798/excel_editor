@@ -1,6 +1,6 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" width="70%">
-    <div class="admin_dispatch" v-if="isAdmin">
+    <div class="admin_dispatch" v-if="!isNormal">
       <div>项目负责人：</div>
       <AutoComplete
         allowClear
@@ -46,6 +46,7 @@
 
   const userList = computed(() => userStore.getUserList);
   const originTargetKeys = computed(() => userList.value.map((i) => i['id']));
+  const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
   const targetKeys = ref<string[]>(originTargetKeys);
   // const rightKeys = ref<string[]>()
   const disabled = ref<boolean>(false);
@@ -78,10 +79,10 @@
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         // resetFields();
         setModalProps({ confirmLoading: false });
-        rowId.value = data.project.id;
+        rowId.value = data.project['projectId'];
         // projectAdminId.value = computed(() => projectUserList.value.filter((i) => i['value'] === data.project.createUserId)[0]);
         isUpdate.value = !!data?.isUpdate;
-        transferRightKeys.value = data.project['teamUsers'].map((i) => i['id']);
+        transferRightKeys.value = data.project['teamUsers'] ? data.project['teamUsers'].map((i) => i['id']) : [];
         // if (unref(isUpdate)) {
         //   rowId.value = data.record.id;
         //   setFieldsValue({
@@ -119,9 +120,7 @@
             contractId: rowId.value,
             removeUserIds: moveKeys,
           };
-          projectStore.removeProjectMembers(params).then((res) => {
-            createMessage.success(res);
-          });
+          projectStore.removeProjectMembers(params).then((res) => createMessage.success(res));
         }
       }
 
@@ -151,7 +150,25 @@
         }
       }
 
-      return { registerModal, registerForm, getTitle, handleSubmit, userList, targetKeys, disabled, showSearch, transferHandler, transferRightDatas, filterOption, isAdmin, projectUserList, getProjectAdminId, projectAdminId, transferRightKeys };
+      return {
+        registerModal,
+        registerForm,
+        getTitle,
+        handleSubmit,
+        userList,
+        targetKeys,
+        disabled,
+        showSearch,
+        transferHandler,
+        transferRightDatas,
+        filterOption,
+        isAdmin,
+        isNormal,
+        projectUserList,
+        getProjectAdminId,
+        projectAdminId,
+        transferRightKeys,
+      };
     },
   });
 </script>
@@ -162,9 +179,7 @@
     margin-bottom: 20px;
   }
   .ant-transfer-list {
-    width: 50%;
-  }
-  .ant-transfer-list {
-    height: 100%;
+    width: 50% !important;
+    height: 100% !important;
   }
 </style>

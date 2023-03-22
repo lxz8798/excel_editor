@@ -24,6 +24,7 @@ enum Api {
   HAVE_DATA = '/template/haveData',
   QUERY_FORM_HISTORY = '/dymcRecord/pages',
   GET_PROJECT_PATH = '/examContract/getRoute',
+  GENERATE_SUB_MENU = '/sysMenu/setChildBaseMenu',
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -49,3 +50,4 @@ export const delProjectItem = ({ id }) => defHttp.delete({ url: `${Api.DEL_PROJE
 export const haveData = (params) => defHttp.get({ url: Api.HAVE_DATA, params });
 export const queryFormHistory = (params) => defHttp.get({ url: Api.QUERY_FORM_HISTORY, params });
 export const getProjectPath = (params) => defHttp.get({ url: Api.GET_PROJECT_PATH, params });
+export const generateSubMenu = (params) => defHttp.post({ url: Api.GENERATE_SUB_MENU, params });

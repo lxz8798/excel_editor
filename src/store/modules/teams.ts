@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
-import { getAllTeams } from '/@/api/sys/team';
-// import { ProjectMembersModel } from '/@/api/sys/model/projectModel';
+import { getAllTeams, getTeams } from '/@/api/sys/team';
 interface TeamsState {
   getUserTeamsList: [];
 }
@@ -9,19 +8,27 @@ interface TeamsState {
 export const useTeamsStore = defineStore({
   id: 'app-teams',
   state: (): TeamsState => ({
-    getUserTeamsList: [],
+    userTeamsList: [],
+    teamsList: [],
   }),
   getters: {
     getTeamsUserList(): [] {
-      return this.getUserTeamsList;
+      return this.userTeamsList;
+    },
+    getTeamsList(): [] {
+      return this.teamsList;
     },
   },
   actions: {
     // sync
     // async
     async setTeamsUserList() {
-      this.getUserTeamsList = await getAllTeams();
-      return this.getUserTeamsList.map((i, k) => i['value'] = k);
+      this.userTeamsList = await getAllTeams();
+      return this.userTeamsList.map((i, k) => i['value'] = k);
+    },
+    async setTeamsList(params) {
+      this.teamsList = await getTeams(params);
+      return this.teamsList;
     },
   },
 });

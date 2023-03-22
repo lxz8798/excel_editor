@@ -48,7 +48,9 @@
   import { columns, searchFormSchema } from './team.data';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useTeamsStore } from '/@/store/modules/teams';
   const userStore = useUserStore();
+  const teamStore = useTeamsStore();
   const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
@@ -130,16 +132,33 @@
           return;
         }
         const { id } = record;
-        userStore.delTeamItem({ id: id }).then((res) => {
-          createMessage.success(res);
-          openModal1(false);
-          userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
-          reload();
-        });
+        if (isAdmin.value) {
+          userStore.deleteTeamItem({ id: id }).then((res) => {
+            createMessage.success(res);
+            openModal1(false);
+            teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+            reload();
+          });
+        } else {
+          userStore.delTeamItem({ id: id }).then((res) => {
+            createMessage.success(res);
+            openModal1(false);
+            teamStore.setTeamsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+            reload();
+          });
+        }
       }
 
       function handleSuccess({ isUpdate, values }) {
-        userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        if (!isActive.value) {
+          createMessage.info('当前账户末激活或者没有权限!');
+          return;
+        }
+        if (isAdmin.value) {
+          teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        } else {
+          teamStore.setTeamsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        }
         reload();
         // if (isUpdate) {
         //   // 演示不刷新表格直接更新内部数据。

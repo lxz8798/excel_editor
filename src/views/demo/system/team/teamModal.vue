@@ -11,6 +11,7 @@
   import { addTeamItem, delTeam } from '/@/api/sys/team';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStore } from '/@/store/modules/user';
+  import { addSkillsItem } from "/@/api/sys/skills";
   const { createMessage } = useMessage();
   const userStore = useUserStore();
   export default defineComponent({
@@ -20,7 +21,7 @@
     setup(_, { emit }) {
       const isUpdate = ref(true);
       const rowId = ref('');
-
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
         labelWidth: 100,
         baseColProps: { span: 24 },
@@ -52,16 +53,27 @@
           setModalProps({ confirmLoading: true });
           // TODO custom api
           if (!unref(isUpdate)) {
-            addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then(() =>  emit('success', { isUpdate: unref(isUpdate), values: values }));
+            addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId })).then(() => emit('success', { isUpdate: unref(isUpdate), values: values }));
           } else {
-            userStore.delTeamItem({ id: rowId.value }).then(() => {
-              let timer = null;
-              if (timer) clearTimeout(timer);
-              addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId }))
-              setTimeout(() => {
-                emit('success', { isUpdate: unref(isUpdate), values: values });
-              }, 300);
-            });
+            if (isAdmin.value) {
+              userStore.deleteTeamItem({ id: rowId.value }).then(() => {
+                let timer = null;
+                if (timer) clearTimeout(timer);
+                addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId }));
+                setTimeout(() => {
+                  emit('success', { isUpdate: unref(isUpdate), values: values });
+                }, 1000);
+              });
+            } else {
+              userStore.delTeamItem({ id: rowId.value }).then(() => {
+                let timer = null;
+                if (timer) clearTimeout(timer);
+                addTeamItem(Object.assign(values, { userId: userStore.getUserInfo.userId }));
+                setTimeout(() => {
+                  emit('success', { isUpdate: unref(isUpdate), values: values });
+                }, 1000);
+              });
+            }
           }
           closeModal();
         } finally {

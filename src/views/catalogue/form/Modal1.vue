@@ -71,7 +71,6 @@
       }
 
       function modalCallBack(data) {
-        console.log(data, 'data');
       }
 
       function setLines() {

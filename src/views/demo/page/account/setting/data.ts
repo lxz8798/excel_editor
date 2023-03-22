@@ -51,6 +51,20 @@ export const baseSetschemas: FormSchema[] = [
     colProps: { span: 18 },
   },
   {
+    field: 'teams',
+    component: 'Input',
+    label: '我的团队',
+    defaultValue: userStore.getUserInfo['realName'],
+    colProps: { span: 18 },
+  },
+  {
+    field: 'skills',
+    component: 'Input',
+    label: '我的技能',
+    defaultValue: userStore.getUserInfo['realName'],
+    colProps: { span: 18 },
+  },
+  {
     field: 'phone',
     component: 'Input',
     label: '联系电话',

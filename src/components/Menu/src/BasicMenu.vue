@@ -9,7 +9,7 @@
     @open-change="handleOpenChange"
     :class="getMenuClass"
     @click="handleMenuClick"
-    :subMenuOpenDelay="0.2"
+    :subMenuOpenDelay="2"
     v-bind="getInlineCollapseOptions"
   >
     <template v-for="item in items" :key="item.path">

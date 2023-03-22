@@ -78,8 +78,8 @@ export const achieveList: TabItem[] = [
   },
   // {
   //   key: '3',
-  //   name: '项目',
-  //   component: 'Project',
+  //   name: '我的技术',
+  //   component: 'Application',
   // },
 ];
 

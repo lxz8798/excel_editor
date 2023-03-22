@@ -15,8 +15,9 @@ import {
   haveData,
   queryFormHistory,
   getProjectPath,
+  generateSubMenu,
 } from '/@/api/demo/form';
-import { getMenuChildren } from '/@/api/sys/menu';
+import { getMenuChildren, addMenu, editMenu, deleteMenu } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {
@@ -37,8 +38,11 @@ interface formState {
   isFormHasData: boolean;
   isFormHistory: [];
   projectRoutePath: string;
+  generateSubMenu: string;
+  addNewMenu: string;
+  eidtMenuResult: string;
+  deleteResult: string;
 }
-const { createMessage } = useMessage();
 export const useFormStore = defineStore({
   id: 'app-form',
   state: (): formState => ({
@@ -58,6 +62,10 @@ export const useFormStore = defineStore({
     isFormHasData: false,
     isFormHistory: [],
     projectRoutePath: '',
+    generateSubMenu: '',
+    addNewMenu: '',
+    eidtMenuResult: '',
+    deleteResult: '',
   }),
   getters: {
     getTempList(): any[] {
@@ -108,6 +116,18 @@ export const useFormStore = defineStore({
     getProjectPath() {
       return this.projectRoutePath;
     },
+    getBasicSubMenu() {
+      return this.generateSubMenu;
+    },
+    getNewMenu() {
+      return this.addNewMenu;
+    },
+    getEditMenu() {
+      return this.eidtMenuResult;
+    },
+    getDeleteMenu() {
+      return this.deleteResult;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -124,6 +144,22 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setNewMenu(params) {
+      this.addNewMenu = await addMenu(params);
+      return this.addNewMenu;
+    },
+    async setEditMenu(params) {
+      this.eidtMenuResult = await editMenu(params);
+      return this.eidtMenuResult;
+    },
+    async setDeleteMenu(params) {
+      this.deleteResult = await deleteMenu(params);
+      return this.deleteResult;
+    },
+    async setBasicSubMenu(params) {
+      this.generateSubMenu = await generateSubMenu(params);
+      return this.generateSubMenu;
     },
     async setProjectPath(params) {
       this.projectRoutePath = await getProjectPath();

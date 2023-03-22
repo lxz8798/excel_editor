@@ -9,7 +9,10 @@ enum Api {
   // 普通用户
   GET_TEAM_LIST = '/sysUserTeam/list',
   ADD_TEAM = '/sysUserTeam/add',
+  // 非管理员使用
   DEL_TEAM = '/sysUserTeam/del',
+  // 管理员使用
+  DELETE_TEAM = '/sysUserTeam/delSteam',
   UPDATA_TEAM = '/sysUserTeam/update',
 }
 
@@ -55,6 +58,15 @@ export function delTeam(params) {
   return defHttp.delete<TeamItemModel>(
     {
       url: `${Api.DEL_TEAM}/${params.id}`,
+    },
+    {},
+  );
+}
+
+export function deleteTeam(params) {
+  return defHttp.delete<TeamItemModel>(
+    {
+      url: `${Api.DELETE_TEAM}/${params.id}`,
     },
     {},
   );

@@ -20,7 +20,7 @@
     setup(_, { emit }) {
       const isUpdate = ref(true);
       const rowId = ref('');
-
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
         labelWidth: 100,
         baseColProps: { span: 24 },
@@ -57,14 +57,25 @@
               },
             );
           } else {
-            userStore.delSkillsItem({ id: rowId.value }).then(() => {
-              let timer = null;
-              if (timer) clearTimeout(timer);
-              addSkillsItem(Object.assign(values, { userId: userStore.getUserInfo.userId }));
-              setTimeout(() => {
-                emit('success', { isUpdate: unref(isUpdate), values: values });
-              }, 300);
-            });
+            if (isAdmin.value) {
+              userStore.deleteSkillsItem({ id: rowId.value }).then(() => {
+                let timer = null;
+                if (timer) clearTimeout(timer);
+                addSkillsItem(Object.assign(values, { userId: userStore.getUserInfo.userId }));
+                setTimeout(() => {
+                  emit('success', { isUpdate: unref(isUpdate), values: values });
+                }, 1000);
+              });
+            } else {
+              userStore.delSkillsItem({ id: rowId.value }).then(() => {
+                let timer = null;
+                if (timer) clearTimeout(timer);
+                addSkillsItem(Object.assign(values, { userId: userStore.getUserInfo.userId }));
+                setTimeout(() => {
+                  emit('success', { isUpdate: unref(isUpdate), values: values });
+                }, 1000);
+              });
+            }
           }
           closeModal();
         } finally {

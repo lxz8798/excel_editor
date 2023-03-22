@@ -1,9 +1,10 @@
-import { computed, h, toRaw } from "vue";
+import { computed, h, toRaw } from 'vue';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { usePermissionStore } from '/@/store/modules/permission';
 import { useProjectStore } from '/@/store/modules/project';
 import { getProjectUserList } from '/@/api/sys/project';
+import { getMenuList } from '/@/api/demo/system';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { useUserStore } from '/@/store/modules/user';
 import { Option } from 'ant-design-vue/es/vc-util/Children/toArray';
@@ -19,7 +20,7 @@ export const columns: BasicColumn[] = [
     title: '关联内容',
     dataIndex: 'contracts',
     customRender: ({ record }) => {
-      return h('span', record['contracts'].map((i) => i && i['menuName'].split('-')[i['menuName'].split('-').length - 1]).toString());
+      return h('span', record['contracts'] && record['contracts'].map((i) => i && i['menuName'].split('-')[i['menuName'].split('-').length - 1]).toString());
     },
   },
   {
@@ -32,7 +33,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'teamUsers',
     width: 300,
     customRender: ({ record }) => {
-      return h('span', record['teamUsers'].map((i) => i && i['name']).toString());
+      return h('span', record['teamUsers'] && record['teamUsers'].map((i) => i && i['name']).toString());
     },
   },
   {
@@ -59,6 +60,17 @@ export const searchFormSchema: FormSchema[] = [
 
 export const projectFormSchema: FormSchema[] = [
   {
+    field: 'name',
+    label: '项目名称',
+    component: 'Input',
+    rules: [
+      {
+        required: true,
+        message: '请输入项目名称',
+      },
+    ],
+  },
+  {
     field: 'projectAdminId',
     label: '指定项目长',
     component: 'AutoComplete',
@@ -84,20 +96,35 @@ export const projectFormSchema: FormSchema[] = [
       };
     },
   },
+  // {
+  //   field: 'parentMenu',
+  //   label: '选择技术',
+  //   component: 'TreeSelect',
+  //   required: true,
+  //   componentProps: {
+  //     fieldNames: {
+  //       label: 'menuName',
+  //       value: 'menuId',
+  //       key: 'menuId',
+  //     },
+  //     getPopupContainer: () => document.body,
+  //   },
+  // },
   {
     field: 'menuName',
-    label: '选择内容',
+    label: '关联内容',
     component: 'TreeSelect',
+    required: true,
     componentProps: ({ formModel, formActionType }) => {
       const permissionStore = usePermissionStore();
       const _technology = toRaw(permissionStore.getTechnologyTree);
       const menuId = computed(() => toRaw(formModel));
 
       return {
-        mode: 'multiple',
+        multiple: true,
         allowClear: true,
         showSearch: true,
-        placeholder: '请先择技术在绑定',
+        placeholder: '请选择关联内容',
         treeData: _technology.map((item) => {
           return { ...item, children: [] };
         }),
@@ -110,12 +137,14 @@ export const projectFormSchema: FormSchema[] = [
           key: 'menuId',
           value: 'menuId',
         },
-        onChange: (id) => {
-          const _arr = [];
-          if (!_arr.includes(id)) {
-            _arr.push(id);
-            projectStore.setMenuIds(_arr);
-          }
+        onChange: (ids) => {
+          // const _arr = [];
+          // if (!_arr.includes(id)) {
+          //   _arr.push(id);
+          //   console.log(_arr, '_arr');
+          //   projectStore.setMenuIds(id);
+          // }
+          projectStore.setMenuIds(ids);
           // _technology.forEach((m) => {
           //   const _arr = [];
           //   let _node: object = {};
@@ -134,23 +163,6 @@ export const projectFormSchema: FormSchema[] = [
         },
       };
     },
-    rules: [
-      {
-        required: true,
-        message: '请输入项目名称',
-      },
-    ],
-  },
-  {
-    field: 'name',
-    label: '项目名称',
-    component: 'Input',
-    rules: [
-      {
-        required: true,
-        message: '请输入项目名称',
-      },
-    ],
   },
   {
     field: 'daysLeft',

@@ -3,7 +3,7 @@
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
     <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="primary" v-if="!isNormal" @click="handleCreate">新增技能</a-button>
+        <a-button type="primary" v-if="isAdmin" @click="handleCreate">新增技能</a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -49,7 +49,9 @@
   import { useGo } from '/@/hooks/web/usePage';
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useSkillsStore } from '/@/store/modules/skills';
   const userStore = useUserStore();
+  const skillsStore = useSkillsStore();
   const { createMessage } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
@@ -71,7 +73,8 @@
           beforeFetch: (params) => {
             params['userId'] = userStore.getUserInfo.userId;
           },
-          api: isAdmin.value ? getAllSkills : getSkills,
+          // api: isAdmin.value ? getAllSkills : getSkills,
+          api: getAllSkills,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -133,12 +136,21 @@
           return;
         }
         const { id } = record;
-        userStore.delSkillsItem({ id: id }).then((res) => {
+        // if (isAdmin.value) {
+        userStore.deleteSkillsItem({ id: id }).then((res) => {
           createMessage.success(res);
           openModal1(false);
-          userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+          skillsStore.setSkillsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
           reload();
         });
+        // } else {
+        //   userStore.delSkillsItem({ id: id }).then((res) => {
+        //     createMessage.success(res);
+        //     openModal1(false);
+        //     userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        //     reload();
+        //   });
+        // }
       }
 
       function handleSuccess({ isUpdate, values }) {
@@ -146,7 +158,11 @@
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
-        userStore.setTeamList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        // if (isAdmin.value) {
+        skillsStore.setSkillsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        // } else {
+        //   skillsStore.setSkillsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+        // }
         reload();
         // if (isUpdate) {
         //   // 演示不刷新表格直接更新内部数据。
@@ -182,6 +198,7 @@
         handleSelect,
         addTeamMebers,
         searchInfo,
+        isAdmin,
         isNormal,
       };
     },
