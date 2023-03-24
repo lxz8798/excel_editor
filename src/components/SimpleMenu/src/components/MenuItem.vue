@@ -19,7 +19,7 @@
         <a-menu>
           <a-menu-item @click="addMenu(item)">创建内容</a-menu-item>
           <a-menu-item @click="editName(item)">修改名称</a-menu-item>
-          <a-menu-item @click="transformThchnologyMenu(item)">开始工作</a-menu-item>
+          <!--<a-menu-item @click="transformThchnologyMenu(item)">开始工作</a-menu-item>-->
           <a-menu-item @click="invitationMember(item)">邀请成员</a-menu-item>
           <!--<a-menu-item @click="transformProjectMenu(item)">转成项目</a-menu-item>-->
           <!--<a-menu-item @click="startWorking(item)">开始工作</a-menu-item>-->
@@ -312,6 +312,7 @@ import { useModal } from "/@/components/Modal";
           menuId: item.id,
         };
         formStore.setEditMenu(params).then((res) => {
+          startWorking(item);
           // createMessage.success(res);
           permissionStore.buildRoutesAction();
           permissionStore.setLastBuildMenuTime();

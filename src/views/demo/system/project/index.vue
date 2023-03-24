@@ -21,7 +21,7 @@
               },
               {
                 icon: 'clarity:note-edit-line',
-                tooltip: '关联内容',
+                tooltip: '设置有效期',
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -49,7 +49,7 @@
   import { defineComponent, reactive, onMounted, h, computed } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getProjects, getOwnerProjectList, delProject, getProjects } from "/@/api/sys/project";
+  import { getProjects, getOwnerProjectList, delProject } from '/@/api/sys/project';
   import { PageWrapper } from '/@/components/Page';
 
   import { useModal } from '/@/components/Modal';
@@ -61,8 +61,10 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { usePermissionStore } from '/@/store/modules/permission';
+  import { useProjectStore } from '/@/store/modules/project';
   const permissionStore = usePermissionStore();
   const userStore = useUserStore();
+  const projectStore = useProjectStore();
   const { createMessage, createConfirm } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
@@ -78,6 +80,7 @@
 
       userStore.setUserList({ page: 1, pageSize: 10 });
       permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
+      projectStore.setProjectUserList();
 
       const [registerTable, { reload, updateTableDataRecord, getDataSource, getRawDataSource, setTableData }] =
         useTable({
@@ -134,10 +137,11 @@
       }
 
       function addProjectMebers(record: Recordable) {
-        if (!isActive.value) {
+        if (!isActive.value || (record['leaderId'] !== userStore.getUserInfo.userId && !isAdmin.value)) {
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
+        record['from'] = 'project';
         openModal2(true, {
           isUpdate: false,
           project: record,
@@ -178,7 +182,7 @@
               getOwnerProjectList({
                 page: 1,
                 pageSize: 10,
-                userId: userStore.getUserInfo.userId,
+                // userId: userStore.getUserInfo.userId,
               }).then((res) => {
                 setTableData(res['records']);
               });

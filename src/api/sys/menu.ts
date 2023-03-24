@@ -21,7 +21,7 @@ export const getMenuList = () => defHttp.get<getMenuListResultModel>({ url: Api.
 export const getMenuChildren = (params?) => defHttp.get({ url: Api.GET_MENU_CHILDREN, params });
 export const editMenu = (params?) => defHttp.put({ url: Api.EDIT_MENU, params });
 export const addMenu = (params?) => defHttp.post({ url: Api.ADD_MENU, params });
-export const deleteMenu = (params?) => defHttp.delete({ url: `${Api.DELETE_MENU}?menuId=${params.menuId}` });
+export const deleteMenu = (params?) => defHttp.delete({ url: `${Api.DELETE_MENU}?menuId=${params.menuId}`, timeout: 1000 });
 export const getMenuCategory = (params?) => defHttp.get({ url: Api.GET_MENU_CATEGORY, params });
 export const getCategory = (params?) => defHttp.get({ url: Api.GET_CATEGROY_ID, params });
 export const getTechnologyTree = (params?) => defHttp.get({ url: Api.GET_TECHNOLOGY_TREE });

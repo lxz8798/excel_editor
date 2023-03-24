@@ -59,12 +59,13 @@
       const isUpdate = ref(true);
       const projectData = ref({});
       const rowId = ref('');
+      const leaderId = ref('');
       const projectAdminId = ref('');
       const transferRightKeys = ref([]);
 
       let transferRightDatas = [];
 
-      projectStore.setProjectUserList();
+      // projectStore.setProjectUserList();
 
       const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
         labelWidth: 100,
@@ -79,7 +80,8 @@
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         // resetFields();
         setModalProps({ confirmLoading: false });
-        rowId.value = data.project['projectId'];
+        rowId.value = data.project['from'] === 'project' ? data.project['id'] : data.project['projectId'];
+        leaderId.value = data.project['leaderId'];
         // projectAdminId.value = computed(() => projectUserList.value.filter((i) => i['value'] === data.project.createUserId)[0]);
         isUpdate.value = !!data?.isUpdate;
         transferRightKeys.value = data.project['teamUsers'] ? data.project['teamUsers'].map((i) => i['id']) : [];
@@ -117,7 +119,7 @@
         if (data.direction.toUpperCase() === 'LEFT') {
           const { moveKeys } = data;
           const params = {
-            contractId: rowId.value,
+            contractId: leaderId.value,
             removeUserIds: moveKeys,
           };
           projectStore.removeProjectMembers(params).then((res) => createMessage.success(res));

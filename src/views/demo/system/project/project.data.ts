@@ -16,17 +16,17 @@ export const columns: BasicColumn[] = [
     title: '项目名称',
     dataIndex: 'name',
   },
-  {
-    title: '关联内容',
-    dataIndex: 'contracts',
-    customRender: ({ record }) => {
-      return h('span', record['contracts'] && record['contracts'].map((i) => i && i['menuName'].split('-')[i['menuName'].split('-').length - 1]).toString());
-    },
-  },
+  // {
+  //   title: '关联内容',
+  //   dataIndex: 'contracts',
+  //   customRender: ({ record }) => {
+  //     return h('span', record['contracts'] && record['contracts'].map((i) => i && i['menuName'].split('-')[i['menuName'].split('-').length - 1]).toString());
+  //   },
+  // },
   {
     title: '项目长',
     dataIndex: 'leaderName',
-    width: 120,
+    width: 200,
   },
   {
     title: '项目成员',
@@ -110,59 +110,59 @@ export const projectFormSchema: FormSchema[] = [
   //     getPopupContainer: () => document.body,
   //   },
   // },
-  {
-    field: 'menuName',
-    label: '关联内容',
-    component: 'TreeSelect',
-    componentProps: ({ formModel, formActionType }) => {
-      const permissionStore = usePermissionStore();
-      const _technology = toRaw(permissionStore.getTechnologyTree);
-      const menuId = computed(() => toRaw(formModel));
-
-      return {
-        multiple: true,
-        allowClear: true,
-        showSearch: true,
-        placeholder: '请选择关联内容',
-        treeData: _technology.map((item) => {
-          return { ...item, children: [] };
-        }),
-        filterTreeNode: (str, node) => {
-          return node['menuName'].includes(str);
-        },
-        fieldNames: {
-          children: 'children',
-          label: 'menuName',
-          key: 'menuId',
-          value: 'menuId',
-        },
-        onChange: (ids) => {
-          // const _arr = [];
-          // if (!_arr.includes(id)) {
-          //   _arr.push(id);
-          //   console.log(_arr, '_arr');
-          //   projectStore.setMenuIds(id);
-          // }
-          projectStore.setMenuIds(ids);
-          // _technology.forEach((m) => {
-          //   const _arr = [];
-          //   let _node: object = {};
-          //   if (m.hasOwnProperty('children') && m['children']) {
-          //     _node = m.children.filter((i) => i['menuId'] === id)[0];
-          //     if (_node) {
-          //       if (!_arr.includes(id)) {
-          //         _arr.push(id);
-          //         projectStore.setMenuIds(_arr);
-          //       }
-          //     } else {
-          //       createMessage.warning('请选择技术本身而不是其父级或子级!');
-          //     }
-          //   }
-          // });
-        },
-      };
-    },
-  },
+  // {
+  //   field: 'menuName',
+  //   label: '关联内容',
+  //   component: 'TreeSelect',
+  //   componentProps: ({ formModel, formActionType }) => {
+  //     const permissionStore = usePermissionStore();
+  //     const _technology = toRaw(permissionStore.getTechnologyTree);
+  //     const menuId = computed(() => toRaw(formModel));
+  //
+  //     return {
+  //       multiple: true,
+  //       allowClear: true,
+  //       showSearch: true,
+  //       placeholder: '请选择关联内容',
+  //       treeData: _technology.map((item) => {
+  //         return { ...item, children: [] };
+  //       }),
+  //       filterTreeNode: (str, node) => {
+  //         return node['menuName'].includes(str);
+  //       },
+  //       fieldNames: {
+  //         children: 'children',
+  //         label: 'menuName',
+  //         key: 'menuId',
+  //         value: 'menuId',
+  //       },
+  //       onChange: (ids) => {
+  //         // const _arr = [];
+  //         // if (!_arr.includes(id)) {
+  //         //   _arr.push(id);
+  //         //   console.log(_arr, '_arr');
+  //         //   projectStore.setMenuIds(id);
+  //         // }
+  //         projectStore.setMenuIds(ids);
+  //         // _technology.forEach((m) => {
+  //         //   const _arr = [];
+  //         //   let _node: object = {};
+  //         //   if (m.hasOwnProperty('children') && m['children']) {
+  //         //     _node = m.children.filter((i) => i['menuId'] === id)[0];
+  //         //     if (_node) {
+  //         //       if (!_arr.includes(id)) {
+  //         //         _arr.push(id);
+  //         //         projectStore.setMenuIds(_arr);
+  //         //       }
+  //         //     } else {
+  //         //       createMessage.warning('请选择技术本身而不是其父级或子级!');
+  //         //     }
+  //         //   }
+  //         // });
+  //       },
+  //     };
+  //   },
+  // },
   {
     field: 'daysLeft',
     label: '到期时间',

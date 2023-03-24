@@ -25,6 +25,7 @@
     setup(_, { emit }) {
       const isUpdate = ref(true);
       const rowId = ref('');
+      const leaderId = ref('');
 
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
@@ -44,6 +45,7 @@
         resetFields();
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
+        leaderId.value = data['record'].leaderId;
         if (unref(isUpdate)) {
           rowId.value = data.record.id;
           setFieldsValue({
@@ -79,16 +81,17 @@
         // ]);
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增项目' : '关联内容'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增项目' : '编辑项目'));
       const getMenuIds = computed(() => toRaw(projectStore.getMenuIds));
 
       async function handleSubmit() {
         try {
           const values = await validate();
-          const { name, daysLeft, projectAdminId, id, parentMenu } = values;
+          const { name, daysLeft, projectAdminId, parentMenu } = values;
           const params = {
             name: name,
-            createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
+            // createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
+            createUserId: leaderId.value,
             parentMenu: parentMenu,
             menuIds: getMenuIds.value,
             targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,

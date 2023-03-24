@@ -62,7 +62,7 @@
         ]"
       >
         <!-- <span class="text"> {{ title }}</span>-->
-        <span class="text">封堵项目管理系统</span>
+        <span class="text">封堵项目实施系统</span>
         <Icon
           :size="16"
           :icon="getMixSideFixed ? 'ri:pushpin-2-fill' : 'ri:pushpin-2-line'"
@@ -113,6 +113,7 @@
   import { useRouter } from 'vue-router';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
+  import { useProjectStore } from '/@/store/modules/project';
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
@@ -143,6 +144,7 @@
       const currentRoute = ref<Nullable<RouteLocationNormalized>>(null);
       const userStore = useUserStore();
       const formStore = useFormStore();
+      const projectStore = useProjectStore();
       // 使用路由
       const router = useRouter();
       const { prefixCls } = useDesign('layout-mix-sider');
@@ -166,6 +168,10 @@
       const permissionStore = usePermissionStore();
       const { createMessage, createConfirm } = useMessage();
       useDragLine(sideRef, dragBarRef, true);
+
+      userStore.setUserList({ page: 1, pageSize: 10 });
+      permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
+      projectStore.setProjectUserList();
 
       const getMenuStyle = computed((): CSSProperties => {
         return {

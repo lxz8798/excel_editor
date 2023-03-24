@@ -41,7 +41,7 @@
           <!--<a-input size="large" v-model:value="titleValue" :placeholder="currTempDetail.name.split('-')[currTempDetail.name.split('-').length - 1]" style="padding-left: 5px;"></a-input>
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
           <span>所属项目：{{ projectInfo['examContract'] && projectInfo['examContract'].name }}</span>
-          <span>关联内容：{{ projectInfo['technologys'] && projectInfo['technologys'].map((i) => i['menuName']).toString() }}</span>
+          <!--<span>关联内容：{{ projectInfo['technologys'] && projectInfo['technologys'].map((i) => i['menuName']).toString() }}</span>-->
           <span>项目负责人：{{ projectInfo['leaderUser'] && projectInfo['leaderUser'].name }}</span>
           <span>参与成员：{{ projectInfo['user'] && projectInfo['user'].map((i) => i['name']).toString() }}</span>
         </div>
