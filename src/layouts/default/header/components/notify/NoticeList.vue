@@ -129,6 +129,7 @@
       });
 
       function handleTitleClick(item: ListItem) {
+        console.log(item, 'item');
         props.onTitleClick && props.onTitleClick(item);
       }
 

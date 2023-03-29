@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
-import { getProjectUserList, removeProjectMembers } from '/@/api/sys/project';
+import { getProjectUserList, removeProjectMembers, changeAuditStatus } from '/@/api/sys/project';
 // import { ProjectMembersModel } from '/@/api/sys/model/projectModel';
 interface ProjectState {
   menuIds?: string[];
   projectUserList: [];
   removeMembersResult: string;
+  changeAuditStatus: string;
 }
 
 export const useProjectStore = defineStore({
@@ -14,6 +15,7 @@ export const useProjectStore = defineStore({
     menuIds: undefined,
     projectUserList: [],
     removeMembersResult: '',
+    changeAuditStatus: '',
   }),
   getters: {
     getMenuIds(): string[] | undefined {
@@ -22,6 +24,9 @@ export const useProjectStore = defineStore({
     getProjectUserList(): [] {
       return this.projectUserList;
     },
+    getAuditStatus() {
+      return this.changeAuditStatus;
+    },
   },
   actions: {
     // sync
@@ -29,6 +34,10 @@ export const useProjectStore = defineStore({
       this.menuIds = list;
     },
     // async
+    async setAuditStatus(params) {
+      this.changeAuditStatus = await changeAuditStatus(params);
+      return this.changeAuditStatus;
+    },
     async setProjectUserList() {
       this.projectUserList = await getProjectUserList();
       return this.projectUserList;

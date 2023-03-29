@@ -102,9 +102,9 @@ export const formSchema: FormSchema[] = [
     defaultValue: '0',
     componentProps: {
       options: [
-        { label: '目录', value: '0' },
+        { label: '类别', value: '0' },
         { label: '项目', value: '1' },
-        { label: '技术', value: '2' },
+        // { label: '技术', value: '2' },
       ],
     },
     colProps: { lg: 24, md: 24 },

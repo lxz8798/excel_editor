@@ -140,7 +140,7 @@
           const params: ProjectParamsModel = {
             contractId: rowId.value,
             inviteUserId: transferRightKeys.value,
-            projectAdminId: isAdmin.value ? getProjectAdminId(projectAdminId.value) : null,
+            projectAdminId: getProjectAdminId(projectAdminId.value),
           };
           projectInviteUsers(params).then((res) => {
             createMessage.success(res);

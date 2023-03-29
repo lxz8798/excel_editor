@@ -3,14 +3,15 @@
     <template v-if="!getCollapse">
       <div :class="`${prefixCls}-submenu-title`" @click.stop="handleClick" :style="getItemStyle">
         <slot name="title"></slot>
-        <a-dropdown :trigger="['contextmenu']" v-if="openRightButton && !isNormal">
+        <a-dropdown :trigger="['contextmenu']" v-if="openRightButton">
           <div class="drop_box"></div>
           <template #overlay>
             <a-menu>
               <a-menu-item @click="addMenu(item)">创建内容</a-menu-item>
               <a-menu-item @click="editName(item)">修改名称</a-menu-item>
+              <a-menu-item @click="copyProject(item)">复制此项</a-menu-item>
               <!--<a-menu-item @click="transformThchnologyMenu(item)">转成技术</a-menu-item>-->
-              <!--<a-menu-item @click="invitationMember(item)">修改成员</a-menu-item>-->
+              <a-menu-item @click="invitationMember(item)">调整成员</a-menu-item>
               <!--<a-menu-item @click="transformProjectMenu(item)">关联项目</a-menu-item>-->
               <!--<a-menu-item @click="startWorking(item)">开始工作</a-menu-item>-->
               <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
@@ -160,6 +161,7 @@
 
       const { rootMenuEmitter } = useSimpleRootMenuContext();
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const [registerModal, { openModal }] = useModal();
 
       const {
@@ -191,7 +193,7 @@
       const getCollapse = computed(() => rootProps.collapse);
       const getTheme = computed(() => rootProps.theme);
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
-      const openRightButton = computed(() => !props.item.name.includes('管理') && !props.item.name.includes('个人') && !props.item.name.includes('原始数据录入') && !props.item.name.includes('数据处理过程') && !props.item.name.includes('计算结果展示') && !props.item.name.includes('结果现象图形化'))
+      const openRightButton = computed(() => !props.item.name.includes('个人') && !props.item.name.includes('原始数据录入') && !props.item.name.includes('数据处理过程') && !props.item.name.includes('计算结果展示') && !props.item.name.includes('结果现象图形化'))
       const getOverlayStyle = computed((): CSSProperties => {
         return {
           minWidth: '200px',
@@ -427,6 +429,42 @@
           },
         });
       }
+      // 复制项目
+      function copyProject(item) {
+        const inputValue = ref(item.name);
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '修改名称!'),
+          content: () => {
+            return h('div', [
+              h('label', '请输入名称!'),
+              h(
+                Input,
+                {
+                  value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+                  onChange: (e) => {
+                    inputValue.value = e.target.value;
+                  },
+                },
+                inputValue,
+              ),
+            ]);
+          },
+          onOk: () => {
+            const { id } = item;
+            const copyParams = {
+              menuId: id,
+              menuName: inputValue.value,
+            };
+            permissionStore.setCopyMenuResult(copyParams).then((res) => {
+              createMessage.success(res);
+              permissionStore.buildRoutesAction();
+              permissionStore.setLastBuildMenuTime();
+              window.location.reload();
+            });
+          },
+        });
+      }
       // 转换成技术
       function transformThchnologyMenu(item) {
         const inputValue = ref(item.name);
@@ -474,26 +512,36 @@
       }
       // 邀请成员
       function invitationMember(item) {
-        if (!isActive.value) {
-          createMessage.info('当前账户末激活或者没有权限!');
-          return;
-        }
-        const inputValue = ref(item.name);
-        const params = {
-          type: '1',
-          menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
-          menuId: item.id,
-        };
-        formStore.setEditMenu(params).then((res) => {
-          // createMessage.success(res);
-          permissionStore.buildRoutesAction();
-          permissionStore.setLastBuildMenuTime();
-          item['projectId'] = res;
+        if (isAdmin.value) {
           openModal(true, {
             isUpdate: false,
             project: item,
           });
-        });
+        } else {
+          formStore.setProjectMembersInfo({ menuId: item['id'] }).then((res) => {
+            const { leaderUser, teamUsers } = res;
+            if (!leaderUser || !teamUsers) {
+              createMessage.info('当前菜单没有权限或者不是项目成员!');
+              return;
+            }
+            if (leaderUser['id'] === userStore.getUserInfo.userId) {
+              openModal(true, {
+                isUpdate: false,
+                project: item,
+              });
+            } else {
+              createMessage.info('不是项目长不可对项目进行调整!');
+              if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId)) {
+                openModal(true, {
+                  isUpdate: false,
+                  project: item,
+                });
+              } else {
+                createMessage.info('不是项目成员不可调整!');
+              }
+            }
+          });
+        }
       }
       // 转换成项目
       function transformProjectMenu(item) {
@@ -552,11 +600,17 @@
           title: () => h('span', '删除有风险!'),
           content: () => h('span', '是否确认删除？'),
           onOk: () => {
-            formStore.setDeleteMenu({ menuId: item.id }).then((res) => {
-              createMessage.success(res);
-              permissionStore.buildRoutesAction();
-              permissionStore.setLastBuildMenuTime();
-            });
+            const params = {
+              menuId: item.id
+            }
+            formStore.setJudgResult(params).then((judge) => {
+              formStore.setDeleteMenu(params).then((res) => {
+                createMessage.success(res);
+                permissionStore.buildRoutesAction();
+                permissionStore.setLastBuildMenuTime();
+                window.location.reload();
+              });
+            })
           },
         });
       }
@@ -578,6 +632,7 @@
         getSubClass,
         addMenu,
         editName,
+        copyProject,
         transformProjectMenu,
         transformThchnologyMenu,
         invitationMember,

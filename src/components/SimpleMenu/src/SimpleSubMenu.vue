@@ -1,5 +1,5 @@
 <template>
-  <MenuItem :item="item" :name="item.path" v-bind="$props" :class="getLevelClass" v-if="!menuHasChildren(item) && getShowMenu">
+  <MenuItem :item="item" :name="item.path" v-bind="$props" :class="getLevelClass" v-if="!menuHasChildren(item) && getShowMenu" @click="setMenuShowState">
     <Icon v-if="getIcon" :icon="getIcon" :size="16" />
     <div v-if="collapsedShowTitle && getIsCollapseParent" class="mt-1 collapse-title">
       {{ getI18nName }}
@@ -44,7 +44,7 @@
   import type { PropType } from 'vue';
   import type { Menu } from '/@/router/types';
 
-  import { defineComponent, computed, toRaw, unref, ref, h } from 'vue';
+  import { defineComponent, computed, ref } from 'vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import Icon from '/@/components/Icon/index';
 
@@ -58,6 +58,7 @@
   import { usePermissionStore } from '/@/store/modules/permission';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useAppStore } from "/@/store/modules/app";
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
@@ -88,6 +89,7 @@
     },
     setup(props) {
       const { setMenuSetting } = useMenuSetting();
+      const appStore = useAppStore();
       const { t } = useI18n();
       const { prefixCls } = useDesign('simple-menu');
       const openMenu = ref(false);
@@ -106,6 +108,9 @@
           },
         ];
       });
+      function setMenuShowState() {
+        setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+      }
       function menuHasChildren(menuTreeItem: Menu): boolean {
         return (
           !menuTreeItem.meta?.hideChildrenInMenu &&
@@ -117,6 +122,7 @@
       return {
         prefixCls,
         menuHasChildren,
+        setMenuShowState,
         getShowMenu,
         getIcon,
         getI18nName,

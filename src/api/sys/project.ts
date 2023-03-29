@@ -9,8 +9,10 @@ enum Api {
   DEL_PROJECT = '/examContract/del',
   PUT_PROJECT = '/examContract/edit',
   INVITE_USER = '/inviteUser',
+  NROMAL_INVITE_USER = '/inviteUserProject',
   PROJECT_USER_LIST = '/user/projectUsers',
   REMOVE_PROJECT_MEMBERS = '/removeTeamUser',
+  CHANGE_AUDIT_STATUS = '/examContract/auditContract'
 }
 
 export function addProject(params) {
@@ -71,6 +73,16 @@ export function projectInviteUsers(params) {
   );
 }
 
+export function nromalProjectInviteUsers(params) {
+  return defHttp.post<ProjectItemModel>(
+    {
+      url: Api.NROMAL_INVITE_USER,
+      params,
+    },
+    {},
+  );
+}
+
 export function getProjectUserList() {
   return defHttp.get(
     {
@@ -90,3 +102,12 @@ export function removeProjectMembers(params) {
   );
 }
 
+export function changeAuditStatus(params) {
+  return defHttp.post(
+    {
+      url: Api.CHANGE_AUDIT_STATUS,
+      params,
+    },
+    {},
+  );
+}

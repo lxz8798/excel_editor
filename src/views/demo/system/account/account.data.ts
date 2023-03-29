@@ -133,6 +133,7 @@ export const accountFormSchema: FormSchema[] = [
     label: '所属团队',
     component: 'Select',
     componentProps: ({ formModel, formActionType }) => {
+      console.log(userStore.getUserInfo);
       const options = computed(() => toRaw(teamStore.getTeamsUserList));
       return {
         mode: 'multiple',
@@ -147,7 +148,6 @@ export const accountFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: ({ formModel, formActionType }) => {
       const options = computed(() => toRaw(skillsStore.getSkillsUserList));
-      console.log(options, 'options');
       return {
         mode: 'multiple',
         placeholder: '请选择你的技能',

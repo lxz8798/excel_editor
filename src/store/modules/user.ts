@@ -17,6 +17,7 @@ import {
   getUserTagList,
   addUserTag,
   deleteUserTag,
+  getLogList,
 } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -44,6 +45,7 @@ interface UserState {
   userTagsList: [];
   projectList: [];
   teamList: [];
+  logList: [];
 }
 
 export const useUserStore = defineStore({
@@ -66,6 +68,7 @@ export const useUserStore = defineStore({
     userTagsList: [],
     projectList: [],
     teamList: [],
+    logList: [],
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -106,6 +109,9 @@ export const useUserStore = defineStore({
       // if (!this.userList.length) return;
       const _list = toRaw(this.userList).filter((i) => !noNeeded.includes(i['name']));
       return _list;
+    },
+    getLogList(type: string | number) {
+      return this.logList;
     },
   },
   actions: {
@@ -199,6 +205,9 @@ export const useUserStore = defineStore({
       }
       this.setUserInfo(userInfo);
       return userInfo;
+    },
+    async setLogList(params) {
+      this.logList = await getLogList(params);
     },
     /**
      * @description: logout

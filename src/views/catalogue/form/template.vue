@@ -238,6 +238,7 @@
             });
             formStore.setTemplateProjectName({ templateId: currentRoute.value.meta.templateId })
               .then((res) => {
+                if (!res) return;
                 const { examContract, technologys, leaderUser, user }  = toRaw(res);
                 state.projectInfo = ({ examContract, technologys, leaderUser, user });
                 state.projectNameDefalutValue = examContract.name;

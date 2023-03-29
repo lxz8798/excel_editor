@@ -17,7 +17,14 @@ import {
   getProjectPath,
   generateSubMenu,
 } from '/@/api/demo/form';
-import { getMenuChildren, addMenu, editMenu, deleteMenu } from '/@/api/sys/menu';
+import {
+  getMenuChildren,
+  addMenu,
+  editMenu,
+  deleteMenu,
+  isProjectMembers,
+  getProjectMembersInfoFn,
+} from "/@/api/sys/menu";
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {
@@ -42,6 +49,7 @@ interface formState {
   addNewMenu: string;
   eidtMenuResult: string;
   deleteResult: string;
+  isProjectMembers: boolean;
 }
 export const useFormStore = defineStore({
   id: 'app-form',
@@ -66,8 +74,20 @@ export const useFormStore = defineStore({
     addNewMenu: '',
     eidtMenuResult: '',
     deleteResult: '',
+    isProjectMembers: false,
+    isProjectNormalMembers: false,
+    projectMembersInfo: {},
   }),
   getters: {
+    getJudgResult(): any[] {
+      return this.isProjectMembers;
+    },
+    getJudgNormalResult(): any[] {
+      return this.isProjectNormalMembers;
+    },
+    getProjectMembersInfo(): any[] {
+      return this.projectMembersInfo;
+    },
     getTempList(): any[] {
       return this.tempList;
     },
@@ -144,6 +164,18 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setProjectMembersInfo(params): any[] {
+      this.projectMembersInfo = await getProjectMembersInfoFn(params);
+      return this.projectMembersInfo;
+    },
+    async setJudgResult(params) {
+      this.isProjectMembers = await isProjectMembers(params);
+      return this.isProjectMembers
+    },
+    async setJudgNormalResult(params) {
+      this.isProjectNormalMembers = await isProjectMembers(params);
+      return this.isProjectNormalMembers
     },
     async setNewMenu(params) {
       this.addNewMenu = await addMenu(params);

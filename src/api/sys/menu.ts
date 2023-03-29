@@ -11,6 +11,10 @@ enum Api {
   GET_MENU_CATEGORY = 'sysMenu/getChildMenu',
   GET_CATEGROY_ID = '/sysMenu/getClassifier',
   GET_TECHNOLOGY_TREE = '/sysMenu/treeTechnology',
+  COPY_MENU = '/sysMenu/copyMenu',
+  IS_PROJECT_MEMBERS = '/sysMenu/isProjectAdmin',
+  IS_PROJECT_NORMAL_MEMBERS = '/inviteUserProject',
+  GET_PROJECT_MEMBERS_INFO = '/sysMenu/projectInfo',
 }
 
 /**
@@ -25,3 +29,7 @@ export const deleteMenu = (params?) => defHttp.delete({ url: `${Api.DELETE_MENU}
 export const getMenuCategory = (params?) => defHttp.get({ url: Api.GET_MENU_CATEGORY, params });
 export const getCategory = (params?) => defHttp.get({ url: Api.GET_CATEGROY_ID, params });
 export const getTechnologyTree = (params?) => defHttp.get({ url: Api.GET_TECHNOLOGY_TREE });
+export const copyMenu = (params?) => defHttp.post({ url: Api.COPY_MENU, params });
+export const isProjectMembers = (params?) => defHttp.get({ url: Api.IS_PROJECT_MEMBERS, params });
+export const isProjectNormalMembers = (params?) => defHttp.get({ url: Api.IS_PROJECT_NORMAL_MEMBERS, params });
+export const getProjectMembersInfoFn = (params?) => defHttp.get({ url: Api.GET_PROJECT_MEMBERS_INFO, params });

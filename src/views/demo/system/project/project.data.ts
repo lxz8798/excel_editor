@@ -8,6 +8,7 @@ import { getMenuList } from '/@/api/demo/system';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { useUserStore } from '/@/store/modules/user';
 import { Option } from 'ant-design-vue/es/vc-util/Children/toArray';
+import { Popconfirm } from 'ant-design-vue';
 const { createMessage } = useMessage();
 const projectStore = useProjectStore();
 const userStore = useUserStore();
@@ -34,6 +35,35 @@ export const columns: BasicColumn[] = [
     width: 300,
     customRender: ({ record }) => {
       return h('span', record['teamUsers'] && record['teamUsers'].map((i) => i && i['name']).toString());
+    },
+  },
+
+  {
+    title: '审批状态',
+    dataIndex: 'status',
+    width: 100,
+    customRender: ({ record }) => {
+      // 0-待审核 1-审核通过 2-审核不通过
+      // return record['status'] == 0 ? '待审核' : record['status'] == 1 ? '审核通过' : record['status'] == 2 ? '审核不通过' : '暂无';
+      return record['status'] == 0 ? h(Popconfirm, {
+        title: "是否批准立项?",
+        okText: '通过',
+        cancelText: '拒绝',
+        onConfirm: () => projectStore.setAuditStatus({ contractId: record['id'], status: '1' }).then((res) => {
+          if (res === '审核成功') {
+            createMessage.success('审核通过');
+            // userStore.setProjectList({ page: 1, pageSize: 15 });
+            window.location.reload();
+          }
+        }),
+        onCancel: () => projectStore.setAuditStatus({ contractId: record['id'], status: '2' }).then((res) => {
+          if (res === '审核成功') {
+            createMessage.success('审核不通过');
+            // userStore.setProjectList({ page: 1, pageSize: 15 });
+            window.location.reload();
+          }
+        }),
+      }, h('span', { style: { color: 'blue', cursor: 'pointer' } }, '待审核')) : record['status'] == 1 ? h('span', { style: { color: 'green' } }, '审核通过') : record['status'] == 2 ? h('span', { style: { color: 'red' } }, '审核不通过') : '暂无'
     },
   },
   {

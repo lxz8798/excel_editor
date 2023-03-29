@@ -35,6 +35,8 @@
   import { useUserStore } from '/@/store/modules/user';
   import { uploadAvatar } from '/@/api/sys/upload';
   import { editUser } from '/@/api/sys/user';
+  import { useSkillsStore } from '/@/store/modules/skills';
+  import { useTeamsStore } from '/@/store/modules/teams';
 
   export default defineComponent({
     components: {
@@ -48,8 +50,10 @@
     setup() {
       const { createMessage } = useMessage();
       const userStore = useUserStore();
+      const skillsStore = useSkillsStore();
+      const teamStore = useTeamsStore();
 
-      const [register, { setFieldsValue, getFieldsValue }] = useForm({
+      const [register, { setFieldsValue, getFieldsValue, validate }] = useForm({
         labelWidth: 120,
         schemas: baseSetschemas,
         showActionButtonGroup: false,
@@ -71,9 +75,21 @@
         register,
         uploadAvatar: uploadAvatar as any,
         updateAvatar,
-        handleSubmit: () => {
-          const params = getFieldsValue();
-          editUser(Object.assign(params, { id: userStore.getUserInfo.userId })).then((res) => {
+        handleSubmit: async () => {
+          const values = await validate();
+          if (values['skills'] && values['skills'].length) {
+            const options = computed(() => toRaw(skillsStore.getSkillsUserList));
+            const _skillsFilter = [];
+            values['skills'].forEach((i) => options['value'].forEach((f) => f['value'] === i && _skillsFilter.push(f)));
+            values['skills'] = _skillsFilter;
+          }
+          if (values['teamName'] && values['teamName'].length) {
+            const options = computed(() => toRaw(teamStore.getTeamsUserList));
+            const _teamsFilter = [];
+            values['teamName'].forEach((i) => options['value'].forEach((f) => f['value'] === i && _teamsFilter.push(f)));
+            values['teamName'] = _teamsFilter;
+          }
+          editUser(Object.assign(values, { id: userStore.getUserInfo.userId })).then((res) => {
             const _userInfo = toRaw(userStore.getUserInfo);
             _userInfo['token'] = res['token'];
             userStore.setToken(res['token']);

@@ -13,7 +13,7 @@
       <slot></slot>
       <slot name="title"></slot>
     </template>
-    <a-dropdown :trigger="['contextmenu']" v-if="!item.name.includes('管理') && !item.name.includes('个人') && !isNormal">
+    <a-dropdown :trigger="['contextmenu']" v-if="!item.name.includes('个人')">
       <div class="drop_box"></div>
       <template #overlay>
         <a-menu>
@@ -83,7 +83,11 @@ import { useModal } from "/@/components/Modal";
       const { prefixCls } = useDesign('menu');
 
       const { rootMenuEmitter, activeName } = useSimpleRootMenuContext();
+
+      const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+      const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
       const getClass = computed(() => {
         return [
           `${prefixCls}-item`,
@@ -96,7 +100,6 @@ import { useModal } from "/@/components/Modal";
       });
 
       const getCollapse = computed(() => unref(getParentRootMenu)?.props.collapse);
-      const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const showTooptip = computed(() => {
         return unref(getParentMenu)?.type.name === 'Menu' && unref(getCollapse) && slots.title;
       });
@@ -345,11 +348,17 @@ import { useModal } from "/@/components/Modal";
           title: () => h('span', '删除有风险!'),
           content: () => h('span', '是否确认删除？'),
           onOk: () => {
-            formStore.setDeleteMenu({ menuId: item.id }).then((res) => {
-              createMessage.success(res);
-              permissionStore.buildRoutesAction();
-              permissionStore.setLastBuildMenuTime();
-            });
+            const params = {
+              menuId: item.id
+            }
+            formStore.setJudgResult(params).then((judge) => {
+              formStore.setDeleteMenu(params).then((res) => {
+                createMessage.success(res);
+                permissionStore.buildRoutesAction();
+                permissionStore.setLastBuildMenuTime();
+                window.location.reload();
+              });
+            })
           },
         });
       }

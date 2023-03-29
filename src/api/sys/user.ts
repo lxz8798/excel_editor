@@ -18,6 +18,7 @@ enum Api {
   DELETE_USER_TAG = '/sysUserLabel/del',
   GET_ROLE_LIST = '/roleList',
   SET_ACTIVE_USER = '/activeProjectUser',
+  GET_LOG_LIST = '/operationLog/page',
 }
 
 /**
@@ -96,4 +97,8 @@ export function deleteUserTag(params) {
 
 export function getRoles() {
   return defHttp.get({ url: Api.GET_ROLE_LIST });
+}
+
+export function getLogList() {
+  return defHttp.get({ url: Api.GET_LOG_LIST });
 }

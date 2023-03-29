@@ -20,7 +20,7 @@ import { ERROR_LOG_ROUTE, PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
 import { filter } from '/@/utils/helper/treeHelper';
 
-import { getMenuList, getMenuChildren, getTechnologyTree } from '/@/api/sys/menu';
+import { getMenuList, getMenuChildren, getTechnologyTree, copyMenu } from '/@/api/sys/menu';
 import { getPermCode } from '/@/api/sys/user';
 
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -46,6 +46,7 @@ interface PermissionState {
   addMenuShowCategory: boolean;
   technologyTree: Menu[];
   cascadeTree: [];
+  copyMenuResult: '';
 }
 
 export const usePermissionStore = defineStore({
@@ -69,6 +70,7 @@ export const usePermissionStore = defineStore({
     addMenuShowCategory: false,
     technologyTree: [],
     cascadeTree: [],
+    copyMenuResult: '',
   }),
   getters: {
     getPermCodeList(): string[] | number[] {
@@ -94,6 +96,9 @@ export const usePermissionStore = defineStore({
     },
     getApiBackMenuList(): Menu[] {
       return this.apiBackMenuList;
+    },
+    getCopyMenuResult(): stirng {
+      return this.copyMenuResult;
     },
   },
   actions: {
@@ -128,6 +133,10 @@ export const usePermissionStore = defineStore({
     },
     setAddMenuShowCategory(flag) {
       this.addMenuShowCategory = flag;
+    },
+    async setCopyMenuResult(params) {
+      this.copyMenuResult = await copyMenu(params);
+      return this.copyMenuResult;
     },
     async changePermissionCode() {
       const codeList = await getPermCode();

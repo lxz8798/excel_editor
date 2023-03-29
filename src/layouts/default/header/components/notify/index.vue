@@ -30,13 +30,17 @@
   import NoticeList from './NoticeList.vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useUserStore } from "/@/store/modules/user";
 
   export default defineComponent({
     components: { Popover, BellOutlined, Tabs, TabPane: Tabs.TabPane, Badge, NoticeList },
     setup() {
       const { prefixCls } = useDesign('header-notify');
       const { createMessage } = useMessage();
+      const userStore = useUserStore();
       const listData = ref(tabListData);
+
+      listData.value[0].list = computed(() => userStore.getLogList['records'].map((i) => ({ title: i['userName'] + '_' + i['opDesc'], datetime: i['createTime']})));
 
       const count = computed(() => {
         let count = 0;
@@ -87,5 +91,9 @@
         width: 0.9em;
       }
     }
+  }
+
+  .ant-spin-container {
+    min-width: 200px;
   }
 </style>

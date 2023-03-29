@@ -34,7 +34,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, computed, ref } from "vue";
+  import { defineComponent, reactive, onMounted, computed, ref } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getAccountList } from '/@/api/demo/system';
@@ -90,8 +90,11 @@ import { defineComponent, reactive, onMounted, computed, ref } from "vue";
         });
 
       // INIT
-      isAdmin.value ? skillsStore.setSkillsUserList() : skillsStore.setSkillsUserList();
-      isAdmin.value ? teamStore.setTeamsUserList() : teamStore.setTeamsUserList();
+      skillsStore.setSkillsUserList();
+      teamStore.setTeamsUserList();
+      // isAdmin.value ? skillsStore.setSkillsUserList() : skillsStore.setSkillsUserList();
+      // isAdmin.value ? teamStore.setTeamsUserList() : teamStore.setTeamsUserList();
+
       // getRoles().then((roles) => {
       //   userStore.setRoleList(roles);
       // });
@@ -150,7 +153,6 @@ import { defineComponent, reactive, onMounted, computed, ref } from "vue";
       }
 
       function handleSuccess({ isUpdate, values }) {
-        console.log(isUpdate, 'isUpdate');
         // if (!isUpdate) {
         //   getAccountList({ page: 1, pageSize: 30 }).then((result) => setTableData(result['records']));
         // } else {
@@ -166,7 +168,6 @@ import { defineComponent, reactive, onMounted, computed, ref } from "vue";
           .then(() => {
             reload().then(() => {
               const data = getRawDataSource();
-              console.log(data.records, 'data.records');
               setTableData(data.records);
             });
           });

@@ -86,6 +86,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useSkillsStore } from '/@/store/modules/skills';
   import { useTeamsStore } from '/@/store/modules/teams';
+  import { getLogList } from "/@/api/sys/user";
 
   export default defineComponent({
     components: {
@@ -106,20 +107,23 @@
       const teamStore = useTeamsStore();
       const { createConfirm, createMessage } = useMessage();
 
+      // INIT
       const showDeleteIcon = ref(false);
       const addTagValue = ref('');
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
-      if (isAdmin.value) {
-        teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
-      } else {
-        teamStore.setTeamsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
-      }
-      if (isAdmin.value) {
-        skillsStore.setSkillsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
-      } else {
-        skillsStore.setSkillsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
-      }
+      userStore.setLogList({ page: 1, size: 9999, userId: userStore.getUserInfo.userId });
+      skillsStore.setSkillsUserList();
+      teamStore.setTeamsUserList();
+      // if (isAdmin.value) {
+      //   teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      //   skillsStore.setSkillsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      //   console.log('111');
+      // } else {
+      //   teamStore.setTeamsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      //   skillsStore.setSkillsList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
+      //   console.log('222');
+      // }
 
       const avatar = computed(() => userStore.getUserInfo.avatar || userStore.getUserAvatar);
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');

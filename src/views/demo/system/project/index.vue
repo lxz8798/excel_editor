@@ -62,9 +62,11 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { usePermissionStore } from '/@/store/modules/permission';
   import { useProjectStore } from '/@/store/modules/project';
+  import { useFormStore } from '/@/store/modules/form';
   const permissionStore = usePermissionStore();
   const userStore = useUserStore();
   const projectStore = useProjectStore();
+  const formStore = useFormStore();
   const { createMessage, createConfirm } = useMessage();
   export default defineComponent({
     name: 'AccountManagement',
@@ -85,7 +87,7 @@
       const [registerTable, { reload, updateTableDataRecord, getDataSource, getRawDataSource, setTableData }] =
         useTable({
           title: '项目列表',
-          api: isAdmin.value ? getProjects : getOwnerProjectList,
+          api: getOwnerProjectList,
           rowKey: 'id',
           columns,
           formConfig: {
@@ -137,19 +139,37 @@
       }
 
       function addProjectMebers(record: Recordable) {
-        if (!isActive.value || (record['leaderId'] !== userStore.getUserInfo.userId && !isAdmin.value)) {
-          createMessage.info('当前账户末激活或者没有权限!');
-          return;
-        }
+        const { teamUsers } = record;
         record['from'] = 'project';
-        openModal2(true, {
-          isUpdate: false,
-          project: record,
-        });
+        if (isAdmin.value) {
+          openModal2(true, {
+            isUpdate: false,
+            project: record,
+          });
+        } else {
+          formStore.setJudgResult(record['menuId'] ? { menuId: record['id'] } : { contractId: record['id'] }).then((res) => {
+              if (!res) {
+                if (teamUsers.length && teamUsers.some((i) => i.id === userStore.getUserInfo.userId)) {
+                  openModal2(true, {
+                    isUpdate: false,
+                    project: record,
+                  });
+                } else {
+                  createMessage.info('不是项目成员不可邀请!');
+                }
+                return;
+              } else {
+                openModal2(true, {
+                  isUpdate: false,
+                  project: record,
+                });
+              }
+          });
+        }
       }
 
       function handleEdit(record: Recordable) {
-        if (!isActive.value) {
+        if ((!isActive.value || (record['leaderId'] !== userStore.getUserInfo.userId) && !isAdmin.value)) {
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
@@ -160,7 +180,7 @@
       }
 
       function handleDelete(record: Recordable) {
-        if (!isActive.value) {
+        if ((!isActive.value || (record['leaderId'] !== userStore.getUserInfo.userId) && !isAdmin.value)) {
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
@@ -185,6 +205,7 @@
                 // userId: userStore.getUserInfo.userId,
               }).then((res) => {
                 setTableData(res['records']);
+                window.location.reload();
               });
             });
           },

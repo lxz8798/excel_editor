@@ -76,11 +76,11 @@ export const achieveList: TabItem[] = [
     name: '我的项目',
     component: 'Application',
   },
-  // {
-  //   key: '3',
-  //   name: '我的技术',
-  //   component: 'Application',
-  // },
+  {
+    key: '3',
+    name: '全部项目',
+    component: 'Project',
+  },
 ];
 
 export const actions: any[] = [

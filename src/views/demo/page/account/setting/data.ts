@@ -1,6 +1,11 @@
 import { FormSchema } from '/@/components/Form/index';
 import { useUserStore } from '/@/store/modules/user';
+import { computed, toRaw } from 'vue';
+import { useSkillsStore } from '/@/store/modules/skills';
+import { useTeamsStore } from '/@/store/modules/teams';
 const userStore = useUserStore();
+const skillsStore = useSkillsStore();
+const teamStore = useTeamsStore();
 export interface ListItem {
   key: string;
   title: string;
@@ -51,18 +56,34 @@ export const baseSetschemas: FormSchema[] = [
     colProps: { span: 18 },
   },
   {
-    field: 'teams',
-    component: 'Input',
+    field: 'teamName',
     label: '我的团队',
-    defaultValue: userStore.getUserInfo['realName'],
+    component: 'Select',
     colProps: { span: 18 },
+    defaultValue: userStore.getUserInfo['teams'],
+    componentProps: ({ formModel, formActionType }) => {
+      const options = computed(() => toRaw(teamStore.getTeamsUserList));
+      return {
+        mode: 'multiple',
+        placeholder: '请选择你的团队',
+        options: options,
+      };
+    },
   },
   {
     field: 'skills',
-    component: 'Input',
     label: '我的技能',
-    defaultValue: userStore.getUserInfo['realName'],
+    component: 'Select',
     colProps: { span: 18 },
+    defaultValue: userStore.getUserInfo['skills'],
+    componentProps: ({ formModel, formActionType }) => {
+      const options = computed(() => toRaw(skillsStore.getSkillsUserList));
+      return {
+        mode: 'multiple',
+        placeholder: '请选择你的技能',
+        options: options,
+      };
+    },
   },
   {
     field: 'phone',
@@ -71,13 +92,13 @@ export const baseSetschemas: FormSchema[] = [
     defaultValue: userStore.getUserInfo['phone'],
     colProps: { span: 18 },
   },
-  {
-    field: 'email',
-    component: 'Input',
-    label: '邮箱',
-    defaultValue: userStore.getUserInfo['email'],
-    colProps: { span: 18 },
-  },
+  // {
+  //   field: 'email',
+  //   component: 'Input',
+  //   label: '邮箱',
+  //   defaultValue: userStore.getUserInfo['email'],
+  //   colProps: { span: 18 },
+  // },
   {
     field: 'introduction',
     component: 'InputTextArea',

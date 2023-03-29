@@ -253,6 +253,7 @@
       }
       // Process module menu click
       async function handleModuleClick(path: string, hover = false, menu?) {
+        setMenuSetting({ menuWidth: 240, mixSideFixed: true });
         const children = await getChildrenMenus(path);
         if (unref(activePath) === path) {
           if (!hover) {

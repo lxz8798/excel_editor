@@ -112,40 +112,6 @@ export const tabListData: TabItem[] = [
   },
   {
     key: '2',
-    name: '消息',
-    list: [
-      {
-        id: '000000006',
-        avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
-        title: '曲丽丽 评论了你',
-        description: '描述信息描述信息描述信息',
-        datetime: '2017-08-07',
-        type: '2',
-        clickClose: true,
-      },
-      {
-        id: '000000007',
-        avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
-        title: '朱偏右 回复了你',
-        description: '这种模板用于提醒谁与你发生了互动',
-        datetime: '2017-08-07',
-        type: '2',
-        clickClose: true,
-      },
-      {
-        id: '000000008',
-        avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
-        title: '标题',
-        description:
-          '请将鼠标移动到此处，以便测试超长的消息在此处将如何处理。本例中设置的描述最大行数为2，超过2行的描述内容将被省略并且可以通过tooltip查看完整内容',
-        datetime: '2017-08-07',
-        type: '2',
-        clickClose: true,
-      },
-    ],
-  },
-  {
-    key: '3',
     name: '待办',
     list: [
       {
@@ -190,4 +156,38 @@ export const tabListData: TabItem[] = [
       },
     ],
   },
+  // {
+  //   key: '3',
+  //   name: '消息',
+  //   list: [
+  //     {
+  //       id: '000000006',
+  //       avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
+  //       title: '曲丽丽 评论了你',
+  //       description: '描述信息描述信息描述信息',
+  //       datetime: '2017-08-07',
+  //       type: '2',
+  //       clickClose: true,
+  //     },
+  //     {
+  //       id: '000000007',
+  //       avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
+  //       title: '朱偏右 回复了你',
+  //       description: '这种模板用于提醒谁与你发生了互动',
+  //       datetime: '2017-08-07',
+  //       type: '2',
+  //       clickClose: true,
+  //     },
+  //     {
+  //       id: '000000008',
+  //       avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
+  //       title: '标题',
+  //       description:
+  //         '请将鼠标移动到此处，以便测试超长的消息在此处将如何处理。本例中设置的描述最大行数为2，超过2行的描述内容将被省略并且可以通过tooltip查看完整内容',
+  //       datetime: '2017-08-07',
+  //       type: '2',
+  //       clickClose: true,
+  //     },
+  //   ],
+  // },
 ];

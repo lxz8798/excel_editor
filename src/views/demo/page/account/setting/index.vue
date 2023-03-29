@@ -18,7 +18,6 @@
 
   import { ScrollContainer } from '/@/components/Container/index';
   import { settingList } from './data';
-
   import BaseSetting from './BaseSetting.vue';
   import SecureSetting from './SecureSetting.vue';
   // import AccountBind from './AccountBind.vue';
