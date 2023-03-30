@@ -8,7 +8,7 @@ import { getMenuList } from '/@/api/demo/system';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { useUserStore } from '/@/store/modules/user';
 import { Option } from 'ant-design-vue/es/vc-util/Children/toArray';
-import { Popconfirm } from 'ant-design-vue';
+import { Popconfirm, Button } from 'ant-design-vue';
 const { createMessage } = useMessage();
 const projectStore = useProjectStore();
 const userStore = useUserStore();
@@ -65,6 +65,11 @@ export const columns: BasicColumn[] = [
         }),
       }, h('span', { style: { color: 'blue', cursor: 'pointer' } }, '待审核')) : record['status'] == 1 ? h('span', { style: { color: 'green' } }, '审核通过') : record['status'] == 2 ? h('span', { style: { color: 'red' } }, '审核不通过') : '暂无'
     },
+    filters: [
+      { text: '待审核', value: '0' },
+      { text: '审核通过', value: '1' },
+      { text: '审核不通过', value: '2' },
+    ],
   },
   {
     title: '到期时间',
@@ -76,13 +81,19 @@ export const columns: BasicColumn[] = [
 export const searchFormSchema: FormSchema[] = [
   {
     field: 'account',
-    label: '用户名',
+    label: '待审核',
     component: 'Input',
     colProps: { span: 8 },
   },
   {
     field: 'nickname',
-    label: '昵称',
+    label: '审核通过',
+    component: 'Input',
+    colProps: { span: 8 },
+  },
+  {
+    field: 'nickname',
+    label: '审核不通过',
     component: 'Input',
     colProps: { span: 8 },
   },

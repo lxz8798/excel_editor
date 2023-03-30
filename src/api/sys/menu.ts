@@ -15,6 +15,8 @@ enum Api {
   IS_PROJECT_MEMBERS = '/sysMenu/isProjectAdmin',
   IS_PROJECT_NORMAL_MEMBERS = '/inviteUserProject',
   GET_PROJECT_MEMBERS_INFO = '/sysMenu/projectInfo',
+  TRANSFORM_ID = '/sysMenu/getMenuByContractId',
+  MENUID_TRANSFORM_PROJECTID = '/sysMenu/getContractByMenuId',
 }
 
 /**
@@ -33,3 +35,5 @@ export const copyMenu = (params?) => defHttp.post({ url: Api.COPY_MENU, params }
 export const isProjectMembers = (params?) => defHttp.get({ url: Api.IS_PROJECT_MEMBERS, params });
 export const isProjectNormalMembers = (params?) => defHttp.get({ url: Api.IS_PROJECT_NORMAL_MEMBERS, params });
 export const getProjectMembersInfoFn = (params?) => defHttp.get({ url: Api.GET_PROJECT_MEMBERS_INFO, params });
+export const idTransform = (params?) => defHttp.get({ url: Api.TRANSFORM_ID, params });
+export const menuIdTransformProjectId = (params?) => defHttp.get({ url: Api.MENUID_TRANSFORM_PROJECTID, params });

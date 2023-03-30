@@ -5,6 +5,7 @@
       <AutoComplete
         allowClear
         v-model:value="projectAdminId"
+        :defaultValue="projectLeader"
         :options="projectUserList"
         style="min-width: 350px"
         placeholder="管理员账号邀请成员需要指定项目长"
@@ -60,7 +61,8 @@
       const projectData = ref({});
       const rowId = ref('');
       const leaderId = ref('');
-      const projectAdminId = ref('');
+      const projectAdminId = ref(null);
+      const projectLeader = ref(null);
       const transferRightKeys = ref([]);
 
       let transferRightDatas = [];
@@ -82,6 +84,7 @@
         setModalProps({ confirmLoading: false });
         rowId.value = data.project['from'] === 'project' ? data.project['id'] : data.project['projectId'];
         leaderId.value = data.project['leaderId'];
+        projectAdminId.value = data.project['leaderName'];
         // projectAdminId.value = computed(() => projectUserList.value.filter((i) => i['value'] === data.project.createUserId)[0]);
         isUpdate.value = !!data?.isUpdate;
         transferRightKeys.value = data.project['teamUsers'] ? data.project['teamUsers'].map((i) => i['id']) : [];
@@ -169,6 +172,7 @@
         projectUserList,
         getProjectAdminId,
         projectAdminId,
+        projectLeader,
         transferRightKeys,
       };
     },

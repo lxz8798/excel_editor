@@ -86,7 +86,6 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useSkillsStore } from '/@/store/modules/skills';
   import { useTeamsStore } from '/@/store/modules/teams';
-  import { getLogList } from "/@/api/sys/user";
 
   export default defineComponent({
     components: {
@@ -129,8 +128,10 @@
       const realName = computed(() => userStore.userInfo.realName || '没有设置真名姓名');
       const introduction = computed(() => userStore.userInfo.introduction || '暂时没有简介');
       const tagList = computed(() => userStore.getUserTagsList || []);
-      const teams = computed(() => isAdmin.value ? teamStore.getTeamsUserList : userStore.getTeamList);
-      const skills = computed(() => isAdmin.value ? skillsStore.getSkillsUserList :  skillsStore.getSkillsList);
+      // const teams = computed(() => isAdmin.value ? teamStore.getTeamsUserList : userStore.getTeamList);
+      // const skills = computed(() => isAdmin.value ? skillsStore.getSkillsUserList :  skillsStore.getSkillsList);
+      const teams = computed(() => userStore.getUserInfo.teams);
+      const skills = computed(() => userStore.getUserInfo.skills);
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
       // 添加TAG
@@ -167,6 +168,7 @@
           },
         });
       }
+
       return {
         prefixCls: 'account-center',
         avatar,

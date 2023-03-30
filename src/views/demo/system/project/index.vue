@@ -95,7 +95,7 @@
             schemas: searchFormSchema,
             autoSubmitOnEnter: true,
           },
-          useSearchForm: false,
+          useSearchForm: true,
           showTableSetting: true,
           bordered: true,
           handleSearchInfoFn(info) {
@@ -259,5 +259,8 @@
 <style lang="less" scope>
   .vben-page-wrapper {
     margin: 16px;
+  }
+  .ant-form-item-control {
+    display: none;
   }
 </style>

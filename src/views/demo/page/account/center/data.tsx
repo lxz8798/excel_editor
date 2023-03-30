@@ -125,7 +125,7 @@ export const applicationList = (() => {
   const result: any[] = [];
   for (let i = 0; i < 8; i++) {
     result.push({
-      title: '表单管理',
+      title: '工作管理',
       icon: 'emojione-monotone:letter-a',
       color: '#1890ff',
       active: '100',

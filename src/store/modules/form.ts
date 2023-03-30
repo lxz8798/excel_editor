@@ -24,7 +24,9 @@ import {
   deleteMenu,
   isProjectMembers,
   getProjectMembersInfoFn,
-} from "/@/api/sys/menu";
+  idTransform,
+  menuIdTransformProjectId,
+} from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
 interface formState {
@@ -50,6 +52,10 @@ interface formState {
   eidtMenuResult: string;
   deleteResult: string;
   isProjectMembers: boolean;
+  isProjectNormalMembers: boolean;
+  projectMembersInfo: {};
+  afterTansformId: string;
+  menuIdAfterTransformId: string;
 }
 export const useFormStore = defineStore({
   id: 'app-form',
@@ -77,8 +83,16 @@ export const useFormStore = defineStore({
     isProjectMembers: false,
     isProjectNormalMembers: false,
     projectMembersInfo: {},
+    afterTansformId: '',
+    menuIdAfterTransformId: '',
   }),
   getters: {
+    getMenuIdTransformId(): string {
+      return this.menuIdAfterTransformId;
+    },
+    getTransformId(): string {
+      return this.afterTansformId;
+    },
     getJudgResult(): any[] {
       return this.isProjectMembers;
     },
@@ -164,6 +178,14 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setTransformId(params: string | number) {
+      this.afterTansformId = await idTransform(params);
+      return this.afterTansformId;
+    },
+    async setMenuIdTransformId(params: string | number) {
+      this.menuIdAfterTransformId = await menuIdTransformProjectId(params);
+      return this.menuIdAfterTransformId;
     },
     async setProjectMembersInfo(params): any[] {
       this.projectMembersInfo = await getProjectMembersInfoFn(params);

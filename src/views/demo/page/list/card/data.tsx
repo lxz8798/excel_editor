@@ -2,7 +2,7 @@ export const cardList = (() => {
   const result: any[] = [];
   for (let i = 0; i < 12; i++) {
     result.push({
-      title: '表单管理',
+      title: '工作管理',
       icon: 'logos:vue',
       color: '#1890ff',
       active: '100',

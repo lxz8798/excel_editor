@@ -512,34 +512,42 @@
       }
       // 邀请成员
       function invitationMember(item) {
+        item['teamUsers'] = [];
+        item['projectId'] = 0;
+        item['leaderId'] = 0;
         if (isAdmin.value) {
           openModal(true, {
             isUpdate: false,
             project: item,
           });
         } else {
-          formStore.setProjectMembersInfo({ menuId: item['id'] }).then((res) => {
-            const { leaderUser, teamUsers } = res;
-            if (!leaderUser || !teamUsers) {
-              createMessage.info('当前菜单没有权限或者不是项目成员!');
-              return;
-            }
-            if (leaderUser['id'] === userStore.getUserInfo.userId) {
-              openModal(true, {
-                isUpdate: false,
-                project: item,
-              });
-            } else {
-              createMessage.info('不是项目长不可对项目进行调整!');
-              if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId)) {
+          formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
+            item['projectId'] = id;
+            formStore.setProjectMembersInfo({ menuId: item['id'] }).then((res) => {
+              const { leaderUser, teamUsers } = res;
+              item['leaderId'] = leaderUser['id'];
+              item['teamUsers'] = teamUsers;
+              if (!leaderUser || !teamUsers) {
+                createMessage.info('当前菜单没有权限或者不是项目成员!');
+                return;
+              }
+              if (leaderUser['id'] === userStore.getUserInfo.userId) {
                 openModal(true, {
                   isUpdate: false,
                   project: item,
                 });
               } else {
-                createMessage.info('不是项目成员不可调整!');
+                createMessage.info('不是项目长不可对项目进行调整!');
+                if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId)) {
+                  openModal(true, {
+                    isUpdate: false,
+                    project: item,
+                  });
+                } else {
+                  createMessage.info('不是项目成员不可调整!');
+                }
               }
-            }
+            });
           });
         }
       }
