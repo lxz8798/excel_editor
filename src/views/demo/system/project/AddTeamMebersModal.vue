@@ -113,7 +113,7 @@
 
       function getProjectAdminId(value) {
         if (!value) return;
-        return toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === value)[0]['id'];
+        return toRaw(projectStore.getProjectUserList).filter((i) => i['realName'] === value)[0]['id'];
       }
 
       function transferHandler(data) {

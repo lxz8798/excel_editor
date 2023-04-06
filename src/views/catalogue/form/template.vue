@@ -608,7 +608,7 @@
             const defaultBasicTemplate = [
               {
                 templateId: id,
-                label: '组份名称',
+                label: '组分名称',
                 inputs: [],
               },
               {
