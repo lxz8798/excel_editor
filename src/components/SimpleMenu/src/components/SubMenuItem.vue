@@ -1,5 +1,6 @@
 <template>
   <li :class="getClass">
+    <!--<div class="sort_placement" @drop="dropHandler($event, item)" @dragover="e=>e.preventDefault()"></div>-->
     <template v-if="!getCollapse">
       <div :class="`${prefixCls}-submenu-title`" @click.stop="handleClick" :style="getItemStyle">
         <slot name="title"></slot>
@@ -622,6 +623,11 @@
           },
         });
       }
+      function dropHandler(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log(props.item, 'item');
+      }
 
       return {
         getClass,
@@ -647,6 +653,7 @@
         startWorking,
         deleteMenu,
         registerModal,
+        dropHandler,
         ...toRefs(state),
         ...toRefs(data),
       };
@@ -658,6 +665,10 @@
     background: #0656859e !important;
   }
   li.vben-menu-submenu {
+    .sort_placement {
+      width: 100%;
+      height: 100px;
+    }
     .vben-menu-submenu-title {
       position: relative;
       &:hover {

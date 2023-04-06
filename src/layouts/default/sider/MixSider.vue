@@ -253,7 +253,11 @@
       }
       // Process module menu click
       async function handleModuleClick(path: string, hover = false, menu?) {
-        setMenuSetting({ menuWidth: 240, mixSideFixed: true });
+        if (!openMenu.value) {
+          setMenuSetting({ menuWidth: 240, mixSideFixed: true });
+        } else {
+          setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+        }
         const children = await getChildrenMenus(path);
         if (unref(activePath) === path) {
           if (!hover) {

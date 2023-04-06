@@ -63,6 +63,7 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   // 提取树指定结构
   const list = treeMap(routeList, {
     conversion: (node: AppRouteRecordRaw) => {
+      node.meta.orderNo = node['orderNo'];
       const { meta: { title, hideMenu = false } = {} } = node;
       return {
         ...(node.meta || {}),

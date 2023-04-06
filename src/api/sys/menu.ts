@@ -17,6 +17,7 @@ enum Api {
   GET_PROJECT_MEMBERS_INFO = '/sysMenu/projectInfo',
   TRANSFORM_ID = '/sysMenu/getMenuByContractId',
   MENUID_TRANSFORM_PROJECTID = '/sysMenu/getContractByMenuId',
+  MENU_SWAP_ORDER_NO = '/sysMenu/swapOrderNo',
 }
 
 /**
@@ -37,3 +38,4 @@ export const isProjectNormalMembers = (params?) => defHttp.get({ url: Api.IS_PRO
 export const getProjectMembersInfoFn = (params?) => defHttp.get({ url: Api.GET_PROJECT_MEMBERS_INFO, params });
 export const idTransform = (params?) => defHttp.get({ url: Api.TRANSFORM_ID, params });
 export const menuIdTransformProjectId = (params?) => defHttp.get({ url: Api.MENUID_TRANSFORM_PROJECTID, params });
+export const menuSwapOrderNo = (params?) => defHttp.get({ url: Api.MENU_SWAP_ORDER_NO, params });

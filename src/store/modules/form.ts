@@ -26,6 +26,7 @@ import {
   getProjectMembersInfoFn,
   idTransform,
   menuIdTransformProjectId,
+  menuSwapOrderNo,
 } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
@@ -56,6 +57,7 @@ interface formState {
   projectMembersInfo: {};
   afterTansformId: string;
   menuIdAfterTransformId: string;
+  menuSwapOrderNoResult: string;
 }
 export const useFormStore = defineStore({
   id: 'app-form',
@@ -85,8 +87,12 @@ export const useFormStore = defineStore({
     projectMembersInfo: {},
     afterTansformId: '',
     menuIdAfterTransformId: '',
+    menuSwapOrderNoResult: '',
   }),
   getters: {
+    getSwapOrderNo(): string {
+      return this.menuSwapOrderNoResult;
+    },
     getMenuIdTransformId(): string {
       return this.menuIdAfterTransformId;
     },
@@ -178,6 +184,9 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setSwapOrderNo(params) {
+      this.menuSwapOrderNoResult = await menuSwapOrderNo(params);
     },
     async setTransformId(params: string | number) {
       this.afterTansformId = await idTransform(params);

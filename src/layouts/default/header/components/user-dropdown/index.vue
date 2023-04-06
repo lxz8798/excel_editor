@@ -42,10 +42,10 @@
 </template>
 <script lang="ts">
   // components
-  import { Dropdown, Menu } from 'ant-design-vue';
+  import { Dropdown, Menu, Input } from 'ant-design-vue';
   import type { MenuInfo } from 'ant-design-vue/lib/menu/src/interface';
 
-  import { defineComponent, computed } from 'vue';
+  import { defineComponent, computed, h } from 'vue';
 
   import { DOC_URL } from '/@/settings/siteSetting';
 
@@ -60,9 +60,10 @@
   import { openWindow } from '/@/utils';
 
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
-
-  type MenuEvent = 'logout' | 'doc' | 'lock';
-
+  import { delProject, getOwnerProjectList } from '/@/api/sys/project';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { editUserPermissions } from "/@/api/sys/user";
+  type MenuEvent = 'logout' | 'doc' | 'lock' | 'changePassword';
   export default defineComponent({
     name: 'UserDropdown',
     components: {
@@ -80,7 +81,7 @@
       const { t } = useI18n();
       const { getShowDoc, getUseLockPage } = useHeaderSetting();
       const userStore = useUserStore();
-
+      const { createMessage, createConfirm } = useMessage();
       const getUserInfo = computed(() => {
         const { realName = '', avatar, desc } = userStore.getUserInfo || {};
         return { realName, avatar: avatar || headerImg, desc };
@@ -102,6 +103,33 @@
         openWindow(DOC_URL);
       }
 
+      // changePassword
+      function changePasswordHandle() {
+        let _passwordValue = '';
+        let _confirmPasswordValue = '';
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '修改密码!'),
+          content: () => {
+            return h('div', { className: 'changePsswordWrap' }, [
+              h('div', { style: { display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '15px' } }, [h('label', { style: { width: '120px', paddingRight: '5px', textAlignLast: 'justify' } }, '输入密码：'), h(Input, { placeholder: '请输入密码', type: 'password', onChange: e => _passwordValue = e.target.value })]),
+              h('div', { style: { display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '15px' } }, [h('label', { style: { width: '120px', paddingRight: '5px', textAlignLast: 'justify' } }, '确认密码：'), h(Input, { placeholder: '请确认密码', type: 'password', onChange: e => _confirmPasswordValue = e.target.value })]),
+            ]);
+          },
+          onOk: async () => {
+            if (_passwordValue !== _confirmPasswordValue) {
+              createMessage.warning('密码不一致, 请重新输入');
+            } else {
+              editUserPermissions({ password: _passwordValue, id: userStore.getUserInfo.userId, phone: userStore.getUserInfo.phone }).then((res) => {
+                createMessage.success('密码修改成功!');
+                userStore.logout();
+                window.location.reload();
+              });
+            }
+          },
+        });
+      }
+
       function handleMenuClick(e: MenuInfo) {
         switch (e.key as MenuEvent) {
           case 'logout':
@@ -112,6 +140,9 @@
             break;
           case 'lock':
             handleLock();
+            break;
+          case 'changePassword':
+            changePasswordHandle();
             break;
         }
       }

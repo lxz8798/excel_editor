@@ -18,10 +18,13 @@
     :name="item.path"
     :class="[getLevelClass, theme]"
     :collapsedShowTitle="collapsedShowTitle"
+    :draggable="true"
+    @dragstart="dragStartHandler($event, item)"
+    @drop="dropHandler($event, item)"
+    @dragover="e=>e.preventDefault()"
   >
     <template #title>
       <Icon v-if="getIcon" :icon="getIcon" :size="16" />
-
       <div v-if="collapsedShowTitle && getIsCollapseParent" class="mt-2 collapse-title">
         {{ getI18nName }}
       </div>
@@ -89,10 +92,9 @@
     },
     setup(props) {
       const { setMenuSetting } = useMenuSetting();
-      const appStore = useAppStore();
       const { t } = useI18n();
       const { prefixCls } = useDesign('simple-menu');
-      const openMenu = ref(false);
+      const sourceItem = ref(null);
       const getShowMenu = computed(() => !props.item?.meta?.hideMenu);
       const getIcon = computed(() => props.item?.icon);
       const getI18nName = computed(() =>
@@ -119,6 +121,46 @@
           menuTreeItem.children.length > 0
         );
       }
+      function getMenuData(item) {
+        const params = {
+          upMenuId: item['id'],
+          downMenuId: sourceItem.value['id'],
+        };
+        // 发送请求获取菜单数据
+        formStore.setSwapOrderNo(params).then((res) => {
+          permissionStore.buildRoutesAction();
+          permissionStore.setLastBuildMenuTime();
+          setMenuShowState();
+          createMessage.success('修改成功!');
+        });
+      }
+      function dragStartHandler(event, item) {
+        event.stopPropagation();
+        if (item['meta'].type !== '1') {
+          createMessage.warning('该类目不可更改顺序，请在项目上操作!');
+          return;
+        }
+        // 在拖拽开始时，设置被拖拽元素的数据
+        event.dataTransfer.setData('text/plain', JSON.stringify(item));
+      }
+      function dropHandler(event, item) {
+        // 在拖拽结束时，获取被拖拽元素的数据以及放置位置的数据，发送请求保存数据
+        event.preventDefault();
+        event.stopPropagation();
+        if (item['meta'].type !== '1') {
+          createMessage.warning('该类目不可更改顺序，请在项目上操作!');
+          return;
+        }
+        sourceItem.value = JSON.parse(event.dataTransfer.getData('text/plain'));
+        let tempSort1 = sourceItem.value['meta'].orderNo, tempSort2 = item['meta'].orderNo;
+
+        sourceItem.value['meta'].orderNo = tempSort2;
+        item['meta'].orderNo = tempSort1;
+
+        // 发送请求更新菜单项位置信息
+        // 更新完后重新获取菜单数据
+        getMenuData(item);
+      }
       return {
         prefixCls,
         menuHasChildren,
@@ -129,6 +171,8 @@
         getShowSubTitle,
         getLevelClass,
         getIsCollapseParent,
+        dragStartHandler,
+        dropHandler,
       };
     },
   });

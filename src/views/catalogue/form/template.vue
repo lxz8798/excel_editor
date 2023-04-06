@@ -87,7 +87,6 @@
             @submit="handleSubmit"
             @save="saveFormDatas"
             style="margin-top: 25px"
-            v-show="isAdmin || isLeader"
           >
             <template #advanceAfter>
               <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>

@@ -109,7 +109,7 @@
       });
       const getTitle = computed(() => '编辑项目成员');
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
-      const projectUserList = computed(() => toRaw(projectStore.getProjectUserList).map((i) => ({ value: i['name'] })));
+      const projectUserList = computed(() => toRaw(projectStore.getProjectUserList).map((i) => ({ value: i['realName'] })));
 
       function getProjectAdminId(value) {
         if (!value) return;
