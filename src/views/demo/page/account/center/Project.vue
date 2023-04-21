@@ -266,7 +266,7 @@ export default defineComponent({
               id: t['id'],
               title: t['name'],
               leaderName: t['leaderName'],
-              teams: t['teamUsers'].map((i) => i['name']).toString(),
+              teams: t['teamUsers'].map((i) => i['realName']).toString(),
               icon: 'gg:loadbar-doc',
               color: Color(),
               day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),

@@ -88,6 +88,10 @@
         try {
           const values = await validate();
           const { name, daysLeft, projectAdminId, parentMenu } = values;
+          if (name.includes('-')) {
+            createMessage.info('名称当中不能包含"-"，请检查后在输入!');
+            return;
+          }
           const params = {
             name: name,
             // createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,

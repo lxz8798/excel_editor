@@ -12,7 +12,6 @@
       :accept="['.xlsx']"
       :uploadParams="uploadParams"
       @change="handleChange"
-      v-show="isAdmin || isLeader"
     />
     <CollapseContainer
       class="form_wrap"
@@ -42,8 +41,8 @@
           <Icon :icon="'material-symbols:edit-note-rounded'" :title="'修改标题'" size="18" style="margin-left: 5px;" @click="editTemplateTitle" />-->
           <span>所属项目：{{ projectInfo['examContract'] && projectInfo['examContract'].name }}</span>
           <!--<span>关联内容：{{ projectInfo['technologys'] && projectInfo['technologys'].map((i) => i['menuName']).toString() }}</span>-->
-          <span>项目负责人：{{ projectInfo['leaderUser'] && projectInfo['leaderUser'].name }}</span>
-          <span>参与成员：{{ projectInfo['user'] && projectInfo['user'].map((i) => i['name']).toString() }}</span>
+          <span>项目负责人：{{ projectInfo['leaderUser'] && projectInfo['leaderUser'].realName }}</span>
+          <span>参与成员：{{ projectInfo['user'] && projectInfo['user'].map((i) => i['realName']).toString() }}</span>
         </div>
         <div class="form_title" v-else>暂无名称</div>
       </template>
@@ -485,7 +484,7 @@
               fromId: userStore.getUserInfo.userId,
               toId: '',
               boradFlag: '',
-              delFlag: false,
+              delFlag: true,
               msg: input,
             };
             send(JSON.stringify(msgObj));

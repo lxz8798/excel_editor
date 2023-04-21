@@ -1,15 +1,15 @@
 <template>
-  <div class="conversation_wrap">
+  <div class="conversation_wrap" :style="{ background: isDel ? '#ff0084a6' : '#eee' }">
     <div class="left">
       <div class="avatar"><img :src="avatarImg"></div>
-      <div class="name">{{ nameText }}</div>
+      <div class="name" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ nameText }}</div>
       <!--<div class="introductionText">{{ introductionText }}</div>-->
     </div>
     <div class="right" v-if="userMsg.content">
-      <div class="title">{{ msgTitle }}</div>
-      <div class="content">{{ msgContent }}</div>
-      <div class="sub">{{ msgSub }}</div>
-      <div class="sub">{{ msgCreateTime }}</div>
+      <div class="title" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgTitle }}</div>
+      <div class="content" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgContent }}</div>
+      <div class="sub" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgSub }}</div>
+      <div class="sub" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgCreateTime }}</div>
     </div>
   </div>
 </template>
@@ -31,6 +31,7 @@
       const msgContent = computed(() => props.userMsg.content.split(',')[1]);
       const msgSub = computed(() => props.userMsg.content.split(',')[2]);
       const msgCreateTime = computed(() => props.userMsg.createTime);
+      const isDel = computed(() => props.userMsg.delFlag);
 
       return {
         avatarImg,
@@ -39,6 +40,7 @@
         msgContent,
         msgSub,
         msgCreateTime,
+        isDel,
       };
     },
   });

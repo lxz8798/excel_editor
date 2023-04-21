@@ -34,7 +34,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'teamUsers',
     width: 300,
     customRender: ({ record }) => {
-      return h('span', record['teamUsers'] && record['teamUsers'].map((i) => i && i['name']).toString());
+      return h('span', record['teamUsers'] && record['teamUsers'].map((i) => i && i['realName']).toString());
     },
   },
 

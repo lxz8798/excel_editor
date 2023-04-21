@@ -162,6 +162,10 @@ import { useModal } from "/@/components/Modal";
             ]);
           },
           onOk: () => {
+            if (inputValue.value.includes('-')) {
+              createMessage.info('名称当中不能包含"-"，请检查后在输入!');
+              return;
+            }
             const params = {
               type: '0',
               menuName: inputValue.value,
