@@ -29,9 +29,13 @@ import { isArray } from '/@/utils/is';
 import { h, toRaw } from 'vue';
 import { getTeams, delTeam, deleteTeam } from '/@/api/sys/team';
 import { getSkills, delSkills, deleteSkills } from '/@/api/sys/skills';
-import { getOwnerProjectList, addProject } from '/@/api/sys/project';
+import {
+  getOwnerProjectList,
+  addProject,
+  getProjectTemplates,
+  getProjectTreeList,
+} from '/@/api/sys/project';
 import { getAccountList } from '/@/api/demo/system';
-import { haveData } from '/@/api/demo/form';
 interface UserState {
   userInfo: Nullable<UserInfo>;
   userAvatar?: string;
@@ -44,6 +48,8 @@ interface UserState {
   userList: [];
   userTagsList: [];
   projectList: [];
+  projectTemplates: [];
+  projectTreeList: [];
   teamList: [];
   logList: [];
 }
@@ -67,6 +73,8 @@ export const useUserStore = defineStore({
     userList: [],
     userTagsList: [],
     projectList: [],
+    projectTemplates: [],
+    projectTreeList: [],
     teamList: [],
     logList: [],
   }),
@@ -100,6 +108,12 @@ export const useUserStore = defineStore({
     },
     getProjectList(): [] {
       return this.projectList;
+    },
+    getProjectTemplates(): [] {
+      return this.projectTemplates;
+    },
+    getProjectTreeList(): [] {
+      return this.projectTreeList;
     },
     getTeamList(): [] {
       return this.teamList;
@@ -277,6 +291,14 @@ export const useUserStore = defineStore({
     // 得到项目列表
     async setProjectList(params) {
       return await getOwnerProjectList(params);
+    },
+    // 得到项目下的所有表单
+    async setProjectTemplates(params) {
+      return await getProjectTemplates(params);
+    },
+    // 获得项目菜单树
+    async setProjectTreeList(params) {
+      return await getProjectTreeList(params);
     },
     // 添加合同
     async addProject(params) {

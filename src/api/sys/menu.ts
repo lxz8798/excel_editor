@@ -18,6 +18,7 @@ enum Api {
   TRANSFORM_ID = '/sysMenu/getMenuByContractId',
   MENUID_TRANSFORM_PROJECTID = '/sysMenu/getContractByMenuId',
   MENU_SWAP_ORDER_NO = '/sysMenu/swapOrderNo',
+  MENUID_TO_TEMPLATEID= '/sysMenu/getTemplateByMenuId',
 }
 
 /**
@@ -39,3 +40,4 @@ export const getProjectMembersInfoFn = (params?) => defHttp.get({ url: Api.GET_P
 export const idTransform = (params?) => defHttp.get({ url: Api.TRANSFORM_ID, params });
 export const menuIdTransformProjectId = (params?) => defHttp.get({ url: Api.MENUID_TRANSFORM_PROJECTID, params });
 export const menuSwapOrderNo = (params?) => defHttp.get({ url: Api.MENU_SWAP_ORDER_NO, params });
+export const menuIdToTemplateId = (params?) => defHttp.get({ url: Api.MENUID_TO_TEMPLATEID, params });

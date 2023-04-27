@@ -46,7 +46,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted, h, computed } from 'vue';
+import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getProjects, getOwnerProjectList, delProject } from '/@/api/sys/project';
@@ -107,6 +107,10 @@
             dataIndex: 'action',
             // slots: { customRender: 'action' },
           },
+          afterFetch: (e) => {
+            console.log(e, 'e');
+            console.log(getRawDataSource(), 'getRawDataSource');
+          }
         });
 
       onMounted(() => {

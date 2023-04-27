@@ -81,7 +81,7 @@
         // ]);
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增项目' : '编辑项目'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增项目' : '设置有效期'));
       const getMenuIds = computed(() => toRaw(projectStore.getMenuIds));
 
       async function handleSubmit() {
@@ -142,8 +142,8 @@
     },
   });
 </script>
-<style lang="less">
-  .ant-row {
+<style lang="less" scoped>
+  ::v-deep(.ant-row) {
     height: 70%;
   }
 </style>

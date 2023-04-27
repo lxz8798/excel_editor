@@ -43,6 +43,7 @@
           <!--<span>关联内容：{{ projectInfo['technologys'] && projectInfo['technologys'].map((i) => i['menuName']).toString() }}</span>-->
           <span>项目负责人：{{ projectInfo['leaderUser'] && projectInfo['leaderUser'].realName }}</span>
           <span>参与成员：{{ projectInfo['user'] && projectInfo['user'].map((i) => i['realName']).toString() }}</span>
+          <span>入库状态：{{ currentRoute.query['confirm'] === '0' ? '临时保存状态' : '已入库' }}</span>
         </div>
         <div class="form_title" v-else>暂无名称</div>
       </template>
@@ -84,10 +85,10 @@
           <BasicForm
             @register="register"
             @submit="handleSubmit"
-            @save="saveFormDatas"
             style="margin-top: 25px"
           >
             <template #advanceAfter>
+              <a-button type="primary" style="margin-right: 8px; background: #4fb818; border: #4fb818" @click="submitInclusionHandler" v-if="isLeader || isAdmin">{{currentRoute.query['confirm'] === '0' ? '提交入库' : '临时保存'}}</a-button>
               <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>
             </template>
           </BasicForm>
@@ -142,6 +143,8 @@
     clearTemplate,
     addProjectItem,
     delProjectItem,
+    submitInclusion,
+    tempSave,
   } from '/@/api/demo/form';
   import Icon from '/@/components/Icon';
   import { useRouter } from 'vue-router';
@@ -149,7 +152,6 @@
   const userStore = useUserStore();
   const { wsUrl, apiUrl, uploadUrl } = useGlobSetting();
   export default defineComponent({
-    methods: { delProjectItem },
     components: {
       Modal1,
       BasicForm,
@@ -167,7 +169,7 @@
     setup() {
       // 使用消息
       const { createMessage, createConfirm } = useMessage();
-      const { currentRoute } = useRouter();
+      const { currentRoute, replace } = useRouter();
       // 获得当前模板的详情
       // formStore.setCurrTemp(state.currTempDetail.id as string);
       // STATE
@@ -192,12 +194,15 @@
         modalOptions: {},
         editTitleFlag: true,
         titleValue: '',
-        currTemp: {},
+        currTemp: {
+          confirm: '0'
+        },
         projectInfo: {},
         projectNameDefalutValue: '',
         projectNames: [],
         projectOptionsValue: '',
         addProjectNameFlag: true,
+        isLeader: '',
       });
       const [registerModal, { openModal: openModal1 }] = useModal();
       // 表单相关业务
@@ -216,7 +221,7 @@
       const uplpdaNum = computed(() => userStore.getTemplateUpdate);
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
-      const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
+      // const isLeader = computed(() => userStore.getUserInfo['id'] === state.projectInfo['leaderUser']['id']);
       const getIsOpen = computed(() => status.value === 'OPEN');
       const getTagColor = computed(() => (getIsOpen.value ? 'success' : 'red'));
       const mergeForm = computed(() => [...state.basicFormHeader, ...state.dynamicFormHeader]);
@@ -237,8 +242,9 @@
             formStore.setTemplateProjectName({ templateId: currentRoute.value.meta.templateId })
               .then((res) => {
                 if (!res) return;
-                const { examContract, technologys, leaderUser, user }  = toRaw(res);
+                const { examContract, technologys, leaderUser, user } = toRaw(res);
                 state.projectInfo = ({ examContract, technologys, leaderUser, user });
+                state.isLeader = computed(() => userStore.getUserInfo['userId'] === leaderUser['id']);
                 state.projectNameDefalutValue = examContract.name;
                 formStore.setProjectNamesList().then((list) => {
                   if (list['records'].length) {
@@ -291,6 +297,13 @@
         const { records } = res;
         state.recordList = records;
       });
+
+      // if (currentRoute.value.query.hasOwnProperty('menuId')) {
+      //   formStore.setProjectMembersInfo({ menuId: currentRoute.value.query.menuId }).then((res) => {
+      //     console.log(res, 'res');
+      //     state.isLeader = res;
+      //   });
+      // }
 
       function toggle() {
         if (getIsOpen.value) {
@@ -526,7 +539,7 @@
         }
         formStore.setFormDataState({ templateId: currentRoute.value.meta.templateId }).then((res) => {
             if (!res) {
-              createMessage.info('您需要先上传一个EXCEL模板才能继续!');
+              createMessage.info('为统一格式，至少需要上传一个空数据的EXCEL模板才能继续!');
               console.log('删除成功');
               return;
             } else {
@@ -670,6 +683,16 @@
       function editDoneHandler() {
         fillForm({ id: currentRoute.value.meta.templateId, name: currentRoute.value.meta.title });
       }
+      function submitInclusionHandler() {
+        const { path } = currentRoute.value;
+        if (currentRoute.value.query.confirm === '0') {
+          submitInclusion({ templateId: currentRoute.value.meta.templateId });
+          replace(path + `?confirm=0`);
+        } else {
+          tempSave({ templateId: currentRoute.value.meta.templateId });
+          replace(path + `?confirm=1`);
+        }
+      }
       // onMounted(() => {
       //   fillForm();
       // });
@@ -682,10 +705,7 @@
         register,
         clearFormDatas,
         saveFormDatas: (inputs: any) => {
-          // setFieldsValue(inputs);
-          // formStore.setDefaultValues(schama);
-          // const children = toRaw(items.value).filter((i) => i.name === 'routes.demo.menu.form')[0];
-          // const item = children.children.filter((i) => i.path === key)[0];
+          // 新需求，添加暂存功能，取消了CHANGE事件，在保存时调用
           formStore.saveForm(mergeForm.value.slice(1, 5)).then((res) => {
             fillForm({
               id: currentRoute.value.meta.templateId,
@@ -735,8 +755,9 @@
         addInputRow,
         editTemplateTitle,
         isAdmin,
-        isLeader,
         isActive,
+        currentRoute,
+        submitInclusionHandler,
       };
     },
   });

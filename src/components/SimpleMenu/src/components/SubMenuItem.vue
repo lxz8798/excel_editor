@@ -16,6 +16,7 @@
               <!--<a-menu-item @click="transformProjectMenu(item)">关联项目</a-menu-item>-->
               <!--<a-menu-item @click="startWorking(item)">开始工作</a-menu-item>-->
               <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
+              <a-menu-item v-if="item['meta']['type'] == '1'" @click="checkProjectDetail(item)">表单操作</a-menu-item>
             </a-menu>
           </template>
         </a-dropdown>
@@ -70,6 +71,8 @@
     </Popover>
     <!--  添加成员  -->
     <AddProjectMebersModal @register="registerModal" />
+    <!-- 抽屉 -->
+    <ProjectDetailDrawer @register="registerDrawer" />
   </li>
 </template>
 
@@ -100,11 +103,14 @@
   import { Popover, Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
   import { isBoolean, isObject } from '/@/utils/is';
   import mitt from '/@/utils/mitt';
+  import ProjectDetailDrawer from './ProjectDetailDrawer.vue';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useFormStore } from '/@/store/modules/form';
   import { usePermissionStore } from '/@/store/modules/permission';
   import { useModal } from '/@/components/Modal';
   import { useUserStore } from '/@/store/modules/user';
+  import { useDrawer } from '/@/components/Drawer';
+  import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   const DELAY = 200;
   const ADropdown = Dropdown;
   const AMenu = Menuu;
@@ -119,6 +125,7 @@
       AMenu,
       AMenuItem,
       AddProjectMebersModal,
+      ProjectDetailDrawer,
     },
     props: {
       item: {
@@ -138,7 +145,10 @@
       const formStore = useFormStore();
       const permissionStore = usePermissionStore();
       const userStore = useUserStore();
-
+      const {
+        setMenuSetting,
+      } = useMenuSetting();
+      const [registerDrawer, { openDrawer }] = useDrawer();
       const state = reactive({
         active: false,
         opened: false,
@@ -394,8 +404,9 @@
             };
             formStore.setNewMenu(params).then((res) => {
               createMessage.success(res);
-              permissionStore.buildRoutesAction();
               permissionStore.setLastBuildMenuTime();
+              permissionStore.buildRoutesAction();
+              setMenuSetting({ menuWidth: 0, mixSideFixed: false });
             });
           },
         });
@@ -463,9 +474,8 @@
             };
             permissionStore.setCopyMenuResult(copyParams).then((res) => {
               createMessage.success(res);
-              permissionStore.buildRoutesAction();
               permissionStore.setLastBuildMenuTime();
-              window.location.reload();
+              permissionStore.buildRoutesAction();
             });
           },
         });
@@ -480,8 +490,8 @@
         };
         formStore.setEditMenu(params).then((res) => {
           createMessage.success(res);
-          permissionStore.buildRoutesAction();
           permissionStore.setLastBuildMenuTime();
+          permissionStore.buildRoutesAction();
         });
         // createConfirm({
         //   iconType: 'warning',
@@ -585,8 +595,8 @@
             };
             formStore.setEditMenu(params).then((res) => {
               createMessage.success(res);
-              permissionStore.buildRoutesAction();
               permissionStore.setLastBuildMenuTime();
+              permissionStore.buildRoutesAction();
             });
           },
         });
@@ -630,7 +640,14 @@
       function dropHandler(event) {
         event.preventDefault();
         event.stopPropagation();
-        console.log(props.item, 'item');
+      }
+
+      // 设置有效期
+      function checkProjectDetail(item) {
+        setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+        formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
+          openDrawer(true, { id: id, menuName: item['title'] });
+        });
       }
 
       return {
@@ -658,6 +675,8 @@
         deleteMenu,
         registerModal,
         dropHandler,
+        registerDrawer,
+        checkProjectDetail,
         ...toRefs(state),
         ...toRefs(data),
       };

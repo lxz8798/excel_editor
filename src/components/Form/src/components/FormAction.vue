@@ -3,7 +3,8 @@
     <div style="width: 100%" :style="{ textAlign: actionColOpt.style.textAlign }">
       <FormItem>
         <slot name="resetBefore"></slot>
-        <Button
+        <!-- 这里是以前的保存，不需要了，万要solt里面在添加一个按钮 -->
+        <!--<Button
           type="default"
           class="mr-2"
           v-bind="getSaveBtnOptions"
@@ -11,7 +12,7 @@
           v-if="showSaveButton"
         >
           {{ getSaveBtnOptions.text }}
-        </Button>
+        </Button>-->
 
         <Button
           type="default"

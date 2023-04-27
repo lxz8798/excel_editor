@@ -391,8 +391,8 @@
             };
             formStore.setNewMenu(params).then((res) => {
               createMessage.success(res);
-              permissionStore.buildRoutesAction();
               permissionStore.setLastBuildMenuTime();
+              permissionStore.buildRoutesAction();
             });
           },
         });

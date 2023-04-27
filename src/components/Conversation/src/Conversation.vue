@@ -1,15 +1,15 @@
 <template>
-  <div class="conversation_wrap" :style="{ background: isDel ? '#ff0084a6' : '#eee' }">
+  <div class="conversation_wrap" :style="{ background: isDel ? '#fa9aa3a6' : '#eee' }">
     <div class="left">
       <div class="avatar"><img :src="avatarImg"></div>
-      <div class="name" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ nameText }}</div>
+      <div class="name" :style="{ color: isDel ? '#7d134aa6' : 'rgba(0, 0, 0, 0.85)' }">{{ nameText }}</div>
       <!--<div class="introductionText">{{ introductionText }}</div>-->
     </div>
     <div class="right" v-if="userMsg.content">
-      <div class="title" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgTitle }}</div>
-      <div class="content" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgContent }}</div>
-      <div class="sub" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgSub }}</div>
-      <div class="sub" :style="{ color: isDel ? 'white' : 'rgba(0, 0, 0, 0.85)' }">{{ msgCreateTime }}</div>
+      <div class="title" :style="{ color: isDel ? '#7d134aa6' : 'rgba(0, 0, 0, 0.85)' }">{{ msgTitle }}</div>
+      <div class="content" :style="{ color: isDel ? '#7d134aa6' : 'rgba(0, 0, 0, 0.85)' }">{{ msgContent }}</div>
+      <div class="sub" :style="{ color: isDel ? '#7d134aa6' : 'rgba(0, 0, 0, 0.85)' }">{{ msgSub }}</div>
+      <div class="sub" :style="{ color: isDel ? '#7d134aa6' : 'rgba(0, 0, 0, 0.85)' }">{{ msgCreateTime }}</div>
     </div>
   </div>
 </template>

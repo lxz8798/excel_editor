@@ -16,6 +16,8 @@ import {
   queryFormHistory,
   getProjectPath,
   generateSubMenu,
+  setTemplateTime,
+  copyTemplate,
 } from '/@/api/demo/form';
 import {
   getMenuChildren,
@@ -27,6 +29,7 @@ import {
   idTransform,
   menuIdTransformProjectId,
   menuSwapOrderNo,
+  menuIdToTemplateId,
 } from '/@/api/sys/menu';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { store } from '/@/store';
@@ -58,6 +61,7 @@ interface formState {
   afterTansformId: string;
   menuIdAfterTransformId: string;
   menuSwapOrderNoResult: string;
+  setTemplateTimeResult: string;
 }
 export const useFormStore = defineStore({
   id: 'app-form',
@@ -88,6 +92,7 @@ export const useFormStore = defineStore({
     afterTansformId: '',
     menuIdAfterTransformId: '',
     menuSwapOrderNoResult: '',
+    setTemplateTimeResult: '',
   }),
   getters: {
     getSwapOrderNo(): string {
@@ -168,6 +173,9 @@ export const useFormStore = defineStore({
     getDeleteMenu() {
       return this.deleteResult;
     },
+    getTemplateTime() {
+      return this.setTemplateTimeResult;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -184,6 +192,16 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setMenuIdToTemplateId(params) {
+      return await menuIdToTemplateId(params);
+    },
+    async setCopyTemplate(params) {
+      this.copyTemplateResult = await copyTemplate(params);
+      return this.copyTemplateResult;
+    },
+    async setTemplateTime(params) {
+      return await setTemplateTime(params);
     },
     async setSwapOrderNo(params) {
       this.menuSwapOrderNoResult = await menuSwapOrderNo(params);

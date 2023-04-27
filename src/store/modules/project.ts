@@ -52,3 +52,4 @@ export const useProjectStore = defineStore({
 export function useProjectStoreWithOut() {
   return useProjectStore(store);
 }
+

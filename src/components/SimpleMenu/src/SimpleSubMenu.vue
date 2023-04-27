@@ -128,8 +128,8 @@
         };
         // 发送请求获取菜单数据
         formStore.setSwapOrderNo(params).then((res) => {
-          permissionStore.buildRoutesAction();
           permissionStore.setLastBuildMenuTime();
+          permissionStore.buildRoutesAction();
           setMenuShowState();
           createMessage.success('修改成功!');
         });

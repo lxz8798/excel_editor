@@ -192,6 +192,10 @@
 </script>
 <style lang="less" scoped>
   .account-center {
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
     ::v-deep(.ant-row) {
       display: flex;
       justify-content: center;
@@ -271,6 +275,7 @@
     }
 
     &-bottom {
+      flex: 1;
       padding: 10px;
       margin: 0 16px 16px;
       background-color: @component-background;

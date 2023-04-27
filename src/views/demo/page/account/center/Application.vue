@@ -13,6 +13,8 @@
                     <a-menu-item @click="copyProject(item)">复制此项</a-menu-item>
                     <a-menu-item @click="invitationMember(item)">调整成员</a-menu-item>
                     <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
+                    <a-menu-item @click="projectApproval(item)" v-if="item['status'] === '0' && isAdmin">项目审批</a-menu-item>
+                    <a-menu-item @click="checkProjectDetail(item)">表单操作</a-menu-item>
                   </a-menu>
                 </template>
               </a-dropdown>
@@ -26,6 +28,7 @@
               <div :class="`${prefixCls}__card-num`">
                 参与人员：<span>{{ item.teams ?? '暂无' }}</span>
               </div>
+
               <div :class="`${prefixCls}__card-num`">
                 <span>完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue'  }">&nbsp;{{ item.day <= 0 ? '0' : item.day }}&nbsp;</span>天到期</span>
                 <!--<span>
@@ -41,10 +44,13 @@
   </List>
   <!--  添加成员  -->
   <AddProjectMebersModal @register="registerModal" />
+  <!-- 抽屉 -->
+  <ProjectDetailDrawer @register="registerDrawer" />
 </template>
 <script lang="ts">
-import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
+import { computed, defineComponent, h, reactive, ref, toRaw } from 'vue';
   import { List, Card, Row, Col, Input, Dropdown, Menu } from 'ant-design-vue';
+  import ProjectDetailDrawer from './ProjectDetailDrawer.vue';
   import AddProjectMebersModal from '/@/views/demo/system/project/AddTeamMebersModal.vue';
   import Icon from '/@/components/Icon/index';
   import { useGo } from '/@/hooks/web/usePage';
@@ -56,6 +62,9 @@ import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
   import { getProjectPath } from '/@/api/demo/form';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { usePermissionStore } from '/@/store/modules/permission';
+  import { useDrawer } from '/@/components/Drawer';
+  import { useProjectStore } from '/@/store/modules/project';
+  import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
 
   const ADropdown = Dropdown;
   const AMenu = Menu;
@@ -80,6 +89,7 @@ import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
       AddProjectMebersModal,
       [Row.name]: Row,
       [Col.name]: Col,
+      ProjectDetailDrawer,
     },
     emits: ['success', 'register'],
     setup(_, { emit }) {
@@ -88,8 +98,13 @@ import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
       const formStore = useFormStore();
       const userStore = useUserStore();
       const permissionStore = usePermissionStore();
+      const projectStore = useProjectStore();
+      const {
+        setMenuSetting,
+      } = useMenuSetting();
       const { createMessage, createConfirm } = useMessage();
       const [registerModal, { openModal }] = useModal();
+      const [registerDrawer, { openDrawer }] = useDrawer();
       const go = useGo();
       const state = reactive({
         formList: [],
@@ -248,6 +263,40 @@ import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
           },
         });
       }
+      // 设置有效期
+      function checkProjectDetail(item) {
+        setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+        openDrawer(true, item);
+      }
+      // 项目审核
+      function projectApproval(item) {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '项目审批'),
+          content: () => h('span', '是否同意立项？'),
+          cancelText: '拒绝',
+          okText: '同意',
+          closable: true,
+          maskClosable: true,
+          cancelButtonProps: { style: { background:'red', color: 'white' } },
+          onOk: () => {
+            state.formList<ProjectCarModel>.map((i) => {
+              if (i['id'] === item['id']) {
+                i['status'] == '1';
+              }
+            })
+            projectStore.setAuditStatus({ contractId: item['id'], status: '1' }).then((res) => createMessage.success(res))
+          },
+          onCancel: () => {
+            state.formList<ProjectCarModel>.map((i) => {
+              if (i['id'] === item['id']) {
+                i['status'] == '2';
+              }
+            })
+            projectStore.setAuditStatus({ contractId: item['id'], status: '2' }).then((res) => createMessage.warning(res))
+          }
+        });
+      }
       function Color() {
         let r, g, b;
         r = Math.floor(Math.random() * 255);
@@ -269,6 +318,7 @@ import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
                 teams: t['teamUsers'].map((i) => i['realName']).toString(),
                 icon: 'gg:loadbar-doc',
                 color: Color(),
+                status: t['status'],
                 day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),
                 // des: t.templateDesc,
                 // download: 'bx:bx-download',
@@ -301,9 +351,13 @@ import { computed, defineComponent, h, reactive, ref, toRaw } from "vue";
         copyProject,
         invitationMember,
         deleteMenu,
-        registerModal
+        checkProjectDetail,
+        projectApproval,
+        registerModal,
+        registerDrawer,
       };
     },
+
   });
 </script>
 <style lang="less">

@@ -24,6 +24,8 @@
           <!--<a-menu-item @click="transformProjectMenu(item)">转成项目</a-menu-item>-->
           <!--<a-menu-item @click="startWorking(item)">开始工作</a-menu-item>-->
           <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
+          <a-menu-item v-if="item['title'].includes('数据归一')">调用此项</a-menu-item>
+          <a-menu-item @click="projectApproval(item)" v-if="item['status'] == '0' && isAdmin">项目审批</a-menu-item>
         </a-menu>
       </template>
     </a-dropdown>
@@ -44,8 +46,10 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useFormStore } from '/@/store/modules/form';
   import { usePermissionStore } from '/@/store/modules/permission';
-import { useModal } from "/@/components/Modal";
+  import { useModal } from '/@/components/Modal';
   import { useUserStore } from '/@/store/modules/user';
+  import { useProjectStore } from '/@/store/modules/project';
+  import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
@@ -75,6 +79,10 @@ import { useModal } from "/@/components/Modal";
       const permissionStore = usePermissionStore();
       const formStore = useFormStore();
       const userStore = useUserStore();
+      const projectStore = useProjectStore();
+      const {
+        setMenuSetting,
+      } = useMenuSetting();
       const [registerModal, { openModal }] = useModal();
       const active = ref(false);
       const { getItemStyle, getParentList, getParentMenu, getParentRootMenu } =
@@ -175,8 +183,8 @@ import { useModal } from "/@/components/Modal";
             };
             formStore.setNewMenu(params).then((res) => {
               createMessage.success(res);
-              permissionStore.buildRoutesAction();
               permissionStore.setLastBuildMenuTime();
+              permissionStore.buildRoutesAction();
             });
           },
         });
@@ -210,8 +218,8 @@ import { useModal } from "/@/components/Modal";
             };
             formStore.setEditMenu(params).then((res) => {
               createMessage.success(res);
-              permissionStore.buildRoutesAction();
               permissionStore.setLastBuildMenuTime();
+              permissionStore.buildRoutesAction();
             });
           },
         });
@@ -226,8 +234,8 @@ import { useModal } from "/@/components/Modal";
         };
         formStore.setEditMenu(params).then((res) => {
           createMessage.success(res);
-          permissionStore.buildRoutesAction();
           permissionStore.setLastBuildMenuTime();
+          permissionStore.buildRoutesAction();
         });
         // createConfirm({
         //   iconType: 'warning',
@@ -270,8 +278,8 @@ import { useModal } from "/@/components/Modal";
         };
         formStore.setEditMenu(params).then((res) => {
           createMessage.success(res);
-          permissionStore.buildRoutesAction();
           permissionStore.setLastBuildMenuTime();
+          permissionStore.buildRoutesAction();
           startWorking(item);
         });
         // createConfirm({
@@ -319,15 +327,13 @@ import { useModal } from "/@/components/Modal";
           menuId: item.id,
         };
         formStore.setEditMenu(params).then((res) => {
-          startWorking(item);
-          // createMessage.success(res);
-          permissionStore.buildRoutesAction();
-          permissionStore.setLastBuildMenuTime();
           item['projectId'] = res;
-          openModal(true, {
-            isUpdate: false,
-            project: item,
-          });
+          startWorking(item);
+          // 创建成功但没审核的话先不弹窗
+          // openModal(true, {
+          //   isUpdate: false,
+          //   project: item,
+          // });
         });
       }
       // 开始工作
@@ -335,13 +341,16 @@ import { useModal } from "/@/components/Modal";
         const { id, name } = toRaw(item);
         const params = { menuId: id, menuName: name };
         formStore.setBasicSubMenu(params).then((res) => {
+          permissionStore.setLastBuildMenuTime();
+          permissionStore.buildRoutesAction();
           if (res) {
             createMessage.success('创建成功!');
-            permissionStore.buildRoutesAction();
-            permissionStore.setLastBuildMenuTime();
-            // window.location.reload();
+            openModal(true, {
+              isUpdate: false,
+              project: item,
+            });
           } else {
-            createMessage.error('创建失败，请检查后重试!');
+            createMessage.info('项目未审核，请联系管理员!');
           }
         });
       }
@@ -366,6 +375,31 @@ import { useModal } from "/@/components/Modal";
           },
         });
       }
+      // 项目审核
+      function projectApproval(item) {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '项目审批'),
+          content: () => h('span', '是否同意立项？'),
+          cancelText: '拒绝',
+          okText: '同意',
+          closable: true,
+          maskClosable: true,
+          cancelButtonProps: { style: { background:'red', color: 'white' } },
+          onOk: () => {
+            formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
+              projectStore.setAuditStatus({ contractId: id, status: '1' }).then((res) => createMessage.success(res));
+              setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+            });
+          },
+          onCancel: () => {
+            formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
+              projectStore.setAuditStatus({ contractId: id, status: '2' }).then((res) => createMessage.warning(res))
+              setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+            });
+          },
+        });
+      }
 
       return {
         getClass,
@@ -375,6 +409,7 @@ import { useModal } from "/@/components/Modal";
         handleClickItem,
         showTooptip,
         isNormal,
+        isAdmin,
         addMenu,
         editName,
         transformProjectMenu,
@@ -383,6 +418,7 @@ import { useModal } from "/@/components/Modal";
         startWorking,
         deleteMenu,
         registerModal,
+        projectApproval,
       };
     },
   });

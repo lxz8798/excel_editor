@@ -25,6 +25,11 @@ enum Api {
   QUERY_FORM_HISTORY = '/dymcRecord/pages',
   GET_PROJECT_PATH = '/examContract/getRoute',
   GENERATE_SUB_MENU = '/sysMenu/setChildBaseMenu',
+  SET_TEMPLATE_TIME = '/template/setTemplateTargetTime',
+  TEMPLATE_COPY = '/template/cpoyTemplateDataToProject',
+  SUBMIT_INCLUSION = '/template/confirmRebortVertical',
+  TEMP_SAVE = '/template/rollBackConfirm',
+
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -51,3 +56,7 @@ export const haveData = (params) => defHttp.get({ url: Api.HAVE_DATA, params });
 export const queryFormHistory = (params) => defHttp.get({ url: Api.QUERY_FORM_HISTORY, params });
 export const getProjectPath = (params) => defHttp.get({ url: Api.GET_PROJECT_PATH, params });
 export const generateSubMenu = (params) => defHttp.post({ url: Api.GENERATE_SUB_MENU, params });
+export const setTemplateTime = (params) => defHttp.post({ url: Api.SET_TEMPLATE_TIME, params });
+export const copyTemplate = (params) => defHttp.post({ url: Api.TEMPLATE_COPY, params });
+export const submitInclusion = (params) => defHttp.get({ url: Api.SUBMIT_INCLUSION, params });
+export const tempSave = (params) => defHttp.get({ url: Api.TEMP_SAVE, params });

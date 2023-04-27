@@ -12,7 +12,9 @@ enum Api {
   NROMAL_INVITE_USER = '/inviteUserProject',
   PROJECT_USER_LIST = '/user/projectUsers',
   REMOVE_PROJECT_MEMBERS = '/removeTeamUser',
-  CHANGE_AUDIT_STATUS = '/examContract/auditContract'
+  CHANGE_AUDIT_STATUS = '/examContract/auditContract',
+  GET_PROJECT_TEMPLATES = '/examContract/listTemplates',
+  GET_PROJECT__TREE_LIST = '/sysMenu/treeProjects',
 }
 
 export function addProject(params) {
@@ -35,6 +37,9 @@ export function getProjects() {
 }
 
 export function getOwnerProjectList(params: ProjectParamsModel) {
+  if (params['status']) {
+    params['status'] = params['status'].toString();
+  }
   return defHttp.get<ProjectParamsModel[]>(
     {
       url: Api.GET_OWNER_PROJECT_LIST,
@@ -106,6 +111,24 @@ export function changeAuditStatus(params) {
   return defHttp.post(
     {
       url: Api.CHANGE_AUDIT_STATUS,
+      params,
+    },
+    {},
+  );
+}
+export function getProjectTemplates(params) {
+  return defHttp.get(
+    {
+      url: Api.GET_PROJECT_TEMPLATES,
+      params,
+    },
+    {},
+  );
+}
+export function getProjectTreeList(params) {
+  return defHttp.get(
+    {
+      url: Api.GET_PROJECT__TREE_LIST,
       params,
     },
     {},
