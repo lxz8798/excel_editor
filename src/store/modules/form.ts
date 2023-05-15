@@ -18,6 +18,10 @@ import {
   generateSubMenu,
   setTemplateTime,
   copyTemplate,
+  formHandlerHisotry,
+  startCalculation,
+  formHandlerLog,
+  complateProject,
 } from '/@/api/demo/form';
 import {
   getMenuChildren,
@@ -62,6 +66,9 @@ interface formState {
   menuIdAfterTransformId: string;
   menuSwapOrderNoResult: string;
   setTemplateTimeResult: string;
+  formHandlerHistoryList: [];
+  formCalculationLogs: [];
+  projectComplateState: string;
 }
 export const useFormStore = defineStore({
   id: 'app-form',
@@ -93,6 +100,9 @@ export const useFormStore = defineStore({
     menuIdAfterTransformId: '',
     menuSwapOrderNoResult: '',
     setTemplateTimeResult: '',
+    formHandlerHistoryList: [],
+    formCalculationLogs: [],
+    projectComplateState: '',
   }),
   getters: {
     getSwapOrderNo(): string {
@@ -176,6 +186,15 @@ export const useFormStore = defineStore({
     getTemplateTime() {
       return this.setTemplateTimeResult;
     },
+    getFormHandlerHistoryList() {
+      return this.formHandlerHistoryList;
+    },
+    getFormCalculationLog() {
+      return this.formCalculationLogs;
+    },
+    getProjectComplateState() {
+      return this.projectComplateState;
+    },
   },
   actions: {
     setTempList(list: []) {
@@ -192,6 +211,20 @@ export const useFormStore = defineStore({
     },
     setDeleteTemplateRow(params) {
       return deleteTemplateRow(params);
+    },
+    async setProjectComplateState(params) {
+      return await complateProject(params);
+    },
+    async startCalculationHandler(params) {
+      return await startCalculation(params);
+    },
+    async setFormCalculationLog(params) {
+      this.formCalculationLogs = await formHandlerLog(params);
+      return this.formCalculationLogs;
+    },
+    async setFormHandlerHistoryList(params) {
+      this.formHandlerHistoryList = await formHandlerHisotry(params);
+      return this.formHandlerHistoryList;
     },
     async setMenuIdToTemplateId(params) {
       return await menuIdToTemplateId(params);

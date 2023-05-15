@@ -23,11 +23,12 @@
         </a-row>
       </a-col>
       <a-col :span="6" :class="`${prefixCls}-col`">
-        <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpan="false">
-          <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
-            <Icon :icon="team.icon" :color="team.color" />
-            <span :style="{ color: team.color }">{{ team.label }}</span>
+        <CollapseContainer :class="`${prefixCls}-top__team affiliation_wrap`" title="隶属" :canExpan="false">
+          <div v-for="(team, index) in affiliationProjects" :key="index" :class="`${prefixCls}-top__team-item`">
+            <!-- <Icon :icon="team.icon" :color="team.color" /> -->
+            <span :style="{ color: team.status == '3' ? 'red' : 'green' }">{{ team.name }}-{{team.status == '3' ? '项目已结束' : '正在进行中'}}</span>
           </div>
+          <a-pagination v-model:current="pages.topProjects.curr" :total="pages.topProjects.total" show-less-items @change="turnThePage" size="small" />
         </CollapseContainer>
       </a-col>
       <a-col :span="6" :class="`${prefixCls}-col`">
@@ -60,10 +61,17 @@
       </a-col>
     </a-row>
     <div :class="`${prefixCls}-bottom`">
+      <div class="handler_list_wrap">
+        <div>计算结果操作日志：</div>
+        <ul>
+          <li v-for="log in formCalculationLogs">生成：{{ log['contractName'] }}，结果：{{ log['dymcDesc'] }}，生成时间：{{ log['createTime'] }}，操作人：{{ !log['userId'] ? '自动生成' : log['userRealName'] }}</li>
+        </ul>
+        <a-pagination v-model:current="pages.logs.curr" :total="pages.logs.total" show-less-items @change="turnThePage" />
+      </div>
       <Tabs>
         <template v-for="item in achieveList" :key="item.key">
           <TabPane :tab="item.name">
-            <component :is="item.component" />
+            <component :is="item.component" @updateHistory="turnThePage(pages.logs.page, pages.logs.size)" />
           </TabPane>
         </template>
       </Tabs>
@@ -72,9 +80,9 @@
 </template>
 
 <script lang="ts">
-  import { Tag, Tabs, Row, Col } from 'ant-design-vue';
+  import { Tag, Tabs, Row, Col, Pagination } from 'ant-design-vue';
   import { useModalInner } from '/@/components/Modal';
-  import { defineComponent, computed, ref, h } from 'vue';
+  import { defineComponent, computed, ref, h, reactive, toRaw, toRefs } from 'vue';
   import { CollapseContainer } from '/@/components/Container/index';
   import Icon from '/@/components/Icon/index';
   import Article from './Article.vue';
@@ -86,6 +94,9 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useSkillsStore } from '/@/store/modules/skills';
   import { useTeamsStore } from '/@/store/modules/teams';
+  import { useFormStore } from '/@/store/modules/form';
+
+  const APagination = Pagination;
 
   export default defineComponent({
     components: {
@@ -97,6 +108,7 @@
       Article,
       Application,
       Project,
+      APagination,
       [Row.name]: Row,
       [Col.name]: Col,
     },
@@ -104,16 +116,49 @@
       const userStore = useUserStore();
       const skillsStore = useSkillsStore();
       const teamStore = useTeamsStore();
+      const formStore = useFormStore();
       const { createConfirm, createMessage } = useMessage();
+
+      let pages = reactive({
+        logs: {
+          page: 1,
+          size: 3,
+          curr: 1,
+          total: 0,
+        },
+        topProjects: {
+          page: 1,
+          size: 3,
+          curr: 1,
+          total: 0,
+        },
+      });
+      let state = reactive({
+        formCalculationLogs: [],
+      });
 
       // INIT
       const showDeleteIcon = ref(false);
       const addTagValue = ref('');
+      const affiliationProjects = ref([]);
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+      const userName = computed(() => userStore.getUserInfo['realName']);
+
       userStore.setUserTagsList({ userId: userStore.getUserInfo.userId });
-      userStore.setLogList({ page: 1, size: 9999, userId: userStore.getUserInfo.userId });
+      userStore.setLogList({ page: 1, size: 999, userId: userStore.getUserInfo.userId });
+      userStore.setUserProjectHistorys({ page: pages.topProjects.page, size: pages.topProjects.size }).then((res) => {
+          pages.topProjects.total = res['total'];
+          affiliationProjects.value = res['records'];
+          console.log(res, 'res111');
+        });
+
       skillsStore.setSkillsUserList();
       teamStore.setTeamsUserList();
+      formStore.setFormCalculationLog({ page: pages.logs.page, size: pages.logs.size }).then((res) => {
+          pages.logs.total = res.total;
+          pages.logs.curr = res.current;
+          state.formCalculationLogs = res['records'];
+        });
       // if (isAdmin.value) {
       //   teamStore.setTeamsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
       //   skillsStore.setSkillsUserList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId });
@@ -169,6 +214,17 @@
         });
       }
 
+      // 翻页操作
+      function turnThePage(page, pageSize) {
+        formStore.setFormCalculationLog({ page: page, size: pageSize }).then((res) => {
+          pages.logs.total = res.total;
+          pages.logs.curr = res.current;
+          state.formCalculationLogs.value.length = 0;
+          state.formCalculationLogs.value = [];
+          state.formCalculationLogs.value = res['records'];
+        });
+      }
+
       return {
         prefixCls: 'account-center',
         avatar,
@@ -178,10 +234,14 @@
         tagList,
         teams,
         skills,
+        affiliationProjects,
         details,
         achieveList,
         showDeleteIcon,
         addTagValue,
+        pages,
+        ...toRefs(state),
+        turnThePage,
         addUserTagHandler,
         correctAddTagHandler,
         deleteTagHandler,
@@ -228,6 +288,17 @@
 
       &:not(:last-child) {
         border-right: 1px dashed rgb(206 206 206 / 50%);
+      }
+    }
+
+    &-col {
+      .affiliation_wrap {
+        ::v-deep(.p-2) {
+          .vben-collapse-container__body {
+            display: flex;
+            flex-direction: column;
+          }
+        }
       }
     }
 
@@ -280,6 +351,11 @@
       margin: 0 16px 16px;
       background-color: @component-background;
       border-radius: 3px;
+      .handler_list_wrap {
+        .ant-pagination {
+          margin-left: auto;
+        }
+      }
     }
   }
 </style>

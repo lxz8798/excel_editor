@@ -362,16 +362,25 @@
           content: () => h('span', '是否确认删除？'),
           onOk: () => {
             const params = {
-              menuId: item.id
-            }
-            formStore.setJudgResult(params).then((judge) => {
+              menuId: item.id,
+            };
+            formStore.setProjectMembersInfo({ menuId: item.id }).then((res) => {
+              const { leaderUser, teamUsers } = res;
+              item['leaderId'] = leaderUser['id'];
+              item['teamUsers'] = teamUsers;
+              if (!leaderUser || !teamUsers || !isAdmin) {
+                createMessage.info('当前菜单没有权限或者不是项目成员!');
+                return;
+              }
+              formStore.setJudgResult(params).then((judge) => {
               formStore.setDeleteMenu(params).then((res) => {
                 createMessage.success(res);
                 permissionStore.buildRoutesAction();
                 permissionStore.setLastBuildMenuTime();
                 window.location.reload();
               });
-            })
+            });
+            });
           },
         });
       }

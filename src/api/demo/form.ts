@@ -29,7 +29,10 @@ enum Api {
   TEMPLATE_COPY = '/template/cpoyTemplateDataToProject',
   SUBMIT_INCLUSION = '/template/confirmRebortVertical',
   TEMP_SAVE = '/template/rollBackConfirm',
-
+  FORM_HANDLER_HISTORY = '/examContract/listTemplatesRecord',
+  START_CALCULATION = '/resultLog/mainResultHandler',
+  FORM_HANDLER_LOG = '/resultLog/page',
+  SUBMIT_PROJECT_COMPLATE = '/examContract/setContractStatus',
 }
 
 export const getFromTemplateList = (params?) => defHttp.get({ url: Api.GET_FROM_LIST, params });
@@ -60,3 +63,7 @@ export const setTemplateTime = (params) => defHttp.post({ url: Api.SET_TEMPLATE_
 export const copyTemplate = (params) => defHttp.post({ url: Api.TEMPLATE_COPY, params });
 export const submitInclusion = (params) => defHttp.get({ url: Api.SUBMIT_INCLUSION, params });
 export const tempSave = (params) => defHttp.get({ url: Api.TEMP_SAVE, params });
+export const formHandlerHisotry = (params) => defHttp.get({ url: Api.FORM_HANDLER_HISTORY, params });
+export const startCalculation = (params) => defHttp.get({ url: Api.START_CALCULATION, params });
+export const formHandlerLog = (params) => defHttp.get({ url: Api.FORM_HANDLER_LOG, params });
+export const complateProject = (params) => defHttp.post({ url: Api.SUBMIT_PROJECT_COMPLATE, params });

@@ -16,7 +16,7 @@
         <span class="text-2xl">8</span>
       </div>
       <div class="flex flex-col justify-center text-right md:mr-10 mr-4">
-        <span class="text-secondary"> 团队 </span>
+        <span class="text-secondary"> 隶属团队 </span>
         <span class="text-2xl">300</span>
       </div>
     </div>

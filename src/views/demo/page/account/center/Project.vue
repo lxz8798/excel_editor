@@ -4,38 +4,62 @@
       <template v-for="item in list" :key="item.title">
         <a-col :span="6">
           <ListItem>
-            <Card :hoverable="true" :class="`${prefixCls}__card`">
-              <a-dropdown :trigger="['contextmenu']">
-                <div class="drop_box"></div>
-                <template #overlay>
-                  <a-menu>
-                    <a-menu-item @click="editName(item)">修改名称</a-menu-item>
-                    <a-menu-item @click="copyProject(item)">复制此项</a-menu-item>
-                    <a-menu-item @click="invitationMember(item)">调整成员</a-menu-item>
-                    <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
-                    <a-menu-item @click="projectApproval(item)" v-if="item['status'] == '0' && isAdmin">项目审批</a-menu-item>
-                    <a-menu-item @click="checkProjectDetail(item)">表单操作</a-menu-item>
-                  </a-menu>
-                </template>
-              </a-dropdown>
-              <div :class="`${prefixCls}__card-title`">
-                <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
-                <span :style="{ color: item.color }">{{ item.title }}</span>
-              </div>
-              <div :class="`${prefixCls}__card-num`">
-                项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
-              </div>
-              <div :class="`${prefixCls}__card-num`">
-                参与人员：<span>{{ item.teams ?? '暂无' }}</span>
-              </div>
-              <div :class="`${prefixCls}__card-num`">
-                <!-- 0-待审核 1-审核通过 2-审核不通过 -->
-                审批状态：<span :style="{ color: item.status == '0' ? 'blue' : item.status == '1' ? 'green' : 'red' }">{{ item.status == '0' ? '待审核' : item.status == '1' ? '审批通过' : '审核不通过' }}</span>
-              </div>
+            <!-- 鼠标经过 -->
+            <a-popover placement="top" overlayClassName="center_popover_wrap" :mouseEnterDelay="0.5">
+              <template #content>
+                <ul>
+                  <li v-for="history in formHistoryList">
+                    <p>
+                      <b>{{ titleHandler(history.templateName) }}</b>
+                    </p>
+                    <ul>
+                      <li v-for="content in history['records']">
+                        <p>
+                          <span style="color: #78aadf">【{{content['formName']}}】</span><span style="color: green">{{content['createTime']}}</span>，<span class="click_item" @click="enterPath(content, history)">修改了{{content['content']}}</span>
+                        </p>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </template>
+              <template #title>
+                <span>更新内容</span>
+              </template>
+              <Card :hoverable="true" :class="`${prefixCls}__card`" @mouseover="formHandlerHistoryList(item)" @click="enterAllPath(item)">
+                <a-dropdown :trigger="['contextmenu']">
+                  <div class="drop_box"></div>
+                  <template #overlay>
+                    <a-menu>
+                      <a-menu-item @click="editName(item)">修改名称</a-menu-item>
+                      <a-menu-item @click="copyProject(item)">复制此项</a-menu-item>
+                      <a-menu-item @click="invitationMember(item)">调整成员</a-menu-item>
+                      <a-menu-item @click="startCalculation(item)">开始计算</a-menu-item>
+                      <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
+                      <a-menu-item @click="projectApproval(item)" v-if="item['status'] == '0' && isAdmin">项目审批</a-menu-item>
+                      <a-menu-item @click="closeProject(item)">结束项目</a-menu-item>
+                      <a-menu-item @click="checkProjectDetail(item)">表单操作</a-menu-item>
+                    </a-menu>
+                  </template>
+                </a-dropdown>
+                <div :class="`${prefixCls}__card-title`">
+                  <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
+                  <span :style="{ color: item.color }">{{ item.title }}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  参与人员：<span>{{ item.teams ?? '暂无' }}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  <!-- 0-待审核 1-审核通过 2-审核不通过 -->
+                  审批状态：<span :style="{ color: item.status == '0' ? 'blue' : item.status == '3' ? 'red' : 'green' }">{{ item.status == '0' ? '待审核' : item.status == '1' ? '审批通过' : item.status == '2' ? '审核不通过' : '项目已结束' }}</span>
+                </div>
               <!--<div :class="`${prefixCls}__card-num`">
                 <span>总体完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue'  }">&nbsp;{{ item.day <= 0 ? '0' : item.day }}&nbsp;</span>天到期</span>
               </div>-->
             </Card>
+            </a-popover>
           </ListItem>
         </a-col>
       </template>
@@ -47,8 +71,8 @@
   <ProjectDetailDrawer @register="registerDrawer" />
 </template>
 <script lang="ts">
-import { computed, defineComponent, h, reactive, ref, toRefs } from 'vue';
-import { List, Card, Row, Col, Input, Dropdown, Menu } from 'ant-design-vue';
+import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue";
+import { List, Card, Row, Col, Input, Popover ,Dropdown, Menu } from 'ant-design-vue';
 import ProjectDetailDrawer from './ProjectDetailDrawer.vue';
 import AddProjectMebersModal from '/@/views/demo/system/project/AddTeamMebersModal.vue';
 import Icon from '/@/components/Icon/index';
@@ -64,10 +88,11 @@ import { usePermissionStore } from '/@/store/modules/permission';
 import { useDrawer } from '/@/components/Drawer';
 import { useProjectStore } from '/@/store/modules/project';
 import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
-
+import { useRouter } from 'vue-router'
 const ADropdown = Dropdown;
 const AMenu = Menu;
 const AMenuItem = Menu.Item;
+const APopover = Popover;
 
 interface ProjectCarModel {
   id?: number | string;
@@ -85,12 +110,13 @@ export default defineComponent({
     ADropdown,
     AMenu,
     AMenuItem,
+    APopover,
     AddProjectMebersModal,
     [Row.name]: Row,
     [Col.name]: Col,
     ProjectDetailDrawer,
   },
-  emits: ['success', 'register'],
+  emits: ['success', 'register', 'updateHistory'],
   setup(_, { emit }) {
     const { apiUrl } = useGlobSetting();
     // 使用表单
@@ -105,10 +131,13 @@ export default defineComponent({
     const [registerModal, { openModal }] = useModal();
     const [registerDrawer, { openDrawer }] = useDrawer();
     const go = useGo();
+    const router = useRouter();
     const state = reactive({
       formList: [],
+      formHistoryList: [],
+      calculationLoading: false,
     });
-    const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
+    const isAdmin = computed(() => toRaw(userStore.getUserInfo['roles']).some((i) => i['roleCode'] === 'super_admin'));
     // 修改名称
     function editName(item) {
       const inputValue = ref(item.title);
@@ -210,18 +239,20 @@ export default defineComponent({
             const { leaderUser, teamUsers } = res;
             item['leaderId'] = leaderUser['id'];
             item['teamUsers'] = teamUsers;
+
             if (!leaderUser || !teamUsers) {
               createMessage.info('当前菜单没有权限或者不是项目成员!');
               return;
             }
-            if (leaderUser['id'] === userStore.getUserInfo.userId) {
+
+            if (leaderUser['id'] === userStore.getUserInfo.userId || isAdmin.value) {
               openModal(true, {
                 isUpdate: false,
                 project: item,
               });
             } else {
-              createMessage.info('不是项目长不可对项目进行调整!');
-              if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId)) {
+              // createMessage.info('不是项目成员不能调整!');
+              if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId || isAdmin.value)) {
                 openModal(true, {
                   isUpdate: false,
                   project: item,
@@ -234,6 +265,15 @@ export default defineComponent({
         })
       }
     }
+    // 开始计算
+    function startCalculation(item) {
+      formStore.startCalculationHandler({ contractId: item['id'] }).then((res) => {
+        if (res) {
+          createMessage.success('计算成功');
+          emit('updateHistory');
+        }
+      })
+    }
     // 删除菜单
     function deleteMenu(item) {
       createConfirm({
@@ -241,15 +281,20 @@ export default defineComponent({
         title: () => h('span', '删除有风险!'),
         content: () => h('span', '是否确认删除？'),
         onOk: () => {
-          formStore.setTransformId({ contractId: item['id'] }).then((id) => {
-            if (!id) {
-              createMessage('该项目可能没有设置项目长或者没有权限!');
-              return;
+          formStore.setProjectMembersInfo({ menuId: item.id }).then((res) => {
+            const { leaderUser, teamUsers } = res;
+            if (leaderUser || teamUsers) {
+              item['leaderId'] = leaderUser['id'];
+              item['teamUsers'] = teamUsers;
+              if (!leaderUser || !teamUsers || !isAdmin) {
+                createMessage.info('当前菜单没有权限或者不是项目成员!');
+                return;
+              }
             }
+            formStore.setTransformId({ contractId: item['id'] }).then((id) => {
             const params = {
               menuId: id
             }
-            // const _filter = JSON.parse(JSON.stringify(state.formList.filter((i) => i['id'] !== item['id'])));
             formStore.setDeleteMenu(params).then((res) => {
               createMessage.success(res);
               permissionStore.setLastBuildMenuTime();
@@ -260,6 +305,7 @@ export default defineComponent({
                 state.formList.splice(index, 1);
               }
             });
+          })
           })
         },
       });
@@ -286,7 +332,10 @@ export default defineComponent({
               i['status'] == '1';
             }
           })
-          projectStore.setAuditStatus({ contractId: item['id'], status: '1' }).then((res) => createMessage.success(res))
+          projectStore.setAuditStatus({ contractId: item['id'], status: '1' }).then((res) => {
+            createMessage.success(res);
+            window.location.reload();
+          })
         },
         onCancel: () => {
           state.formList<ProjectCarModel>.map((i) => {
@@ -297,6 +346,14 @@ export default defineComponent({
           projectStore.setAuditStatus({ contractId: item['id'], status: '2' }).then((res) => createMessage.warning(res))
         }
       });
+    }
+
+    // 结束项目
+    function closeProject(item) {
+      const { id } = item;
+      formStore.setProjectComplateState({ contractId: id, status: 3 }).then((res) => {
+        if (res) createMessage.success('项目已结束!')
+      })
     }
 
     function Color() {
@@ -319,6 +376,7 @@ export default defineComponent({
               leaderName: t['leaderName'],
               teams: t['teamUsers'].map((i) => i['realName']).toString(),
               icon: 'gg:loadbar-doc',
+              // closePopFlag: false,
               color: Color(),
               status: t['status'],
               confirmFlag: t['confirmFlag'],
@@ -346,7 +404,54 @@ export default defineComponent({
       a.click(); //触发下载
       document.body.removeChild(a);
     }
+
+    // 表单操作历史
+    function formHandlerHistoryList(item) {
+      const { id } = item;
+      formStore.setFormHandlerHistoryList({ contractId: id }).then((res) => {
+        if (state.formHistoryList.length) {
+          state.formHistoryList.length = 0;
+          state.formHistoryList = [];
+        }
+        state.formHistoryList = res
+      });
+    }
+
+    // 处理调标题包含的-
+    function titleHandler(title) {
+      if (!title) return;
+      if (title.includes('-')) {
+        return title.split('-')[title.split('-').length - 1];
+      } else {
+        return title;
+      }
+    }
+
+    // 快速访问
+    function enterPath(item, his) {
+      getProjectPath({ templateId: item['templateId'] }).then((res) => {
+        // go(res + `?confirm=${item['confirmFlag']}`)
+        router.push({
+          path: res,
+          query: {
+            confirm: item['confirmFlag'],
+          },
+          state: item
+        })
+      });
+    }
+
+    // 进入所有的表单
+    function enterAllPath() {
+      state.formHistoryList.forEach((i) => {
+        if (i['records'].length) {
+          // i['records'].map((item) => Object.assign(item, { confirmFlag: i['confirmFlag'] }))
+          enterPath(i['records'][0], { confirmFlag: i['confirmFlag'] });
+        }
+      })
+    }
     return {
+      ...toRefs(state),
       downloadExcel,
       enterProject,
       prefixCls: 'account-center-application',
@@ -355,16 +460,25 @@ export default defineComponent({
       editName,
       copyProject,
       invitationMember,
+      startCalculation,
       deleteMenu,
       checkProjectDetail,
       projectApproval,
+      closeProject,
       registerModal,
       registerDrawer,
+      formHandlerHistoryList,
+      titleHandler,
+      enterPath,
+      enterAllPath,
     };
   },
 });
 </script>
 <style lang="less">
+.demo-loadmore-list {
+  min-height: 350px;
+}
 .ant-list {
   .ant-spin-container {
     .ant-row {
@@ -435,6 +549,22 @@ export default defineComponent({
       float: right;
       font-size: 20px !important;
       color: @primary-color;
+    }
+  }
+}
+.center_popover_wrap {
+  .ant-popover-inner-content {
+    max-height: 460px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .click_item {
+    cursor: pointer;
+    color: #aaa;
+    transition: .3s;
+    &:hover {
+      color: #000;
     }
   }
 }

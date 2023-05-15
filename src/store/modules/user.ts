@@ -18,6 +18,7 @@ import {
   addUserTag,
   deleteUserTag,
   getLogList,
+  getUserProjectHistory,
 } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -52,6 +53,7 @@ interface UserState {
   projectTreeList: [];
   teamList: [];
   logList: [];
+  userProjectHistory: [];
 }
 
 export const useUserStore = defineStore({
@@ -77,6 +79,7 @@ export const useUserStore = defineStore({
     projectTreeList: [],
     teamList: [],
     logList: [],
+    userProjectHistory: [],
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -126,6 +129,9 @@ export const useUserStore = defineStore({
     },
     getLogList(type: string | number) {
       return this.logList;
+    },
+    getUserProjectHistorys(type: string | number) {
+      return this.userProjectHistory;
     },
   },
   actions: {
@@ -307,6 +313,10 @@ export const useUserStore = defineStore({
     // 删除项目
     async delProjectItem(params) {
       // return await delTeam(params);
+    },
+    async setUserProjectHistorys(params) {
+      this.userProjectHistory = await getUserProjectHistory(params);
+      return this.userProjectHistory;
     },
     /**
      * @description: Confirm before logging out

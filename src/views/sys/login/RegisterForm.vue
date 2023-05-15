@@ -7,7 +7,6 @@
         <p>1. 拥有创建项目,团队,技术,专业技能等功能;</p>
         <p>2. 可以对项目,团队,技术,专业技能,表单进行编辑;</p>
         <p>3. 可以在项目邀请成员,设置项目到期的天数指标等;</p>
-        <b>注册时需要选择角色,【普通用户】的权限：</b>
         <p>1. 只拥有访问权限,被激活邀请后才拥有编辑功能;</p>
       </section>
       <section style="margin-left: 10px;">
@@ -27,6 +26,7 @@
           :token-separators="[',']"
           :placeholder="t('sys.login.team')"
           :options="roleOptions"
+          disabled
           style="width: 120px"
         />
         <Input
@@ -249,16 +249,16 @@
   async function handleRegister() {
     const data = await validForm();
     data['roleId'] = formData.roleId;
-      if (typeof toRaw(state['teamValue']) === 'string') {
-        data['teamName'] = [{label: toRaw(state['teamValue'])}];
-      } else {
-        data['teamName'] = toRaw(state['teamValue']);
-      }
-      if (typeof toRaw(state['skillValue']) === 'string') {
-        data['skills'] = [{label: toRaw(state['skillValue'])}];
-      } else {
-        data['skills'] = toRaw(state['skillValue']);
-      }
+    if (typeof toRaw(state['teamValue']) === 'string') {
+      data['teamName'] = [{label: toRaw(state['teamValue'])}];
+    } else {
+      data['teamName'] = toRaw(state['teamValue']);
+    }
+    if (typeof toRaw(state['skillValue']) === 'string') {
+      data['skills'] = [{label: toRaw(state['skillValue'])}];
+    } else {
+      data['skills'] = toRaw(state['skillValue']);
+    }
     const { account, phone, password, policy, realName, sms } = data;
     formData.account = account;
     formData.teamName = state.teamValue;

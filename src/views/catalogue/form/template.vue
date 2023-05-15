@@ -88,8 +88,8 @@
             style="margin-top: 25px"
           >
             <template #advanceAfter>
-              <a-button type="primary" style="margin-right: 8px; background: #4fb818; border: #4fb818" @click="submitInclusionHandler" v-if="isLeader || isAdmin">{{currentRoute.query['confirm'] === '0' ? '提交入库' : '临时保存'}}</a-button>
-              <a-button type="primary" danger @click="clearFormDatas">清空数据</a-button>
+              <a-button type="primary" style="margin-right: 8px; background: #4fb818; border: #4fb818" @click="submitInclusionHandler" v-if="isLeader || isAdmin">{{currentRoute.query['confirm'] === '0' ? '提交入库' : '切换成缓存状态'}}</a-button>
+              <a-button type="primary" danger @click="clearFormDatas" v-if="!currTempDetail['name'].includes('计算结果')">清空数据</a-button>
             </template>
           </BasicForm>
         </div>
@@ -121,6 +121,7 @@
     toRaw,
     watchEffect,
     watch,
+    onMounted,
     h,
   } from 'vue';
   import { BasicForm, FormSchema, ApiSelect, useForm } from '/@/components/Form/index';
@@ -538,26 +539,40 @@
           return;
         }
         formStore.setFormDataState({ templateId: currentRoute.value.meta.templateId }).then((res) => {
-            if (!res) {
-              createMessage.info('为统一格式，至少需要上传一个空数据的EXCEL模板才能继续!');
-              console.log('删除成功');
-              return;
-            } else {
-              mergeForm.value.map((i) => {
-                i.inputs.push({
-                  type: 'input',
-                  value: '',
-                });
-                return i;
+            mergeForm.value.map((i) => {
+              i.inputs.push({
+                type: 'input',
+                value: '',
               });
-              state.basicFormHeader[0].inputs[state.no].value = state.no++;
-              formStore.saveForm(mergeForm.value.slice(1, 5)).then(() =>
-                fillForm({
-                  id: currentRoute.value.meta.templateId,
-                  name: currentRoute.value.meta.title,
-                }),
-              );
-            }
+              return i;
+            });
+            state.basicFormHeader[0].inputs[state.no].value = state.no++;
+            formStore.saveForm(mergeForm.value.slice(1, 5)).then(() =>
+              fillForm({
+                id: currentRoute.value.meta.templateId,
+                name: currentRoute.value.meta.title,
+              }),
+            );
+            // if (!res) {
+            //   createMessage.info('为统一格式，至少需要上传一个空数据的EXCEL模板才能继续!');
+            //   console.log('删除成功');
+            //   return;
+            // } else {
+            //   mergeForm.value.map((i) => {
+            //     i.inputs.push({
+            //       type: 'input',
+            //       value: '',
+            //     });
+            //     return i;
+            //   });
+            //   state.basicFormHeader[0].inputs[state.no].value = state.no++;
+            //   formStore.saveForm(mergeForm.value.slice(1, 5)).then(() =>
+            //     fillForm({
+            //       id: currentRoute.value.meta.templateId,
+            //       name: currentRoute.value.meta.title,
+            //     }),
+            //   );
+            // }
           });
       }
       const n = ref(1);
@@ -676,6 +691,7 @@
                 id: currentRoute.value.meta.templateId,
                 name: currentRoute.value.meta.title,
               });
+              window.location.reload();
             });
           },
         });
@@ -687,12 +703,14 @@
         const { path } = currentRoute.value;
         if (currentRoute.value.query.confirm === '0') {
           submitInclusion({ templateId: currentRoute.value.meta.templateId });
-          replace(path + `?confirm=0`);
+          replace(path + `?confirm=1`);
         } else {
           tempSave({ templateId: currentRoute.value.meta.templateId });
-          replace(path + `?confirm=1`);
+          replace(path + `?confirm=0`);
         }
       }
+
+      console.log(history, 'route');
       // onMounted(() => {
       //   fillForm();
       // });

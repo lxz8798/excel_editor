@@ -171,7 +171,10 @@
             };
             formStore.setTemplateTime(params).then((msg) => {
               userStore.setProjectTemplates({ contractId: state.datas['id'] }).then((res) => {
-                if (res.length) state.templates = flattenByDFS(res[0]['children']);
+                if (res.length) {
+                  state.templates = flattenByDFS(res[0]['children']);
+                  window.location.href();
+                }
               });
             });
           },
@@ -179,7 +182,17 @@
       }
 
       function enterPath(item) {
-        getProjectPath({ templateId: item['templateId'] }).then((res) => go(res + `?confirm=${item['confirmFlag']}`));
+        item['confirmFlag'] = !item['confirmFlag'] ? '0' : item['confirmFlag'];
+        getProjectPath({ templateId: item['templateId'] }).then((res) => {
+          // go(res + `?confirm=${item['confirmFlag']}`)
+          router.push({
+            path: res,
+            query: {
+              confirm: item['confirmFlag'],
+            },
+            state: item,
+          });
+        });
       }
 
       const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {

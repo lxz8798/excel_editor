@@ -19,6 +19,7 @@ enum Api {
   GET_ROLE_LIST = '/roleList',
   SET_ACTIVE_USER = '/activeProjectUser',
   GET_LOG_LIST = '/operationLog/page',
+  GET_USER_ALL_PROJECTS = '/examContract/listJoin',
 }
 
 /**
@@ -101,4 +102,8 @@ export function getRoles() {
 
 export function getLogList() {
   return defHttp.get({ url: Api.GET_LOG_LIST });
+}
+
+export function getUserProjectHistory(params) {
+  return defHttp.get({ url: Api.GET_USER_ALL_PROJECTS, params });
 }

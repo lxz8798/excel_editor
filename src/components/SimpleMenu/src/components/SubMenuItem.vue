@@ -15,7 +15,10 @@
               <a-menu-item @click="invitationMember(item)">调整成员</a-menu-item>
               <!--<a-menu-item @click="transformProjectMenu(item)">关联项目</a-menu-item>-->
               <!--<a-menu-item @click="startWorking(item)">开始工作</a-menu-item>-->
+              <a-menu-item @click="startCalculation(item)">开始计算</a-menu-item>
               <a-menu-item @click="deleteMenu(item)">删除此项</a-menu-item>
+              <a-menu-item @click="projectApproval(item)" v-if="item['status'] == '0' && isAdmin">项目审批</a-menu-item>
+              <a-menu-item @click="closeProject(item)">结束项目</a-menu-item>
               <a-menu-item v-if="item['meta']['type'] == '1'" @click="checkProjectDetail(item)">表单操作</a-menu-item>
             </a-menu>
           </template>
@@ -111,10 +114,20 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useDrawer } from '/@/components/Drawer';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
+  import { useProjectStore } from "/@/store/modules/project";
   const DELAY = 200;
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
+
+  interface ProjectCarModel {
+    id?: number | string;
+    title: string;
+    icon?: string;
+    color?: Function | string;
+    day: string;
+  }
+
   export default defineComponent({
     name: 'SubMenu',
     components: {
@@ -145,6 +158,7 @@
       const formStore = useFormStore();
       const permissionStore = usePermissionStore();
       const userStore = useUserStore();
+      const projectStore = useProjectStore();
       const {
         setMenuSetting,
       } = useMenuSetting();
@@ -152,6 +166,7 @@
       const state = reactive({
         active: false,
         opened: false,
+        formList: [],
       });
 
       const data = reactive({
@@ -542,18 +557,20 @@
               const { leaderUser, teamUsers } = res;
               item['leaderId'] = leaderUser['id'];
               item['teamUsers'] = teamUsers;
-              if (!leaderUser || !teamUsers) {
+
+              if (!leaderUser || !teamUsers || !isAdmin) {
                 createMessage.info('当前菜单没有权限或者不是项目成员!');
                 return;
               }
-              if (leaderUser['id'] === userStore.getUserInfo.userId) {
+
+              if (leaderUser['id'] === userStore.getUserInfo.userId || isAdmin.value) {
                 openModal(true, {
                   isUpdate: false,
                   project: item,
                 });
               } else {
-                createMessage.info('不是项目长不可对项目进行调整!');
-                if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId)) {
+                createMessage.info('不是项目成员不可对项目调整!');
+                if (teamUsers.some((i) => i.id === userStore.getUserInfo.userId || isAdmin.value)) {
                   openModal(true, {
                     isUpdate: false,
                     project: item,
@@ -616,6 +633,18 @@
           }
         });
       }
+
+      // 开始计算
+      function startCalculation(item) {
+        formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
+          formStore.startCalculationHandler({ contractId: id }).then((res) => {
+            if (res) {
+              createMessage.success('计算成功');
+              window.location.reload();
+            }
+          })
+        })
+      }
       // 删除菜单
       function deleteMenu(item) {
         createConfirm({
@@ -624,16 +653,27 @@
           content: () => h('span', '是否确认删除？'),
           onOk: () => {
             const params = {
-              menuId: item.id
-            }
-            formStore.setJudgResult(params).then((judge) => {
-              formStore.setDeleteMenu(params).then((res) => {
-                createMessage.success(res);
-                permissionStore.buildRoutesAction();
-                permissionStore.setLastBuildMenuTime();
-                window.location.reload();
+              menuId: item.id,
+            };
+            formStore.setProjectMembersInfo({ menuId: item.id }).then((res) => {
+              const { leaderUser, teamUsers } = res;
+              if (leaderUser || teamUsers) {
+                item['leaderId'] = leaderUser['id'];
+                item['teamUsers'] = teamUsers;
+                if (!leaderUser || !teamUsers || !isAdmin) {
+                  createMessage.info('当前菜单没有权限或者不是项目成员!');
+                  return;
+                }
+              }
+              formStore.setJudgResult(params).then((judge) => {
+                formStore.setDeleteMenu(params).then((res) => {
+                  createMessage.success(res);
+                  permissionStore.buildRoutesAction();
+                  permissionStore.setLastBuildMenuTime();
+                  window.location.reload();
+                });
               });
-            })
+            });
           },
         });
       }
@@ -648,6 +688,48 @@
         formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
           openDrawer(true, { id: id, menuName: item['title'] });
         });
+      }
+
+      // 项目审核
+      function projectApproval(item) {
+        createConfirm({
+          iconType: 'warning',
+          title: () => h('span', '项目审批'),
+          content: () => h('span', '是否同意立项？'),
+          cancelText: '拒绝',
+          okText: '同意',
+          closable: true,
+          maskClosable: true,
+          cancelButtonProps: { style: { background:'red', color: 'white' } },
+          onOk: () => {
+            state.formList<ProjectCarModel>.map((i) => {
+              if (i['id'] === item['id']) {
+                i['status'] == '1';
+              }
+            })
+            projectStore.setAuditStatus({ contractId: item['id'], status: '1' }).then((res) => {
+              createMessage.success(res);
+              window.location.reload();
+            })
+          },
+          onCancel: () => {
+            state.formList<ProjectCarModel>.map((i) => {
+              if (i['id'] === item['id']) {
+                i['status'] == '2';
+              }
+            })
+            projectStore.setAuditStatus({ contractId: item['id'], status: '2' }).then((res) => createMessage.warning(res))
+          }
+        });
+      }
+
+      // 结束项目
+      function closeProject(item) {
+        formStore.setMenuIdTransformId({ menuId: item['id'] }).then((id) => {
+          formStore.setProjectComplateState({ contractId: id, status: 3 }).then((res) => {
+            if (res) createMessage.success('项目已结束!')
+          })
+        })
       }
 
       return {
@@ -672,11 +754,15 @@
         transformThchnologyMenu,
         invitationMember,
         startWorking,
+        startCalculation,
         deleteMenu,
         registerModal,
         dropHandler,
         registerDrawer,
         checkProjectDetail,
+        projectApproval,
+        closeProject,
+        isAdmin,
         ...toRefs(state),
         ...toRefs(data),
       };
