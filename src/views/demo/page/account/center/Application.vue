@@ -224,6 +224,7 @@ import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue"
         item['projectId'] = 0;
         item['leaderId'] = 0;
         if (isAdmin.value) {
+          item['projectId'] = item['id'];
           openModal(true, {
             isUpdate: false,
             project: item,

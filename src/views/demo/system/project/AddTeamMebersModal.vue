@@ -82,6 +82,7 @@
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         // resetFields();
         setModalProps({ confirmLoading: false });
+        console.log(data , 'data111');
         rowId.value = data.project['from'] === 'project' ? data.project['id'] : data.project['projectId'];
         leaderId.value = data.project['leaderId'];
         projectAdminId.value = data.project['leaderName'];

@@ -223,7 +223,9 @@ export default defineComponent({
       item['teamUsers'] = [];
       item['projectId'] = 0;
       item['leaderId'] = 0;
+      console.log(item, '111');
       if (isAdmin.value) {
+        item['projectId'] = item['id'];
         openModal(true, {
           isUpdate: false,
           project: item,
