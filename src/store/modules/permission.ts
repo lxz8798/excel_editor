@@ -1,6 +1,5 @@
 import type { AppRouteRecordRaw, Menu } from '/@/router/types';
 import { LAYOUT } from '/@/router/constant';
-
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
 import { useI18n } from '/@/hooks/web/useI18n';
@@ -20,12 +19,12 @@ import { ERROR_LOG_ROUTE, PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
 import { filter } from '/@/utils/helper/treeHelper';
 
-import { getMenuList, getMenuChildren, getTechnologyTree, copyMenu } from '/@/api/sys/menu';
+import { getMenuList, getMenuChildren, getTechnologyTree, copyMenu, oauth2GotoCloud } from '/@/api/sys/menu';
 import { getPermCode } from '/@/api/sys/user';
 
 import { useMessage } from '/@/hooks/web/useMessage';
 import { PageEnum } from '/@/enums/pageEnum';
-
+// const IFrame = () => import('/@/views/sys/iframe/FrameBlank.vue');
 interface PermissionState {
   // Permission code list
   // 权限代码列表
@@ -133,6 +132,10 @@ export const usePermissionStore = defineStore({
     },
     setAddMenuShowCategory(flag) {
       this.addMenuShowCategory = flag;
+    },
+    async requireOAuth2(params) {
+      const test = await oauth2GotoCloud(params);
+      return Promise.resolve(test);
     },
     async setCopyMenuResult(params) {
       this.copyMenuResult = await copyMenu(params);
@@ -246,6 +249,7 @@ export const usePermissionStore = defineStore({
           routes = filter(routes, routeRemoveIgnoreFilter);
           // 移除掉 ignoreRoute: true 的路由 一级路由；
           routes = routes.filter(routeRemoveIgnoreFilter);
+          console.log(routes, 'routes');
           const range = ['/medical', '/architecture', '/mineral', '/petroleum'];
           menuList.forEach((r) => {
             if (range.includes(r.path)) {
@@ -316,6 +320,15 @@ export const usePermissionStore = defineStore({
                   title: t('routes.demo.page.accountSetting'),
                 },
               },
+              // {
+              //   path: 'cloud',
+              //   name: 'Cloud',
+              //   component: 'IFrame',
+              //   meta: {
+              //     frameSrc: 'http://cloud.lazy-studio.com/index.php/apps/oauth2/authorize?response_type=code&client_id=nH1tDzS2O1MgtkepPYocZN9gk3cR26stjfSCZ7i0EcoaxUjQZE8daWtmAyJ3LCJK&redirect_uri=http://43.142.155.174:8100/cloud',
+              //     title: '云数据',
+              //   },
+              // },
             ],
           };
           const systemRoutes = {
@@ -410,9 +423,20 @@ export const usePermissionStore = defineStore({
           // this function may only need to be executed once, and the actual project can be put at the right time by itself
           // 这个功能可能只需要执行一次，实际项目可以自己放在合适的时间
           let routeList: AppRouteRecordRaw[] = [];
+
           try {
             // await this.changePermissionCode();
             routeList = (await getMenuList()) as AppRouteRecordRaw[];
+            // routeList[0]['children']['1']['children']['0']['children']['0']['children']['6'].component = '/files/index.vue';
+            // routeList[0]['children']['1']['children']['0']['children']['0']['children']['6'].path = 'Management';
+
+            // routeList[0]['children']['1']['children']['0']['children']['0']['children']['6'].component = 'IFrame';
+            // routeList[0]['children']['1']['children']['0']['children']['0']['children']['6'].meta = {
+            //   frameSrc: 'http://cloud.lazy-studio.com/index.php/apps/oauth2/authorize?response_type=token&client_id=euaTLNCIhU7oFsAZ5vDSU7rTeP4jEaW9aU0Na3Y2n9zbaqGKLLw4xGZhJwy2yiti&redirect_uri=http://cloud.lazy-studio.com/index.php/apps/files/',
+            //   title: '原始数据上传',
+            //   icon: 'ph:upload-bold'
+            // };
+            // console.log(routeList[0]['children']['1']['children']['0']['children']['0']['children']['6']);
             this.setApiBackMenuList(routeList);
           } catch (error) {
             console.error(error);

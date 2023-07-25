@@ -20,6 +20,8 @@ enum Api {
   SET_ACTIVE_USER = '/activeProjectUser',
   GET_LOG_LIST = '/operationLog/page',
   GET_USER_ALL_PROJECTS = '/examContract/listJoin',
+  GET_USER_FILES = '/user/files',
+  DEL_USER_FILE = '/user/delFile',
 }
 
 /**
@@ -106,4 +108,12 @@ export function getLogList() {
 
 export function getUserProjectHistory(params) {
   return defHttp.get({ url: Api.GET_USER_ALL_PROJECTS, params });
+}
+
+export function getUserFiles(params) {
+  return defHttp.get({ url: Api.GET_USER_FILES, params });
+}
+
+export function delUserFiles(params) {
+  return defHttp.get({ url: Api.DEL_USER_FILE, params });
 }

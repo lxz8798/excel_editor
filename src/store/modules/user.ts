@@ -19,6 +19,8 @@ import {
   deleteUserTag,
   getLogList,
   getUserProjectHistory,
+  getUserFiles,
+  delUserFiles,
 } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -37,6 +39,18 @@ import {
   getProjectTreeList,
 } from '/@/api/sys/project';
 import { getAccountList } from '/@/api/demo/system';
+// 定义 userFiles 的类型
+interface UserFiles {
+  curr: number;
+  size: number;
+  total: number;
+}
+
+// 定义 userPages 的类型
+interface UserPages {
+  userFiles: UserFiles;
+}
+
 interface UserState {
   userInfo: Nullable<UserInfo>;
   userAvatar?: string;
@@ -54,6 +68,8 @@ interface UserState {
   teamList: [];
   logList: [];
   userProjectHistory: [];
+  userFiles: [];
+  userPages: UserPages;
 }
 
 export const useUserStore = defineStore({
@@ -80,6 +96,14 @@ export const useUserStore = defineStore({
     teamList: [],
     logList: [],
     userProjectHistory: [],
+    userFiles: [],
+    userPages: {
+      userFiles: {
+        curr: 0,
+        size: 10,
+        total: 0,
+      },
+    },
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -132,6 +156,12 @@ export const useUserStore = defineStore({
     },
     getUserProjectHistorys(type: string | number) {
       return this.userProjectHistory;
+    },
+    getUserFilesList() {
+      return this.userFiles;
+    },
+    getUserFilesPage() {
+      return this.userPages;
     },
   },
   actions: {
@@ -317,6 +347,16 @@ export const useUserStore = defineStore({
     async setUserProjectHistorys(params) {
       this.userProjectHistory = await getUserProjectHistory(params);
       return this.userProjectHistory;
+    },
+    async setUserFilesList(params) {
+      this.userFiles = await getUserFiles(params);
+      this.userPages.userFiles.curr = this.userFiles['current'];
+      this.userPages.userFiles.size = this.userFiles['size'];
+      this.userPages.userFiles.total = this.userFiles['total'];
+      return this.userFiles;
+    },
+    async delUserFileList(params) {
+      return await delUserFiles(params);
     },
     /**
      * @description: Confirm before logging out

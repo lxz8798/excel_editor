@@ -36,11 +36,31 @@ export const LoginRoute: AppRouteRecordRaw = {
   },
 };
 
+export const filesManagement = {
+  path: '/files',
+  name: 'files',
+  component: 'LAYOUT',
+  meta: {
+    title: 'OAuth2请求',
+  },
+  children: [
+    {
+      path: 'management',
+      name: 'Management',
+      component: 'LAYOUT',
+      meta: {
+        title: '文件管理',
+      },
+    },
+  ],
+};
+
 // Basic routing without permission
 // 未经许可的基本路由
 export const basicRoutes = [
   LoginRoute,
   RootRoute,
+  filesManagement,
   ...mainOutRoutes,
   REDIRECT_ROUTE,
   PAGE_NOT_FOUND_ROUTE,

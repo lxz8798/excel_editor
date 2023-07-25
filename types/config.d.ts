@@ -148,6 +148,7 @@ export interface GlobConfig {
   // Project abbreviation
   shortName: string;
   wsUrl: string;
+  userFileUpload: string;
 }
 export interface GlobEnvConfig {
   // Site title
@@ -161,4 +162,5 @@ export interface GlobEnvConfig {
   // Upload url
   VITE_GLOB_UPLOAD_URL?: string;
   VITE_GLOB_WS_URL: string;
+  VITE_GLOB_USER_FILES: string;
 }

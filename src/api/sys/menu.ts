@@ -1,4 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
+import axios from "axios";
 import { getMenuListResultModel } from './model/menuModel';
 
 enum Api {
@@ -19,6 +20,7 @@ enum Api {
   MENUID_TRANSFORM_PROJECTID = '/sysMenu/getContractByMenuId',
   MENU_SWAP_ORDER_NO = '/sysMenu/swapOrderNo',
   MENUID_TO_TEMPLATEID= '/sysMenu/getTemplateByMenuId',
+  OAUTH2_URI = 'http://cloud.lazy-studio.com/index.php/apps/oauth2/authorize',
 }
 
 /**
@@ -41,3 +43,4 @@ export const idTransform = (params?) => defHttp.get({ url: Api.TRANSFORM_ID, par
 export const menuIdTransformProjectId = (params?) => defHttp.get({ url: Api.MENUID_TRANSFORM_PROJECTID, params });
 export const menuSwapOrderNo = (params?) => defHttp.get({ url: Api.MENU_SWAP_ORDER_NO, params });
 export const menuIdToTemplateId = (params?) => defHttp.get({ url: Api.MENUID_TO_TEMPLATEID, params });
+export const oauth2GotoCloud = (params?) => axios.get('http://cloud.lazy-studio.com/index.php/apps/oauth2/authorize', { params: params });

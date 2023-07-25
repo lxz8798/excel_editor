@@ -1,4 +1,8 @@
 <template>
+<!--  <li :class="getClass" :style="getCollapse ? {} : getItemStyle" v-if="isUploadPage" @click.stop="gotoOAuth">-->
+<!--    <Icon icon="ph:upload-bold"></Icon>-->
+<!--    <span class="ml-2 vben-simple-menu-sub-title">原始数据上传</span>-->
+<!--  </li>-->
   <li :class="getClass" @click.stop="handleClickItem" :style="getCollapse ? {} : getItemStyle">
     <Tooltip placement="right" v-if="showTooptip">
       <template #title>
@@ -50,6 +54,9 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useProjectStore } from '/@/store/modules/project';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
+  import Icon from '/@/components/Icon/index';
+  import { useGo } from '/@/hooks/web/usePage';
+  import { router } from '/@/router';
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
@@ -61,6 +68,7 @@
       AMenu,
       AMenuItem,
       AddProjectMebersModal,
+      Icon,
     },
     props: {
       item: {
@@ -96,6 +104,7 @@
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isLeader = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'project_admin'));
+      const isUploadPage = computed(() => toRaw(props['item'])['name'].includes('原始数据上传'));
       const getClass = computed(() => {
         return [
           `${prefixCls}-item`,
@@ -112,7 +121,16 @@
         return unref(getParentMenu)?.type.name === 'Menu' && unref(getCollapse) && slots.title;
       });
 
+      function gotoOAuth() {
+        // if (toRaw(props['item'])['name'].includes('原始数据上传')) {
+      }
+
       function handleClickItem() {
+        if (toRaw(props['item'])['name'].includes('原始数据上传')) {
+          props['item'].path = '/petroleum/requestOAuth2'
+          const go = useGo(router);
+          go('/petroleum/requestOAuth2');
+        }
         const { disabled } = props;
         if (disabled) {
           return;
@@ -416,9 +434,11 @@
         getItemStyle,
         getCollapse,
         handleClickItem,
+        gotoOAuth,
         showTooptip,
         isNormal,
         isAdmin,
+        isUploadPage,
         addMenu,
         editName,
         transformProjectMenu,
