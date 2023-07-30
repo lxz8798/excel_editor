@@ -46,6 +46,7 @@ interface PermissionState {
   technologyTree: Menu[];
   cascadeTree: [];
   copyMenuResult: '';
+  menuParams: {};
 }
 
 export const usePermissionStore = defineStore({
@@ -70,6 +71,7 @@ export const usePermissionStore = defineStore({
     technologyTree: [],
     cascadeTree: [],
     copyMenuResult: '',
+    menuParams: {},
   }),
   getters: {
     getPermCodeList(): string[] | number[] {
@@ -99,8 +101,14 @@ export const usePermissionStore = defineStore({
     getCopyMenuResult(): stirng {
       return this.copyMenuResult;
     },
+    getMenuParams() {
+      return this.menuParams;
+    },
   },
   actions: {
+    setMenuParams(params) {
+      this.menuParams = params;
+    },
     setApiBackMenuList(list: Menu[]) {
       this.apiBackMenuList = list;
     },

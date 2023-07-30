@@ -126,11 +126,11 @@
       }
 
       function handleClickItem() {
-        if (toRaw(props['item'])['name'].includes('原始数据上传')) {
-          props['item'].path = '/petroleum/requestOAuth2'
-          const go = useGo(router);
-          go('/petroleum/requestOAuth2');
-        }
+        // if (toRaw(props['item'])['name'].includes('原始数据上传')) {
+        //   props['item'].path = '/petroleum/requestOAuth2'
+        //   const go = useGo(router);
+        //   go('/petroleum/requestOAuth2');
+        // }
         const { disabled } = props;
         if (disabled) {
           return;

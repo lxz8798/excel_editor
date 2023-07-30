@@ -5,6 +5,7 @@
       name="file"
       :multiple="true"
       accept=".doc, .docx, .xls, .xlsx, .pdf, .jpg, .png, .txt, .zip, .rar"
+      :data="uploadParams"
       :action="userFileUpload"
       :headers="uploadHeaders"
       :showUploadList="false"
@@ -65,6 +66,8 @@
   import { useUserStore } from '/@/store/modules/user';
   import { Icon } from '/@/components/Icon';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useRouter } from "vue-router";
+  import { usePermissionStore } from "/@/store/modules/permission";
 
   const AUploadDragger = Upload.Dragger;
   const AList = List;
@@ -88,6 +91,7 @@
       const { userFileUpload } = useGlobSetting();
       const userStore = useUserStore();
       const { createMessage, createConfirm } = useMessage();
+      const permissionStore = usePermissionStore();
 
       interface IDataItem {
         title: string;
@@ -129,18 +133,22 @@
           txt: 'tabler:file-type-txt',
           pdf: 'teenyicons:pdf-outline',
         } as IFileType,
-        uploadParams: [],
+        menuParams: computed(() => JSON.parse(sessionStorage.menuParams)),
+        uploadParams: {
+          menuId: computed(() => JSON.parse(sessionStorage.menuParams)['id']),
+        },
         allSelectFlag: false,
         pages: {
           curr: 1,
           size: 24,
-          total: 100,
+          total: 0,
         },
       });
 
       // created
       const paramsColl: Record<string, IGetFileParams> = {
         getFileListParams: {
+          menuId: state['uploadParams']['menuId'],
           userId: userStore['getUserInfo']['userId'],
           page: state.pages.curr,
           size: state.pages.size,

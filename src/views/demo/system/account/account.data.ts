@@ -113,6 +113,7 @@ export const accountFormSchema: FormSchema[] = [
     field: 'realName',
     label: '真实名称',
     component: 'Input',
+    defaultValue: toRaw(userStore.getUserInfo['realName']),
     required: true,
   },
   {
@@ -132,8 +133,8 @@ export const accountFormSchema: FormSchema[] = [
     field: 'teamName',
     label: '所属团队',
     component: 'Select',
+    defaultValue: toRaw(userStore.getUserInfo['teams']),
     componentProps: ({ formModel, formActionType }) => {
-      console.log(userStore.getUserInfo);
       const options = computed(() => toRaw(teamStore.getTeamsUserList));
       return {
         mode: 'multiple',
@@ -146,12 +147,14 @@ export const accountFormSchema: FormSchema[] = [
     field: 'skills',
     label: '专业技能',
     component: 'Select',
+    defaultValue: toRaw(userStore.getUserInfo['skills']),
     componentProps: ({ formModel, formActionType }) => {
+      console.log(toRaw(userStore.getUserInfo['teams']));
       const options = computed(() => toRaw(skillsStore.getSkillsUserList));
       return {
         mode: 'multiple',
         placeholder: '请选择你的技能',
-        options: options,
+        options: options.value,
       };
     },
   },
@@ -173,6 +176,7 @@ export const accountFormSchema: FormSchema[] = [
     field: 'phone',
     label: '手机号',
     component: 'InputNumber',
+    defaultValue: toRaw(userStore.getUserInfo['phone']),
   },
   {
     label: '角色',
@@ -183,6 +187,7 @@ export const accountFormSchema: FormSchema[] = [
       labelField: 'roleName',
       valueField: 'roleId',
     },
+    defaultValue: toRaw(userStore.getUserInfo['roles']),
     ifShow: () => {
       if (!Object.keys(userStore.getUserInfo).length) return;
       return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');

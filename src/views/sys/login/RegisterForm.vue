@@ -20,7 +20,7 @@
     <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
       <!-- 角色选择 -->
       <FormItem name="account" class="enter-x role_wrap">
-        <a-select
+        <!--<a-select
           v-model:value="formData.roleId"
           class="select-wrap"
           :token-separators="[',']"
@@ -28,7 +28,7 @@
           :options="roleOptions"
           disabled
           style="width: 120px"
-        />
+        />-->
         <Input
           class="fix-auto-fill"
           size="large"

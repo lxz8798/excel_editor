@@ -62,12 +62,11 @@
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useAppStore } from "/@/store/modules/app";
+  import { useRouter } from "vue-router";
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
-  const { createMessage, createConfirm } = useMessage();
-  const formStore = useFormStore();
-  const permissionStore = usePermissionStore();
+
   export default defineComponent({
     name: 'SimpleSubMenu',
     components: {
@@ -91,7 +90,11 @@
       theme: propTypes.oneOf(['dark', 'light']),
     },
     setup(props) {
+      const { createMessage, createConfirm } = useMessage();
+      const formStore = useFormStore();
       const { setMenuSetting } = useMenuSetting();
+      const permissionStore = usePermissionStore();
+
       const { t } = useI18n();
       const { prefixCls } = useDesign('simple-menu');
       const sourceItem = ref(null);
@@ -111,6 +114,8 @@
         ];
       });
       function setMenuShowState() {
+        permissionStore.setMenuParams(props.item);
+        sessionStorage.menuParams = JSON.stringify(props.item);
         setMenuSetting({ menuWidth: 0, mixSideFixed: false });
       }
       function menuHasChildren(menuTreeItem: Menu): boolean {

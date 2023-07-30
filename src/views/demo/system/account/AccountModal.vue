@@ -39,9 +39,10 @@
         isUpdate.value = !!data?.isUpdate;
         if (unref(isUpdate)) {
           rowId.value = data.record.id;
-          setFieldsValue({
-            ...data.record,
-          });
+          // 这里角开弹窗内部没有回显
+          // setFieldsValue({
+          //   ...data.record,
+          // });
         }
 
         // const treeData = await getDeptList();
