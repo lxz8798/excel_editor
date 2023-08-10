@@ -1,7 +1,7 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
-    <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
+    <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo" :pagination="{pageSize: pages.size, current: 1 }">
       <template #toolbar>
         <a-button type="primary" v-if="!isNormal" @click="handleCreate">新增项目</a-button>
       </template>
@@ -46,7 +46,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
+  import { defineComponent, reactive, onMounted, h, computed, toRefs } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getProjects, getOwnerProjectList, delProject } from '/@/api/sys/project';
@@ -80,13 +80,29 @@ import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
 
-      userStore.setUserList({ page: 1, pageSize: 10 });
-      permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
+      const state = reactive({
+        pages: {
+          page: 1,
+          size: 12,
+          curr: 1,
+          total: 0,
+        },
+      });
+
+      userStore.setUserList({ page: state.pages['curr'], pageSize: state.pages['size'], size: state.pages['size'] });
+      permissionStore.setTechnologyTree({ page: state.pages['curr'], pageSize: state.pages['size'], size: state.pages['size'] });
       projectStore.setProjectUserList();
 
       const [registerTable, { reload, updateTableDataRecord, getDataSource, getRawDataSource, setTableData }] =
         useTable({
           title: '项目列表',
+          beforeFetch: (params) => {
+            params['size'] = state.pages.size
+            state.pages.curr = params['page']
+          },
+          fetchSetting: {
+            listField: 'records'
+          },
           api: getOwnerProjectList,
           rowKey: 'id',
           columns,
@@ -107,10 +123,11 @@ import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
             dataIndex: 'action',
             // slots: { customRender: 'action' },
           },
-          afterFetch: (e) => {
-            console.log(e, 'e');
-            console.log(getRawDataSource(), 'getRawDataSource');
-          }
+          // afterFetch: (e) => {
+          //   const { current, size } = getRawDataSource()
+          //   state.pages.curr = current
+          //   state.pages.size = size
+          // }
         });
 
       onMounted(() => {
@@ -204,8 +221,8 @@ import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
             delProject({ id: record['id'] }).then((result) => {
               createMessage.success(result);
               getOwnerProjectList({
-                page: 1,
-                pageSize: 10,
+                page: state.pages['curr'],
+                pageSize: state.pages['size'],
                 // userId: userStore.getUserInfo.userId,
               }).then((res) => {
                 setTableData(res['records']);
@@ -244,6 +261,7 @@ import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
       }
 
       return {
+        ...toRefs(state),
         registerTable,
         registerModal1,
         registerModal2,
@@ -263,5 +281,10 @@ import { defineComponent, reactive, onMounted, h, computed, toRaw } from "vue";
 <style lang="less" scope>
   .vben-page-wrapper {
     margin: 16px;
+  }
+  .ant-spin-container {
+    .ant-pagination {
+      margin: unset;
+    }
   }
 </style>

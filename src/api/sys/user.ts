@@ -22,6 +22,7 @@ enum Api {
   GET_USER_ALL_PROJECTS = '/examContract/listJoin',
   GET_USER_FILES = '/user/files',
   DEL_USER_FILE = '/user/delFile',
+  ALL_USER_FILES = '/user/dirs',
 }
 
 /**
@@ -116,4 +117,8 @@ export function getUserFiles(params) {
 
 export function delUserFiles(params) {
   return defHttp.get({ url: Api.DEL_USER_FILE, params });
+}
+
+export function allUserFiles(params) {
+  return defHttp.get({ url: Api.ALL_USER_FILES, params });
 }

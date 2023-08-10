@@ -24,25 +24,31 @@
     <!--  全选&删除  -->
     <div class="fun_wrap">
       <div class="select_all">
+        <Icon icon="tabler:folder-up" style="margin-right: 8px; cursor: pointer;" @click="uppageHandler"></Icon>
         <a-checkbox v-model:checked="allSelectFlag" class="checked_box" @change="selectAll"></a-checkbox>
         <label style="margin-left: 10px;">全选</label>
       </div>
       <p class="delete_but" @click="delMultiple">删除</p>
     </div>
     <!--  文件列表  -->
-    <a-list item-layout="horizontal" :data-source="fileDatas" :grid="{ gutter: 8, column: 8 }">
+    <a-list item-layout="vertical" :data-source="isDirFlag ? dirLists : fileDatas" :grid="{ gutter: 8, column: 8 }">
       <template #renderItem="{ item }">
         <a-list-item>
           <a-list-item-meta :description="`上传时间：${uploadTime(item['createTime'])}`">
             <template #title>
-              <span :title="getFileName(item['fileOriginalName'])">{{ getFileName(item['fileOriginalName']) }}</span>
+              <span class="isDirFlag" :title="getFileName(item['fileName'])" v-if="isDirFlag">{{ getFileName(item['fileName']) }}</span>
+              <span :title="getFileName(item['fileOriginalName'])" v-else>{{ getFileName(item['fileOriginalName']) }}</span>
             </template>
             <template #avatar>
-              <Icon :icon="isWhatType(item['fileName'])"></Icon>
+              <Icon :icon="isWhatType(item['fileName'])" @dblclick="dblclickEnterDir(item)" v-if="isDirFlag"></Icon>
+              <Icon :icon="isWhatType(item['fileName'])" v-else></Icon>
               <Icon icon="typcn:delete-outline" class="del_icon" @click="deleteUserFile(item)"></Icon>
-              <a-checkbox v-model:checked="item['checked']" class="checked_box"></a-checkbox>
+              <a-checkbox v-model:checked="item['checked']" class="checked_box" v-if="!isDirFlag"></a-checkbox>
             </template>
           </a-list-item-meta>
+          <template #actions>
+            <a-button class="down" type="primary" shape="round" size="small" @click="downloadHandler(item)">下载</a-button>
+          </template>
         </a-list-item>
       </template>
     </a-list>
@@ -66,12 +72,11 @@
   import { useUserStore } from '/@/store/modules/user';
   import { Icon } from '/@/components/Icon';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { useRouter } from "vue-router";
-  import { usePermissionStore } from "/@/store/modules/permission";
 
   const AUploadDragger = Upload.Dragger;
   const AList = List;
-  const AListItemMeta = ListItemMeta;
+  const AListItem = List.Item;
+  const AListItemMeta = List.Item.Meta;
   const ACheckbox = Checkbox;
   const AInputSearch = InputSearch;
   const APagination = Pagination;
@@ -81,6 +86,7 @@
       InboxOutlined,
       AUploadDragger,
       AList,
+      AListItem,
       AListItemMeta,
       Icon,
       ACheckbox,
@@ -91,7 +97,6 @@
       const { userFileUpload } = useGlobSetting();
       const userStore = useUserStore();
       const { createMessage, createConfirm } = useMessage();
-      const permissionStore = usePermissionStore();
 
       interface IDataItem {
         title: string;
@@ -112,6 +117,7 @@
         xlsx: string;
         txt: string;
         pdf: string;
+        dir: string;
       }
       // 获得当前模板的详情
       // formStore.setCurrTemp(state.currTempDetail.id as string);
@@ -132,6 +138,7 @@
           xlsx: 'teenyicons:xls-outline',
           txt: 'tabler:file-type-txt',
           pdf: 'teenyicons:pdf-outline',
+          dir: 'octicon:file-directory-open-fill-16',
         } as IFileType,
         menuParams: computed(() => JSON.parse(sessionStorage.menuParams)),
         uploadParams: {
@@ -143,10 +150,11 @@
           size: 24,
           total: 0,
         },
+        dirLists: [],
+        isDirFlag: false,
       });
-
       // created
-      const paramsColl: Record<string, IGetFileParams> = {
+      let paramsColl: Record<string, IGetFileParams> = {
         getFileListParams: {
           menuId: state['uploadParams']['menuId'],
           userId: userStore['getUserInfo']['userId'],
@@ -211,12 +219,22 @@
       };
 
       const searchFile = (txt) => {
-        if (!txt) {
-          state['fileDatas'] = computed(() => userStore['getUserFilesList']['records'] as IDataItem[]);
-        } else {
-          const filter = state.fileDatas.filter((i) => i['fileOriginalName'].includes(txt));
-          state['fileDatas'] = ref(filter);
-        }
+        // 下面的代码是正常的，只不过只能在前端检索，也就是第一页查找
+        // if (!txt) {
+        //   state['fileDatas'] = computed(() => userStore['getUserFilesList']['records'] as IDataItem[]);
+        // } else {
+        //   const filter = state.fileDatas.filter((i) => i['fileOriginalName'].includes(txt));
+        //   state['fileDatas'] = ref(filter);
+        // }
+        const params = {
+          page: state.pages.curr,
+          size: state.pages.size,
+          menuId: paramsColl['getFileListParams']['menuId'],
+          fileName: txt,
+        };
+        userStore['setUserFilesList'](params).then((res) => {
+          console.log(res, 'res');
+        });
       };
 
       const turnThePage = () => {
@@ -259,6 +277,36 @@
         });
       };
 
+      const uppageHandler = () => {
+        const params = {
+          page: state.pages.curr,
+          size: state.pages.size,
+          menuId: state['uploadParams']['menuId'],
+        };
+        userStore.setAllUserFileList(params).then((res) => {
+          state.dirLists = res.map((i) => ({...i, fileName: `${i.fileName}\.dir`}));
+          state.isDirFlag = true;
+          state.fileDatas.length = 0;
+        });
+      };
+
+      const dblclickEnterDir = (item) => {
+        state.isDirFlag = false;
+        paramsColl['getFileListParams']['menuId'] = item['menuId'];
+        paramsColl['getFileListParams']['parentId'] = item['id'];
+        paramsColl['getFileListParams']['userId'] = item['userId'];
+        userStore['setUserFilesList'](paramsColl['getFileListParams']);
+      };
+
+      const downloadHandler = (item) => {
+        const link = document.createElement('a');
+        link.href = item.filePath;
+        link.download = item.filePath;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
       return {
         ...toRefs(state),
         handleChange,
@@ -270,6 +318,9 @@
         turnThePage,
         delMultiple,
         selectAll,
+        uppageHandler,
+        dblclickEnterDir,
+        downloadHandler,
         fileList: ref([]),
         userFileUpload,
       };
@@ -286,6 +337,17 @@
   }
   ::v-deep(.ant-list) {
     min-height: 486px;
+  }
+  ::v-deep(.ant-list-item-action) {
+    margin-top: 0;
+    li {
+      width: 89%;
+      display: inline-block;
+      text-align: right;
+      .ant-btn {
+        font-size: 12px;
+      }
+    }
   }
   ::v-deep(.ant-list-item-meta) {
     position: relative;
@@ -339,6 +401,11 @@
         overflow: hidden;
         > span {
           word-wrap: break-word;
+        }
+        > .isDirFlag {
+          width: 100%;
+          display: inline-block;
+          text-align: center;
         }
       }
     }

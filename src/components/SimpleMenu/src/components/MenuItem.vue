@@ -1,8 +1,8 @@
 <template>
-<!--  <li :class="getClass" :style="getCollapse ? {} : getItemStyle" v-if="isUploadPage" @click.stop="gotoOAuth">-->
-<!--    <Icon icon="ph:upload-bold"></Icon>-->
-<!--    <span class="ml-2 vben-simple-menu-sub-title">原始数据上传</span>-->
-<!--  </li>-->
+  <!--  <li :class="getClass" :style="getCollapse ? {} : getItemStyle" v-if="isUploadPage" @click.stop="gotoOAuth">-->
+  <!--    <Icon icon="ph:upload-bold"></Icon>-->
+  <!--    <span class="ml-2 vben-simple-menu-sub-title">原始数据上传</span>-->
+  <!--  </li>-->
   <li :class="getClass" @click.stop="handleClickItem" :style="getCollapse ? {} : getItemStyle">
     <Tooltip placement="right" v-if="showTooptip">
       <template #title>
@@ -44,7 +44,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { propTypes } from '/@/utils/propTypes';
   import { useMenuItem } from './useMenu';
-  import { Tooltip } from 'ant-design-vue';
+  import { Checkbox, Tooltip } from "ant-design-vue";
   import { useSimpleRootMenuContext } from './useSimpleMenuContext';
   import { Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -60,6 +60,8 @@
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
+  const ACheckbox = Checkbox;
+
   export default defineComponent({
     name: 'MenuItem',
     components: {
@@ -69,6 +71,8 @@
       AMenuItem,
       AddProjectMebersModal,
       Icon,
+      AMenuItem,
+      ACheckbox,
     },
     props: {
       item: {
@@ -126,11 +130,6 @@
       }
 
       function handleClickItem() {
-        // if (toRaw(props['item'])['name'].includes('原始数据上传')) {
-        //   props['item'].path = '/petroleum/requestOAuth2'
-        //   const go = useGo(router);
-        //   go('/petroleum/requestOAuth2');
-        // }
         const { disabled } = props;
         if (disabled) {
           return;
@@ -170,21 +169,25 @@
       // 添加菜单
       function addMenu(item) {
         const inputValue = ref('');
+        const contentType = ref('0');
         createConfirm({
           iconType: 'warning',
-          title: () => h('span', '创建内容!'),
+          width: '35vw',
+          title: () => h('div', '创建内容!'),
           content: () => {
-            return h('div', [
-              h('label', '内容名称'),
+            return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
+              h('label', { style: { width: '72px' } },'内容名称：'),
               h(
                 Input,
                 {
-                  onChange: (e) => {
-                    inputValue.value = e.target.value;
+                  style: {
+                    width: '335px'
                   },
+                  onChange: (e) => inputValue.value = e.target.value,
                 },
                 inputValue,
               ),
+              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => e.target.checked ? contentType.value = '1' : contentType.value = '0' },'生成项目')
             ]);
           },
           onOk: () => {
@@ -193,7 +196,7 @@
               return;
             }
             const params = {
-              type: '0',
+              type: contentType.value,
               menuName: inputValue.value,
               parentMenu: item.id,
               icon: 'ant-design:appstore-outlined',
@@ -203,6 +206,7 @@
               createMessage.success(res);
               permissionStore.setLastBuildMenuTime();
               permissionStore.buildRoutesAction();
+              setMenuSetting({ menuWidth: 0, mixSideFixed: false });
             });
           },
         });
@@ -210,22 +214,25 @@
       // 修改名称
       function editName(item) {
         const inputValue = ref(item.name);
+        const contentType = ref('0');
         createConfirm({
           iconType: 'warning',
+          width: '35vw',
           title: () => h('span', '创建内容!'),
           content: () => {
-            return h('div', [
-              h('label', '内容名称'),
+            return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
+              h('label', { style: { width: '72px' } },'内容名称：'),
               h(
                 Input,
                 {
-                  value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
-                  onChange: (e) => {
-                    inputValue.value = e.target.value;
+                  style: {
+                    width: '335px',
                   },
+                  onChange: (e) => inputValue.value = e.target.value,
                 },
                 inputValue,
               ),
+              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => e.target.checked ? contentType.value = '1' : contentType.value = '0' },'生成项目')
             ]);
           },
           onOk: () => {
@@ -384,20 +391,23 @@
             };
             formStore.setProjectMembersInfo({ menuId: item.id }).then((res) => {
               const { leaderUser, teamUsers } = res;
-              item['leaderId'] = leaderUser['id'];
-              item['teamUsers'] = teamUsers;
-              if (!leaderUser || !teamUsers || !isAdmin) {
-                createMessage.info('当前菜单没有权限或者不是项目成员!');
-                return;
-              }
+              // if (item['type'] === '1' && !isAdmin.value) {
+              //   if (leaderUser) item['leaderId'] = leaderUser['id'];
+              //   if (teamUsers) item['teamUsers'] = teamUsers;
+              //   if (!leaderUser || !teamUsers) {
+              //     createMessage.info('当前菜单没有权限或者不是项目成员!');
+              //     return;
+              //   }
+              // }
               formStore.setJudgResult(params).then((judge) => {
-              formStore.setDeleteMenu(params).then((res) => {
-                createMessage.success(res);
-                permissionStore.buildRoutesAction();
-                permissionStore.setLastBuildMenuTime();
-                window.location.reload();
+                console.log(judge, 'judge');
+                formStore.setDeleteMenu(params).then((res) => {
+                  createMessage.success(res);
+                  permissionStore.buildRoutesAction();
+                  permissionStore.setLastBuildMenuTime();
+                  window.location.reload();
+                });
               });
-            });
             });
           },
         });

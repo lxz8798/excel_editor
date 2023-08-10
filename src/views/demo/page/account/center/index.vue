@@ -66,7 +66,7 @@
         <ul>
           <li v-for="log in formCalculationLogs">生成：{{ log['contractName'] }}，结果：{{ log['dymcDesc'] }}，生成时间：{{ log['createTime'] }}，操作人：{{ !log['userId'] ? '自动生成' : log['userRealName'] }}</li>
         </ul>
-        <a-pagination v-model:current="pages.logs.curr" :total="pages.logs.total" show-less-items @change="turnThePage" />
+        <a-pagination v-model:current="pages.logs.curr" size="small" :total="pages.logs.total" show-less-items @change="turnThePage" />
       </div>
       <Tabs>
         <template v-for="item in achieveList" :key="item.key">

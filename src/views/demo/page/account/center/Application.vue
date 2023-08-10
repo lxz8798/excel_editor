@@ -64,6 +64,9 @@
         </a-col>
       </template>
     </a-row>
+    <a-row :gutter="16" style="padding-left: 5px; padding-top: 10px;">
+      <a-pagination v-model:current="pages.curr" :pageSize="pages.size" :total="pages.total" size="small" show-less-items showTotal @change="getOwnerProjectListFn" />
+    </a-row>
   </List>
   <!--  添加成员  -->
   <AddProjectMebersModal @register="registerModal" />
@@ -71,8 +74,8 @@
   <ProjectDetailDrawer @register="registerDrawer" />
 </template>
 <script lang="ts">
-import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue";
-  import { List, Card, Row, Col, Input, Dropdown, Menu, Popover } from 'ant-design-vue';
+  import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from 'vue';
+  import { List, Card, Row, Col, Input, Dropdown, Menu, Popover, Pagination } from "ant-design-vue";
   import ProjectDetailDrawer from './ProjectDetailDrawer.vue';
   import AddProjectMebersModal from '/@/views/demo/system/project/AddTeamMebersModal.vue';
   import Icon from '/@/components/Icon/index';
@@ -94,6 +97,7 @@ import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue"
   const AMenu = Menu;
   const AMenuItem = Menu.Item;
   const APopover = Popover;
+  const APagination = Pagination;
 
   interface ProjectCarModel {
     id?: number | string;
@@ -112,6 +116,7 @@ import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue"
       AMenu,
       AMenuItem,
       APopover,
+      APagination,
       AddProjectMebersModal,
       [Row.name]: Row,
       [Col.name]: Col,
@@ -136,6 +141,12 @@ import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue"
       const state = reactive({
         formList: [],
         formHistoryList: [],
+        pages: {
+          page: 1,
+          size: 12,
+          curr: 1,
+          total: 0,
+        }
       });
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       // 修改名称
@@ -356,26 +367,40 @@ import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue"
         return 'rgba(' + r + ',' + g + ',' + b + ',0.8)';
       }
 
-      function getOwnerProjectListFn() {
-        getOwnerProjectList({ page: 1, pageSize: 10, userId: userStore.getUserInfo.userId }).then(
+      function resultHandler(result: any) {
+        result['records'].forEach((t) => {
+          const ids = state.formList.map((i) => i['id']);
+          if (ids.includes(t['id'])) return;
+          state.formList<ProjectCarModel>.push({
+            id: t['id'],
+            title: t['name'],
+            leaderName: t['leaderName'],
+            teams: t['teamUsers'].map((i) => i['realName']).toString(),
+            icon: 'gg:loadbar-doc',
+            // closePopFlag: false,
+            color: Color(),
+            status: t['status'],
+            confirmFlag: t['confirmFlag'],
+            day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),
+            // des: t.templateDesc,
+            // download: 'bx:bx-download',
+            // downLoadUri: apiUrl + '/excel/downLoadExcelVertical?templateId=' + t.id,
+          });
+        });
+      }
+
+      function getOwnerProjectListFn(page?: number | string, pageSize?:  number | string) {
+        if (page) {
+          state.pages['curr'] = Number(page)
+          state.pages['size'] = Number(pageSize)
+        }
+        getOwnerProjectList({ page: state.pages['curr'], size: state.pages['size'], userId: userStore.getUserInfo.userId }).then(
           (result) => {
-            result['records'].forEach((t) => {
-              const ids = state.formList.map((i) => i['id']);
-              if (ids.includes(t['id'])) return;
-              state.formList<ProjectCarModel>.push({
-                id: t['id'],
-                title: t['name'],
-                leaderName: t['leaderName'],
-                teams: t['teamUsers'].map((i) => i['realName']).toString(),
-                icon: 'gg:loadbar-doc',
-                color: Color(),
-                status: t['status'],
-                day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),
-                // des: t.templateDesc,
-                // download: 'bx:bx-download',
-                // downLoadUri: apiUrl + '/excel/downLoadExcelVertical?templateId=' + t.id,
-              });
-            });
+            state.pages['total'] = result['total']
+            state.pages['curr'] = result['current']
+            state.pages['size'] = result['size']
+            state.formList.length = 0
+            resultHandler(result)
           },
         );
       }
@@ -459,6 +484,7 @@ import { computed, defineComponent, h, reactive, ref, toRaw, toRefs } from "vue"
         titleHandler,
         enterPath,
         enterAllPath,
+        getOwnerProjectListFn,
       };
     },
 

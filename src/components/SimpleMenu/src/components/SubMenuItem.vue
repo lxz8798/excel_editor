@@ -103,7 +103,7 @@
   import { useSimpleRootMenuContext } from './useSimpleMenuContext';
   import { CollapseTransition } from '/@/components/Transition';
   import Icon from '/@/components/Icon';
-  import { Popover, Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
+  import { Popover, Dropdown, Input, Menu as Menuu, Checkbox } from 'ant-design-vue';
   import { isBoolean, isObject } from '/@/utils/is';
   import mitt from '/@/utils/mitt';
   import ProjectDetailDrawer from './ProjectDetailDrawer.vue';
@@ -119,6 +119,7 @@
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
+  const ACheckbox = Checkbox;
 
   interface ProjectCarModel {
     id?: number | string;
@@ -137,6 +138,7 @@
       ADropdown,
       AMenu,
       AMenuItem,
+      ACheckbox,
       AddProjectMebersModal,
       ProjectDetailDrawer,
     },
@@ -388,21 +390,25 @@
       // 添加菜单
       function addMenu(item) {
         const inputValue = ref('');
+        const contentType = ref('0');
         createConfirm({
           iconType: 'warning',
-          title: () => h('span', '创建内容!'),
+          width: '35vw',
+          title: () => h('div', '创建内容!'),
           content: () => {
-            return h('div', [
-              h('label', '内容名称'),
+            return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
+              h('label', { style: { width: '72px' } },'内容名称：'),
               h(
                 Input,
                 {
-                  onChange: (e) => {
-                    inputValue.value = e.target.value;
+                  style: {
+                    width: '335px'
                   },
+                  onChange: (e) => inputValue.value = e.target.value,
                 },
                 inputValue,
               ),
+              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => e.target.checked ? contentType.value = '1' : contentType.value = '0' },'生成项目')
             ]);
           },
           onOk: () => {
@@ -411,7 +417,7 @@
               return;
             }
             const params = {
-              type: '0',
+              type: contentType.value,
               menuName: inputValue.value,
               parentMenu: item.id,
               icon: 'ant-design:appstore-outlined',
@@ -586,22 +592,25 @@
       // 转换成项目
       function transformProjectMenu(item) {
         const inputValue = ref(item.name);
+        const contentType = ref('0');
         createConfirm({
           iconType: 'warning',
+          width: '35vw',
           title: () => h('span', '创建内容!'),
           content: () => {
-            return h('div', [
-              h('label', '内容名称'),
+            return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
+              h('label', { style: { width: '72px' } },'内容名称：'),
               h(
                 Input,
                 {
-                  value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
-                  onChange: (e) => {
-                    inputValue.value = e.target.value;
+                  style: {
+                    width: '335px'
                   },
+                  onChange: (e) => inputValue.value = e.target.value,
                 },
                 inputValue,
               ),
+              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => e.target.checked ? contentType.value = '1' : contentType.value = '0' },'生成项目')
             ]);
           },
           onOk: () => {

@@ -21,6 +21,7 @@ import {
   getUserProjectHistory,
   getUserFiles,
   delUserFiles,
+  allUserFiles,
 } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -70,6 +71,7 @@ interface UserState {
   userProjectHistory: [];
   userFiles: [];
   userPages: UserPages;
+  allUserFiles: [];
 }
 
 export const useUserStore = defineStore({
@@ -104,6 +106,7 @@ export const useUserStore = defineStore({
         total: 0,
       },
     },
+    allUserFiles: [],
   }),
   getters: {
     getGotoDocID(): string | number {
@@ -162,6 +165,9 @@ export const useUserStore = defineStore({
     },
     getUserFilesPage() {
       return this.userPages;
+    },
+    getAllUserFiles() {
+      return this.allUserFiles;
     },
   },
   actions: {
@@ -357,6 +363,9 @@ export const useUserStore = defineStore({
     },
     async delUserFileList(params) {
       return await delUserFiles(params);
+    },
+    async setAllUserFileList(params) {
+      return await allUserFiles(params);
     },
     /**
      * @description: Confirm before logging out
