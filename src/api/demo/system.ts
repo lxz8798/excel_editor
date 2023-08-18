@@ -24,7 +24,7 @@ enum Api {
 }
 
 export const getAccountList = (params: AccountParams) =>
-  defHttp.post<AccountListGetResultModel>({ url: Api.AccountList, params, timeout: 3000 });
+  defHttp.get<AccountListGetResultModel>({ url: Api.AccountList, params, timeout: 3000 });
 
 export const getDeptList = (params?: DeptListItem) =>
   defHttp.get<DeptListGetResultModel>({ url: Api.DeptList, params });

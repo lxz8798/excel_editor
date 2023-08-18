@@ -443,7 +443,6 @@
 
       // 快速访问
       function enterPath(item, his) {
-        item['confirmFlag'] = !his['confirmFlag'] ? '0' : his['confirmFlag'];
         getProjectPath({ templateId: item['templateId'] }).then((res) => {
           // go(res + `?confirm=${item['confirmFlag']}`)
           router.push({
@@ -455,6 +454,7 @@
           })
         });
       }
+
       // 进入所有的表单
       function enterAllPath() {
         state.formHistoryList.forEach((i) => {

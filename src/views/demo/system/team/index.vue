@@ -61,7 +61,7 @@
       const [registerModal2, { openModal: openModal2 }] = useModal();
       const searchInfo = reactive<Recordable>({});
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
-      userStore.setUserList({ page: 1, pageSize: 10 });
+      userStore.setUserList({ page: 1, size: 9999 });
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =

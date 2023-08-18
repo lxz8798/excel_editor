@@ -95,6 +95,7 @@
 
       //  login out
       function handleLoginOut() {
+        sessionStorage.clear('isNewUser');
         userStore.confirmLoginOut();
       }
 

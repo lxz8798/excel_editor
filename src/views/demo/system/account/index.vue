@@ -145,7 +145,7 @@
           return;
         }
         userStore.deleteUser({ userId: record.id }).then((res) => {
-          getAccountList({ page: 1, pageSize: 30 }).then((result) => {
+          getAccountList({ page: 1, size: 9999 }).then((result) => {
             setTableData(result.records);
             createMessage.success(res);
           });
@@ -163,7 +163,7 @@
         //     setTableData(data.records);
         //   });
         // }
-        getAccountList({ page: 1, pageSize: 30 })
+        getAccountList({ page: 1, size: 9999 })
           .then((result) => setTableData(result['records']))
           .then(() => {
             reload().then(() => {

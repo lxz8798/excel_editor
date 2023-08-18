@@ -65,7 +65,7 @@
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
       const isAdmin = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin'));
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
-      userStore.setUserList({ page: 1, pageSize: 10 });
+      userStore.setUserList({ page: 1, size: 9999 });
 
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({

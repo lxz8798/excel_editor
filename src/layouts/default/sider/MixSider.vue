@@ -43,7 +43,7 @@
             <div></div>
             <template #overlay>
               <a-menu>
-                <a-menu-item key="1" @click="addMenu(item)">创建类型</a-menu-item>
+                <a-menu-item key="1" @click="addMenu(item)">创建项目</a-menu-item>
               </a-menu>
             </template>
           </a-dropdown>
@@ -169,8 +169,8 @@
       const { createMessage, createConfirm } = useMessage();
       useDragLine(sideRef, dragBarRef, true);
 
-      userStore.setUserList({ page: 1, pageSize: 10 });
-      permissionStore.setTechnologyTree({ page: 1, pageSize: 10 });
+      userStore.setUserList({ page: 1, size: 9999 });
+      permissionStore.setTechnologyTree({ page: 1, size: 9999 });
       projectStore.setProjectUserList();
 
       const getMenuStyle = computed((): CSSProperties => {
@@ -366,7 +366,7 @@
         const inputValue = ref('');
         createConfirm({
           iconType: 'warning',
-          title: () => h('span', '创建类型!'),
+          title: () => h('span', '创建项目!'),
           content: () => {
             return h('div', [
               h('label', '类型名称'),

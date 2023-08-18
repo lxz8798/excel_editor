@@ -76,18 +76,23 @@
         </template>
       </Tabs>
     </div>
+    <!-- 引导弹窗 -->
+    <GuidModal @register="guidModalRegister" />
   </div>
 </template>
 
 <script lang="ts">
   import { Tag, Tabs, Row, Col, Pagination } from 'ant-design-vue';
-  import { useModalInner } from '/@/components/Modal';
-  import { defineComponent, computed, ref, h, reactive, toRaw, toRefs } from 'vue';
+  // import { useModalInner } from '/@/components/Modal';
+  import { defineComponent, computed, ref, h, reactive, toRaw, toRefs, onMounted } from 'vue';
   import { CollapseContainer } from '/@/components/Container/index';
   import Icon from '/@/components/Icon/index';
   import Article from './Article.vue';
   import Application from './Application.vue';
   import Project from './Project.vue';
+
+  import { useModal } from '/@/components/Modal';
+  import GuidModal from './modal/guid.vue';
 
   import { tags, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
@@ -111,6 +116,7 @@
       APagination,
       [Row.name]: Row,
       [Col.name]: Col,
+      GuidModal,
     },
     setup() {
       const userStore = useUserStore();
@@ -135,6 +141,7 @@
       });
       let state = reactive({
         formCalculationLogs: [],
+        showModal: false,
       });
 
       // INIT
@@ -149,7 +156,6 @@
       userStore.setUserProjectHistorys({ page: pages.topProjects.page, size: pages.topProjects.size }).then((res) => {
           pages.topProjects.total = res['total'];
           affiliationProjects.value = res['records'];
-          console.log(res, 'res111');
         });
 
       skillsStore.setSkillsUserList();
@@ -177,8 +183,16 @@
       // const skills = computed(() => isAdmin.value ? skillsStore.getSkillsUserList :  skillsStore.getSkillsList);
       const teams = computed(() => userStore.getUserInfo.teams);
       const skills = computed(() => userStore.getUserInfo.skills);
+      const isNewUser = computed(() => sessionStorage.isNewUser);
 
-      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {});
+      const [guidModalRegister, { openModal }] = useModal();
+      onMounted(() => {
+        if (!isNewUser.value) {
+          openModal(true);
+        } else {
+          openModal(false);
+        }
+      });
       // 添加TAG
       function addUserTagHandler() {
         if (!tagList.value.some((i) => i.type === 'add')) {
@@ -226,6 +240,7 @@
       }
 
       return {
+        ...toRefs(state),
         prefixCls: 'account-center',
         avatar,
         realName,
@@ -240,12 +255,12 @@
         showDeleteIcon,
         addTagValue,
         pages,
-        ...toRefs(state),
+        isNewUser,
         turnThePage,
         addUserTagHandler,
         correctAddTagHandler,
         deleteTagHandler,
-        registerModal,
+        guidModalRegister,
       };
     },
   });

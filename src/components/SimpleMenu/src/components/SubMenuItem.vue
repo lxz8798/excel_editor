@@ -8,7 +8,7 @@
           <div class="drop_box"></div>
           <template #overlay>
             <a-menu>
-              <a-menu-item @click="addMenu(item)">创建内容</a-menu-item>
+              <a-menu-item @click="addMenu(item)">创建项目</a-menu-item>
               <a-menu-item @click="editName(item)">修改名称</a-menu-item>
               <a-menu-item @click="copyProject(item)">复制此项</a-menu-item>
               <!--<a-menu-item @click="transformThchnologyMenu(item)">转成技术</a-menu-item>-->
@@ -390,11 +390,12 @@
       // 添加菜单
       function addMenu(item) {
         const inputValue = ref('');
-        const contentType = ref('0');
+        const contentType = ref('1');
+        const _checked = ref(true);
         createConfirm({
           iconType: 'warning',
           width: '35vw',
-          title: () => h('div', '创建内容!'),
+          title: () => h('div', '创建项目!'),
           content: () => {
             return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
               h('label', { style: { width: '72px' } },'内容名称：'),
@@ -408,7 +409,10 @@
                 },
                 inputValue,
               ),
-              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => e.target.checked ? contentType.value = '1' : contentType.value = '0' },'生成项目')
+              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, checked: _checked, onChange: (e) => {
+                  _checked.value = e.target.checked;
+                  return e.target.checked ? contentType.value = '1' : contentType.value = '0';
+                }},'生成项目')
             ]);
           },
           onOk: () => {
@@ -516,7 +520,7 @@
         });
         // createConfirm({
         //   iconType: 'warning',
-        //   title: () => h('span', '创建内容!'),
+        //   title: () => h('span', '创建项目!'),
         //   content: () => {
         //     return h('div', [
         //       h('label', '内容名称'),
@@ -592,11 +596,12 @@
       // 转换成项目
       function transformProjectMenu(item) {
         const inputValue = ref(item.name);
-        const contentType = ref('0');
+        const contentType = ref('1');
+        const _checked = ref(true);
         createConfirm({
           iconType: 'warning',
           width: '35vw',
-          title: () => h('span', '创建内容!'),
+          title: () => h('span', '创建项目!'),
           content: () => {
             return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
               h('label', { style: { width: '72px' } },'内容名称：'),
@@ -610,7 +615,10 @@
                 },
                 inputValue,
               ),
-              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => e.target.checked ? contentType.value = '1' : contentType.value = '0' },'生成项目')
+              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, onChange: (e) => {
+                  _checked.value = e.target.checked
+                  return e.target.checked ? contentType.value = '1' : contentType.value = '0'
+                }},'生成项目')
             ]);
           },
           onOk: () => {
