@@ -459,6 +459,7 @@
           },
           onOk: () => {
             const params = {
+              type: item['type'],
               menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
               menuId: item.id,
             };
@@ -466,6 +467,7 @@
               createMessage.success(res);
               permissionStore.setLastBuildMenuTime();
               permissionStore.buildRoutesAction();
+              setMenuSetting({ menuWidth: 0, mixSideFixed: true });
             });
           },
         });

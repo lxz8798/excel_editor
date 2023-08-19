@@ -15,7 +15,7 @@
                     <ul>
                       <li v-for="content in history['records']">
                         <p>
-                          <span style="color: #78aadf">【{{content['formName']}}】</span><span style="color: green">{{content['createTime']}}</span>，<span class="click_item" @click="enterPath(content, history)">修改了{{content['content']}}</span>
+                          <span style="color: #78aadf">【{{content['formName']}}】</span><span style="color: green">{{content['createTime']}}</span>，<span class="click_item" @click="enterPath(content, history)">{{content['content']}}</span>
                         </p>
                       </li>
                     </ul>
@@ -42,8 +42,8 @@
                   </template>
                 </a-dropdown>
                 <div :class="`${prefixCls}__card-title`">
-                  <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
-                  <span :style="{ color: item.color }">{{ item.title }}</span>
+                  <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="'#161616'" />
+                  <span style="color: #161616;">{{ item.title }}</span>
                 </div>
                 <div :class="`${prefixCls}__card-num`">
                   项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
@@ -178,7 +178,7 @@ export default defineComponent({
               return;
             }
             const params = {
-              type: '1',
+              type: item['type'],
               menuName: inputValue.value,
               menuId: id,
             };
@@ -325,7 +325,7 @@ export default defineComponent({
     }
     // 设置有效期
     function checkProjectDetail(item) {
-      setMenuSetting({ menuWidth: 0, mixSideFixed: false });
+      setMenuSetting({ menuWidth: 0, mixSideFixed: false, hidden: false });
       openDrawer(true, item);
     }
     // 项目审核
@@ -387,6 +387,7 @@ export default defineComponent({
           leaderName: t['leaderName'],
           teams: t['teamUsers'].map((i) => i['realName']).toString(),
           icon: 'gg:loadbar-doc',
+          type: t['type'],
           // closePopFlag: false,
           color: Color(),
           status: t['status'],
@@ -406,6 +407,7 @@ export default defineComponent({
       }
       getOwnerProjectList({ page: state.pages['curr'], size: state.pages['size'] }).then(
         (result) => {
+          if (result['records']) result['records'] = result['records'].map((i) => ({ ...i, type: 1 }));
           state.pages['total'] = Number(result['total'])
           state.pages['curr'] = Number(result['current'])
           state.pages['size'] = Number(result['size'])
@@ -466,12 +468,42 @@ export default defineComponent({
       });
     }
 
+    // 拍平MENU结构
+    function flattenByDFS(data) {
+      let leafNodes = [];
+      function findLeaves(node) {
+        if (!node.children || node.children.length === 0) {
+          leafNodes.push(node);
+        } else {
+          for (let i = 0; i < node.children.length; i++) {
+            findLeaves(node.children[i]);
+          }
+        }
+      }
+      for (let i = 0; i < data.length; i++) {
+        findLeaves(data[i]);
+      }
+      return leafNodes;
+    }
+
     // 进入所有的表单
-    function enterAllPath() {
+    function enterAllPath(item) {
+      const params = {
+        contractId: item['id'],
+      };
+      userStore.setProjectTemplates(params).then((res) => {
+        const result = flattenByDFS(res[0]['children']);
+        console.log(result, 'result');
+      });
+      return
       state.formHistoryList.forEach((i) => {
         if (i['records'].length) {
           // i['records'].map((item) => Object.assign(item, { confirmFlag: i['confirmFlag'] }))
-          enterPath(i['records'][0], { confirmFlag: i['confirmFlag'] });
+          // 原
+          // enterPath(i['records'][0], { confirmFlag: i['confirmFlag'] });
+          // 新
+          item['templateId'] = i['records'][0]['templateId'];
+          enterPath(item, { confirmFlag: i['confirmFlag'] });
         }
       })
     }

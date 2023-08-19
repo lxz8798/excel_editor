@@ -33,7 +33,9 @@
 
     <!-- action  -->
     <div :class="`${prefixCls}-action`">
-      <AppSearch :class="`${prefixCls}-action__item `" v-if="getShowSearch" />
+      <!--<AppSearch :class="`${prefixCls}-action__item `" v-if="getShowSearch" />-->
+      <!-- 新手教程弹窗 -->
+      <GuidModal @register="guidModalRegister" />
 
       <ErrorAction v-if="getUseErrorHandle" :class="`${prefixCls}-action__item error-action`" />
 
@@ -50,12 +52,12 @@
 
       <UserDropDown :theme="getHeaderTheme" />
       <!--系统设置按钮-->
-      <!--<SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />-->
+      <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />
     </div>
   </Header>
 </template>
 <script lang="ts">
-  import { defineComponent, unref, computed } from 'vue';
+  import { defineComponent, unref, computed, onMounted } from 'vue';
 
   import { propTypes } from '/@/utils/propTypes';
 
@@ -81,6 +83,9 @@
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
   import { useLocale } from '/@/locales/useLocale';
 
+  import GuidModal from './components/guid.vue';
+  import { useModal } from '/@/components/Modal';
+
   export default defineComponent({
     name: 'LayoutHeader',
     components: {
@@ -95,6 +100,7 @@
       Notify,
       AppSearch,
       ErrorAction,
+      GuidModal,
       SettingDrawer: createAsyncComponent(() => import('/@/layouts/default/setting/index.vue'), {
         loading: true,
       }),
@@ -129,6 +135,16 @@
       const { getShowLocalePicker } = useLocale();
 
       const { getIsMobile } = useAppInject();
+
+      const isNewUser = computed(() => sessionStorage.isNewUser);
+      const [guidModalRegister, { openModal }] = useModal();
+      // onMounted(() => {
+      //   if (!isNewUser.value) {
+      //     openModal(true);
+      //   } else {
+      //     openModal(false);
+      //   }
+      // });
 
       const getHeaderClass = computed(() => {
         const theme = unref(getHeaderTheme);
@@ -192,6 +208,7 @@
         getShowSettingButton,
         getShowSetting,
         getShowSearch,
+        guidModalRegister,
       };
     },
   });

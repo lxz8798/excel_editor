@@ -253,6 +253,7 @@
       }
       // Process module menu click
       async function handleModuleClick(path: string, hover = false, menu?) {
+        // 设置侧边栏参数
         if (!openMenu.value) {
           setMenuSetting({ menuWidth: 240, mixSideFixed: true });
         } else {

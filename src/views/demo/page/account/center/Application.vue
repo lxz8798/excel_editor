@@ -15,7 +15,7 @@
                     <ul>
                       <li v-for="content in history['records']">
                         <p>
-                          <span style="color: #78aadf">【{{content['formName']}}】</span><span style="color: green">{{content['createTime']}}</span>，<span class="click_item" @click="enterPath(content, history)">修改了{{content['content']}}</span>
+                          <span style="color: #78aadf">【{{content['formName']}}】</span><span style="color: green">{{content['createTime']}}</span>，<span class="click_item" @click="enterPath(content, history)">{{content['content']}}</span>
                         </p>
                       </li>
                     </ul>
@@ -42,8 +42,8 @@
                 </template>
               </a-dropdown>
               <div :class="`${prefixCls}__card-title`">
-                <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
-                <span :style="{ color: item.color }">{{ item.title }}</span>
+                <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="'#161616'" />
+                <span style="color: #161616;">{{ item.title }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
                 项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
@@ -178,7 +178,7 @@
                 return;
               }
               const params = {
-                type: '1',
+                type: item['type'],
                 menuName: inputValue.value,
                 menuId: id,
               };
@@ -377,6 +377,7 @@
             leaderName: t['leaderName'],
             teams: t['teamUsers'].map((i) => i['realName']).toString(),
             icon: 'gg:loadbar-doc',
+            type: t['type'],
             // closePopFlag: false,
             color: Color(),
             status: t['status'],
@@ -396,6 +397,7 @@
         }
         getOwnerProjectList({ page: state.pages['curr'], size: state.pages['size'], userId: userStore.getUserInfo.userId }).then(
           (result) => {
+            if (result['records']) result['records'] = result['records'].map((i) => ({ ...i, type: 1 }));
             state.pages['total'] = result['total']
             state.pages['curr'] = result['current']
             state.pages['size'] = result['size']
@@ -456,11 +458,15 @@
       }
 
       // 进入所有的表单
-      function enterAllPath() {
+      function enterAllPath(item) {
         state.formHistoryList.forEach((i) => {
           if (i['records'].length) {
             // i['records'].map((item) => Object.assign(item, { confirmFlag: i['confirmFlag'] }))
-            enterPath(i['records'][0], { confirmFlag: i['confirmFlag'] });
+            // 原
+            // enterPath(i['records'][0], { confirmFlag: i['confirmFlag'] });
+            // 新
+            item['templateId'] = i['records'][0]['templateId'];
+            enterPath(item, { confirmFlag: i['confirmFlag'] });
           }
         })
       }

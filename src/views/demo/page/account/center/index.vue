@@ -1,7 +1,7 @@
 <template>
   <div :class="prefixCls">
     <a-row :class="`${prefixCls}-top`">
-      <a-col :span="6" :class="`${prefixCls}-col`">
+      <a-col :span="4" :class="`${prefixCls}-col`">
         <a-row>
           <a-col :span="16">
             <div :class="`${prefixCls}-top__avatar`">
@@ -22,7 +22,7 @@
           </a-col>-->
         </a-row>
       </a-col>
-      <a-col :span="6" :class="`${prefixCls}-col`">
+      <a-col :span="8" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team affiliation_wrap`" title="隶属" :canExpan="false">
           <div v-for="(team, index) in affiliationProjects" :key="index" :class="`${prefixCls}-top__team-item`">
             <!-- <Icon :icon="team.icon" :color="team.color" /> -->
@@ -31,7 +31,7 @@
           <a-pagination v-model:current="pages.topProjects.curr" :total="pages.topProjects.total" show-less-items @change="turnThePage" size="small" />
         </CollapseContainer>
       </a-col>
-      <a-col :span="6" :class="`${prefixCls}-col`">
+      <a-col :span="8" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team`" title="技能" :canExpan="false">
           <div v-for="(team, index) in skills" :key="index" :class="`${prefixCls}-top__team-item`">
             <Icon :icon="team.icon" :color="team.color" />
@@ -39,7 +39,7 @@
           </div>
         </CollapseContainer>
       </a-col>
-      <a-col :span="6" :class="`${prefixCls}-col`">
+      <!--<a-col :span="6" :class="`${prefixCls}-col`">
         <CollapseContainer title="标签" :canExpan="false">
           <template v-for="tag in tagList" :key="tag">
             <a-input v-if="tag.label == 'add'" v-model:value="addTagValue" style="margin-top: 10px;">
@@ -58,7 +58,7 @@
             <Icon icon="ant-design:plus-square-filled" style="cursor: pointer" @click="addUserTagHandler" />
           </template>
         </CollapseContainer>
-      </a-col>
+      </a-col>-->
     </a-row>
     <div :class="`${prefixCls}-bottom`">
       <div class="handler_list_wrap">
@@ -77,7 +77,7 @@
       </Tabs>
     </div>
     <!-- 引导弹窗 -->
-    <GuidModal @register="guidModalRegister" />
+    <!--<GuidModal @register="guidModalRegister" />-->
   </div>
 </template>
 
@@ -91,8 +91,8 @@
   import Application from './Application.vue';
   import Project from './Project.vue';
 
-  import { useModal } from '/@/components/Modal';
-  import GuidModal from './modal/guid.vue';
+  // import { useModal } from '/@/components/Modal';
+  // import GuidModal from './modal/guid.vue';
 
   import { tags, details, achieveList } from './data';
   import { useUserStore } from '/@/store/modules/user';
@@ -116,7 +116,7 @@
       APagination,
       [Row.name]: Row,
       [Col.name]: Col,
-      GuidModal,
+      // GuidModal,
     },
     setup() {
       const userStore = useUserStore();
@@ -183,16 +183,16 @@
       // const skills = computed(() => isAdmin.value ? skillsStore.getSkillsUserList :  skillsStore.getSkillsList);
       const teams = computed(() => userStore.getUserInfo.teams);
       const skills = computed(() => userStore.getUserInfo.skills);
-      const isNewUser = computed(() => sessionStorage.isNewUser);
+      // const isNewUser = computed(() => sessionStorage.isNewUser);
 
-      const [guidModalRegister, { openModal }] = useModal();
-      onMounted(() => {
-        if (!isNewUser.value) {
-          openModal(true);
-        } else {
-          openModal(false);
-        }
-      });
+      // const [guidModalRegister, { openModal }] = useModal();
+      // onMounted(() => {
+      //   if (!isNewUser.value) {
+      //     openModal(true);
+      //   } else {
+      //     openModal(false);
+      //   }
+      // });
       // 添加TAG
       function addUserTagHandler() {
         if (!tagList.value.some((i) => i.type === 'add')) {
@@ -255,12 +255,12 @@
         showDeleteIcon,
         addTagValue,
         pages,
-        isNewUser,
+        // isNewUser,
         turnThePage,
         addUserTagHandler,
         correctAddTagHandler,
         deleteTagHandler,
-        guidModalRegister,
+        // guidModalRegister,
       };
     },
   });

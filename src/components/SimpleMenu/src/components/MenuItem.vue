@@ -218,34 +218,47 @@
       // 修改名称
       function editName(item) {
         const inputValue = ref(item.name);
-        const contentType = ref('1');
-        const _checked = ref(true);
+        // const contentType = ref('1');
+        // const _checked = ref(true);
         createConfirm({
           iconType: 'warning',
           width: '35vw',
-          title: () => h('span', '创建项目!'),
+          title: () => h('span', '修改名称!'),
           content: () => {
-            return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
-              h('label', { style: { width: '72px' } },'内容名称：'),
+            return h('div', [
+              h('label', '请输入名称!'),
               h(
                 Input,
                 {
-                  style: {
-                    width: '335px',
+                  value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
+                  onChange: (e) => {
+                    inputValue.value = e.target.value;
                   },
-                  onChange: (e) => inputValue.value = e.target.value,
                 },
                 inputValue,
               ),
-              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, checked: _checked, onChange: (e) => {
-                  _checked.value = e.target.checked;
-                  return e.target.checked ? contentType.value = '1' : contentType.value = '0';
-                }},'生成项目')
             ]);
+            // return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
+            //   h('label', { style: { width: '72px' } },'内容名称：'),
+            //   h(
+            //     Input,
+            //     {
+            //       style: {
+            //         width: '80%',
+            //       },
+            //       onChange: (e) => inputValue.value = e.target.value,
+            //     },
+            //     inputValue,
+            //   ),
+            //   h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, checked: _checked, onChange: (e) => {
+            //       _checked.value = e.target.checked;
+            //       return e.target.checked ? contentType.value = '1' : contentType.value = '0';
+            //     }},'生成项目')
+            // ]);
           },
           onOk: () => {
             const params = {
-              type: '1',
+              type: item['type'],
               menuName: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
               menuId: item.id,
             };
@@ -253,6 +266,7 @@
               createMessage.success(res);
               permissionStore.setLastBuildMenuTime();
               permissionStore.buildRoutesAction();
+              setMenuSetting({ menuWidth: 0, mixSideFixed: true });
             });
           },
         });

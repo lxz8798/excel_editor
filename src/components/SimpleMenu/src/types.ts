@@ -3,4 +3,5 @@ export interface MenuState {
   openNames: string[];
   activeSubMenuNames: string[];
   currTemp: null | object;
+  pages: {};
 }

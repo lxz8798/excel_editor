@@ -116,6 +116,7 @@
       function setMenuShowState() {
         permissionStore.setMenuParams(props.item);
         sessionStorage.menuParams = JSON.stringify(props.item);
+        // 设置侧边栏状态
         setMenuSetting({ menuWidth: 0, mixSideFixed: false });
       }
       function menuHasChildren(menuTreeItem: Menu): boolean {

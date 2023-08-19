@@ -22,6 +22,7 @@ import {
   getUserFiles,
   delUserFiles,
   allUserFiles,
+  userProjectType,
 } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -366,6 +367,9 @@ export const useUserStore = defineStore({
     },
     async setAllUserFileList(params) {
       return await allUserFiles(params);
+    },
+    async setUserProjectDir(params) {
+      return await userProjectType(params);
     },
     /**
      * @description: Confirm before logging out

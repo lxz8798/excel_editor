@@ -133,15 +133,15 @@ export const formSchema: FormSchema[] = [
             model[field] = e.target.value;
           },
         }),
-        h(Checkbox, {
-          style: {
-            marginLeft: '8px',
-          },
-          onChange: (e) => {
-            // isShowCategory.value = e.target.checked;
-            permissionStore.setAddMenuShowCategory(e.target.checked);
-          },
-        }),
+        // h(Checkbox, {
+        //   style: {
+        //     marginLeft: '8px',
+        //   },
+        //   onChange: (e) => {
+        //     // isShowCategory.value = e.target.checked;
+        //     permissionStore.setAddMenuShowCategory(e.target.checked);
+        //   },
+        // }),
       ]),
   },
   {
@@ -236,12 +236,13 @@ export const formSchema: FormSchema[] = [
   //     ]);
   //   },
   // },
-  // {
-  //   field: 'component',
-  //   label: '组件路径',
-  //   component: 'Input',
-  //   ifShow: ({ values }) => isMenu(values.type),
-  // },
+  {
+    field: 'component',
+    label: '组件路径',
+    component: 'Input',
+    defaultValue: 'LAYOUT',
+    ifShow: ({ values }) => values.type == '0',
+  },
   // {
   //   field: 'permission',
   //   label: '权限标识',

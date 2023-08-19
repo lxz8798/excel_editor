@@ -240,7 +240,7 @@
               id: currentRoute.value.meta.templateId,
               name: currentRoute.value.meta.title,
             });
-            formStore.setTemplateProjectName({ templateId: currentRoute.value.meta.templateId })
+            formStore.setTemplateProjectName({ contractId: currentRoute.value.meta.templateId })
               .then((res) => {
                 if (!res) return;
                 const { examContract, technologys, leaderUser, user } = toRaw(res);
@@ -369,7 +369,7 @@
               })
               .then(() => {
                 formStore.setTemplateProjectName({
-                  templateId: currentRoute.value.meta.templateId,
+                  contractId: currentRoute.value.meta.templateId,
                 });
                 formStore
                   .addProjectNameToList({
@@ -378,7 +378,7 @@
                   })
                   .then(() => {
                     formStore
-                      .setTemplateProjectName({ templateId: currentRoute.value.meta.templateId })
+                      .setTemplateProjectName({ contractId: currentRoute.value.meta.templateId })
                       .then((res) => {
                         state.projectNameDefalutValue = res.projectName;
                         state.projectNames = computed(() => res.projectNames);
@@ -412,7 +412,7 @@
           onOk: async () => {
             formStore.delProjectNameFormList({ id: obj.id }).then((res) => {
               createMessage.success(res);
-              formStore.setTemplateProjectName({ templateId: currentRoute.value.meta.templateId }).then((res) => {
+              formStore.setTemplateProjectName({ contractId: currentRoute.value.meta.templateId }).then((res) => {
                   state.projectNames = computed(() => res.projectNames);
                   state.projectOptionsValue = '';
                   state.projectNameDefalutValue = '';
@@ -623,6 +623,7 @@
         }
       }
       function fillForm({ id, name }) {
+        if (!id) return
         // formStore.setCurrTemp(item);
         state.currTempDetail = { id: id, name: name };
         // 获得所有的表单项

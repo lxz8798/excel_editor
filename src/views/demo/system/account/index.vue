@@ -1,7 +1,7 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
     <!--<DeptTree class="w-1/4 xl:w-1/5" @select="handleSelect" />-->
-    <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo">
+    <BasicTable @register="registerTable" class="w-4/4 xl:w-5/5" :searchInfo="searchInfo" :pagination="{pageSize: pages.size, current: 1 }">
       <template #toolbar>
         <a-button type="primary" v-if="!isNormal" @click="handleCreate">新增账号</a-button>
       </template>
@@ -34,7 +34,7 @@
   </PageWrapper>
 </template>
 <script lang="ts">
-  import { defineComponent, reactive, onMounted, computed, ref } from 'vue';
+  import { defineComponent, reactive, onMounted, computed, ref, toRefs } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getAccountList } from '/@/api/demo/system';
@@ -67,6 +67,13 @@
       const [registerTable, { reload, updateTableDataRecord, getRawDataSource, setTableData }] =
         useTable({
           title: '用户列表',
+          beforeFetch: (params) => {
+            params['size'] = state.pages.size;
+            state.pages.curr = params['page'];
+          },
+          fetchSetting: {
+            listField: 'records',
+          },
           api: getAccountList,
           rowKey: 'id',
           columns,
@@ -88,6 +95,15 @@
             // slots: { customRender: 'action' },
           },
         });
+
+      const state = reactive({
+        pages: {
+          page: 1,
+          size: 12,
+          curr: 1,
+          total: 0,
+        },
+      });
 
       // INIT
       skillsStore.setSkillsUserList();
@@ -183,6 +199,7 @@
       }
 
       return {
+        ...toRefs(state),
         registerTable,
         registerModal,
         handleCreate,
@@ -201,5 +218,10 @@
 <style lang="less" scope>
   .vben-page-wrapper {
     margin: 16px;
+  }
+  .ant-spin-container {
+    .ant-pagination {
+      margin: unset;
+    }
   }
 </style>

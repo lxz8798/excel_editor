@@ -1,7 +1,5 @@
 <template>
   <PageWrapper contentFullHeight class="page_wrap">
-    <!--@change="handleChange"-->
-    <!--:custom-request="handleChange"-->
     <a-upload-dragger
       v-model:fileList="fileList"
       name="file"
@@ -64,6 +62,7 @@
     message,
     Upload,
     List,
+    ListItemMeta,
     Checkbox,
     InputSearch,
     Pagination,
@@ -73,7 +72,6 @@
   import { useUserStore } from '/@/store/modules/user';
   import { Icon } from '/@/components/Icon';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { defHttp } from '/@/utils/http/axios';
 
   const AUploadDragger = Upload.Dragger;
   const AList = List;
@@ -167,13 +165,6 @@
       userStore['setUserFilesList'](paramsColl['getFileListParams']).then(() => {
         state.pages = computed(() => userStore.getUserFilesPage['userFiles']);
       });
-
-      const uploadSuccess = () => {
-        console.log('成功');
-      };
-      const uploadFail = () => {
-        console.log('失败');
-      };
 
       const handleChange = (info) => {
         const reg = /^[0-9]+_.+_([\u4e00-\u9fa5]+|[a-zA-Z]+)_[\u4e00-\u9fa5]{2,4}$/g;

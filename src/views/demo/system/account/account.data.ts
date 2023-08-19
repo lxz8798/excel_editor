@@ -93,7 +93,6 @@ export const accountFormSchema: FormSchema[] = [
     component: 'Input',
     rules: [
       {
-        required: true,
         message: '请输入用户名',
       },
       // {
@@ -113,8 +112,7 @@ export const accountFormSchema: FormSchema[] = [
     field: 'realName',
     label: '真实名称',
     component: 'Input',
-    defaultValue: toRaw(userStore.getUserInfo['realName']),
-    required: true,
+    // defaultValue: toRaw(userStore.getUserInfo['realName']),
   },
   {
     field: 'password',
@@ -130,10 +128,10 @@ export const accountFormSchema: FormSchema[] = [
   //   component: 'Input',
   // },
   {
-    field: 'teamName',
+    field: 'userTeams',
     label: '所属团队',
     component: 'Select',
-    defaultValue: toRaw(userStore.getUserInfo['teams']),
+    // defaultValue: toRaw(userStore.getUserInfo['teams']),
     componentProps: ({ formModel, formActionType }) => {
       const options = computed(() => toRaw(teamStore.getTeamsUserList));
       return {
@@ -144,12 +142,11 @@ export const accountFormSchema: FormSchema[] = [
     },
   },
   {
-    field: 'skills',
+    field: 'userSkills',
     label: '专业技能',
     component: 'Select',
-    defaultValue: toRaw(userStore.getUserInfo['skills']),
+    // defaultValue: toRaw(userStore.getUserInfo['skills']),
     componentProps: ({ formModel, formActionType }) => {
-      console.log(toRaw(userStore.getUserInfo['teams']));
       const options = computed(() => toRaw(skillsStore.getSkillsUserList));
       return {
         mode: 'multiple',
@@ -176,7 +173,7 @@ export const accountFormSchema: FormSchema[] = [
     field: 'phone',
     label: '手机号',
     component: 'InputNumber',
-    defaultValue: toRaw(userStore.getUserInfo['phone']),
+    // defaultValue: toRaw(userStore.getUserInfo['phone']),
   },
   {
     label: '角色',
@@ -187,7 +184,7 @@ export const accountFormSchema: FormSchema[] = [
       labelField: 'roleName',
       valueField: 'roleId',
     },
-    defaultValue: toRaw(userStore.getUserInfo['roles']),
+    // defaultValue: toRaw(userStore.getUserInfo['roles']),
     ifShow: () => {
       if (!Object.keys(userStore.getUserInfo).length) return;
       return userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'super_admin' || i['roleCode'] === 'project_admin');

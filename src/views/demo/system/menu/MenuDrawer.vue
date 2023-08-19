@@ -94,9 +94,9 @@
             createMessage.success(addResult);
           } else {
             const { menuId, component } = toRaw(state.datas.record);
-            if (type == 1 && component.includes('template')) {
-              formDatas['templateFlag'] = '1';
-            }
+            // if (unref(isUpdate)) {
+            //   formDatas['templateFlag'] = '1';
+            // }
             formDatas['menuId'] = menuId;
             // 编辑菜单
             const editResult = await editMenu(formDatas);
