@@ -19,7 +19,7 @@
     </a-upload-dragger>
     <!--  文件检索  -->
     <div class="file_search">
-      <a-input-search type="text" placeholder="请输入文件名称" enter-button="检索" size="large" @search="searchFile"></a-input-search>
+      <a-input-search type="text" placeholder="文件名规范格式请参考：20230819_项目名称_完井_管理员，检索输入文件名称即可!" enter-button="检索" size="large" @search="searchFile"></a-input-search>
     </div>
     <!--  全选&删除  -->
     <div class="fun_wrap">
@@ -170,7 +170,7 @@
         const reg = /^[0-9]+_.+_([\u4e00-\u9fa5]+|[a-zA-Z]+)_[\u4e00-\u9fa5]{2,4}$/g;
         const status = info.file.status;
         if (!reg.test(info.file.name.split('.')[0])) {
-          message.warning(`${info.file.name} 文件名称不规范!`);
+          message.warning(`${info.file.name} 文件名称不规范，请参考："20230819_项目名称_完井_管理员"`);
           return;
         }
         if (status !== 'uploading') {

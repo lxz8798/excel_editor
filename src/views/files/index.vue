@@ -21,7 +21,7 @@
     </a-upload-dragger>
     <!--  文件检索  -->
     <div class="file_search">
-      <a-input-search type="text" placeholder="请输入文件名称" enter-button="检索" size="large" @search="searchFile"></a-input-search>
+      <a-input-search type="text" placeholder="文件名规范格式请参考：20230819_项目名称_完井_管理员，检索输入文件名称即可!" enter-button="检索" size="large" @search="searchFile"></a-input-search>
     </div>
     <!--  全选&删除  -->
     <div class="fun_wrap">
@@ -44,7 +44,7 @@
             <template #avatar>
               <Icon :icon="isWhatType(item['fileName'])" @dblclick="dblclickEnterDir(item)" v-if="isDirFlag"></Icon>
               <Icon :icon="isWhatType(item['fileName'])" v-else></Icon>
-              <Icon icon="typcn:delete-outline" class="del_icon" @click="deleteUserFile(item)"></Icon>
+              <Icon icon="typcn:delete-outline" class="del_icon" @click="deleteUserFile(item)" v-if="item.type == '2'"></Icon>
               <a-checkbox v-model:checked="item['checked']" class="checked_box" v-if="!isDirFlag"></a-checkbox>
             </template>
           </a-list-item-meta>
@@ -154,6 +154,7 @@
         },
         dirLists: [],
         isDirFlag: false,
+        dirZIndex: 2,
       });
       // created
       let paramsColl: Record<string, IGetFileParams> = {
@@ -179,7 +180,7 @@
         const reg = /^[0-9]+_.+_([\u4e00-\u9fa5]+|[a-zA-Z]+)_[\u4e00-\u9fa5]{2,4}$/g;
         const status = info.file.status;
         if (!reg.test(info.file.name.split('.')[0])) {
-          message.warning(`${info.file.name} 文件名称不规范!`);
+          message.warning(`${info.file.name} 文件名称不规范，请参考："20230819_项目名称_完井_管理员"`);
           return;
         }
         if (status !== 'uploading') {
@@ -243,12 +244,11 @@
         const params = {
           page: state.pages.curr,
           size: state.pages.size,
+          userId: userStore['getUserInfo']['userId'],
           menuId: paramsColl['getFileListParams']['menuId'],
           fileName: txt,
         };
-        userStore['setUserFilesList'](params).then((res) => {
-          console.log(res, 'res');
-        });
+        userStore['setUserFilesList'](params)
       };
 
       const turnThePage = () => {
@@ -292,24 +292,52 @@
       };
 
       const uppageHandler = () => {
+        state.dirZIndex--;
+
         const params = {
           page: state.pages.curr,
           size: state.pages.size,
           menuId: state['uploadParams']['menuId'],
         };
-        userStore.setAllUserFileList(params).then((res) => {
-          state.dirLists = res.map((i) => ({...i, fileName: `${i.fileName}\.dir`}));
-          state.isDirFlag = true;
-          state.fileDatas.length = 0;
-        });
+
+        if (state.dirZIndex == 1) {
+          userStore.setAllUserFileList(params).then((res) => {
+            console.log(res, 'res');
+            state.dirLists = res.map((i) => ({...i, fileName: `${i.fileName}\.dir`}));
+            state.isDirFlag = true;
+            state.fileDatas.length = 0;
+          });
+        }
+
+        if (state.dirZIndex <= 0) {
+          userStore.setUserProjectDir(params).then((res) => {
+            state.dirLists = res.map((i) => ({...i, fileName: `${i.fileName}\.dir`}));
+            state.isDirFlag = true;
+            state.fileDatas.length = 0;
+          });
+        }
       };
 
       const dblclickEnterDir = (item) => {
-        state.isDirFlag = false;
-        paramsColl['getFileListParams']['menuId'] = item['menuId'];
-        paramsColl['getFileListParams']['parentId'] = item['id'];
-        paramsColl['getFileListParams']['userId'] = item['userId'];
-        userStore['setUserFilesList'](paramsColl['getFileListParams']);
+        if (state.dirZIndex == 0) {
+          const params = {
+            page: state.pages.curr,
+            size: state.pages.size,
+            menuId: state['uploadParams']['menuId'],
+          };
+          userStore.setAllUserFileList(params).then((res) => {
+            state.dirLists = res.map((i) => ({...i, fileName: `${i.fileName}\.dir`}));
+            state.isDirFlag = true;
+            state.fileDatas.length = 0;
+            state.dirZIndex = 2;
+          });
+        } else {
+          state.isDirFlag = false;
+          paramsColl['getFileListParams']['menuId'] = item['menuId'];
+          paramsColl['getFileListParams']['parentId'] = item['id'];
+          paramsColl['getFileListParams']['userId'] = item['userId'];
+          userStore['setUserFilesList'](paramsColl['getFileListParams']);
+        }
       };
 
       const downloadHandler = (item) => {
