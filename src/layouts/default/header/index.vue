@@ -58,7 +58,7 @@
   </Header>
 </template>
 <script lang="ts">
-  import { defineComponent, unref, computed, onMounted } from 'vue';
+  import { defineComponent, unref, computed, onMounted, onBeforeUnmount } from 'vue';
 
   import { propTypes } from '/@/utils/propTypes';
   import { Icon } from '/@/components/Icon';
@@ -188,6 +188,22 @@
 
       const getMenuMode = computed(() => {
         return unref(getSplit) ? MenuModeEnum.HORIZONTAL : null;
+      });
+
+      const beforeUnloadHandler = () => {
+        // 执行退出操作，清除登录状态
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // 如果需要执行其他清理操作，也可以在这里添加
+      };
+
+      // 监听窗口关闭事件
+      // window.addEventListener('beforeunload', beforeUnloadHandler);
+
+      // 在组件卸载前移除监听器
+      onBeforeUnmount(() => {
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
       });
 
       const openGuid = () => {

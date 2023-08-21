@@ -46,6 +46,12 @@
                 <span style="color: #161616;">{{ item.title }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
+                项目简介：<span>{{ item.content ?? '暂无' }}</span>
+              </div>
+              <div :class="`${prefixCls}__card-num`">
+                甲方：<span>{{ item.partyA ?? '暂无' }}</span>
+              </div>
+              <div :class="`${prefixCls}__card-num`">
                 项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
               </div>
               <div :class="`${prefixCls}__card-num`">
