@@ -21,7 +21,7 @@
               },
               {
                 icon: 'clarity:note-edit-line',
-                tooltip: '设置有效期',
+                tooltip: '编辑项目',
                 onClick: handleEdit.bind(null, record),
               },
               {

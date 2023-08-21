@@ -349,6 +349,7 @@ export const usePermissionStore = defineStore({
               title: t('routes.demo.system.moduleName'),
             },
             children: [
+              // 系统管理的项目管理
               {
                 path: 'project',
                 name: 'ProjectManagement',

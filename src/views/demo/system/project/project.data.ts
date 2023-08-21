@@ -17,22 +17,24 @@ export const columns: BasicColumn[] = [
     title: '项目名称',
     dataIndex: 'name',
   },
-  // {
-  //   title: '关联内容',
-  //   dataIndex: 'contracts',
-  //   customRender: ({ record }) => {
-  //     return h('span', record['contracts'] && record['contracts'].map((i) => i && i['menuName'].split('-')[i['menuName'].split('-').length - 1]).toString());
-  //   },
-  // },
+  {
+    title: '项目描述',
+    dataIndex: 'content',
+  },
+  {
+    title: '甲方',
+    dataIndex: 'partyA',
+    width: 80,
+  },
   {
     title: '项目长',
     dataIndex: 'leaderName',
-    width: 200,
+    width: 80,
   },
   {
     title: '项目成员',
     dataIndex: 'teamUsers',
-    width: 300,
+    width: 200,
     customRender: ({ record }) => {
       return h('span', record['teamUsers'] && record['teamUsers'].map((i) => i && i['realName']).toString());
     },
@@ -113,7 +115,29 @@ export const projectFormSchema: FormSchema[] = [
     ],
   },
   {
-    field: 'projectAdminId',
+    field: 'content',
+    label: '项目描述',
+    component: 'Input',
+    rules: [
+      {
+        required: true,
+        message: '请输入项目描述',
+      },
+    ],
+  },
+  {
+    field: 'partyA',
+    label: '甲方',
+    component: 'Input',
+    rules: [
+      {
+        required: true,
+        message: '请输入项目描述',
+      },
+    ],
+  },
+  {
+    field: 'leaderName',
     label: '指定项目长',
     component: 'AutoComplete',
     rules: [
@@ -206,7 +230,7 @@ export const projectFormSchema: FormSchema[] = [
   //   },
   // },
   {
-    field: 'daysLeft',
+    field: 'targetTime',
     label: '到期时间',
     component: 'DatePicker',
     componentProps: ({ formModel, formActionType }) => {

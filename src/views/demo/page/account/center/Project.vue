@@ -23,7 +23,7 @@
                 </ul>
               </template>
               <template #title>
-                <span>更新内容</span>
+                <span>最新更新</span>
               </template>
               <Card :hoverable="true" :class="`${prefixCls}__card`" @mouseover="formHandlerHistoryList(item)" @click="enterAllPath(item)">
                 <a-dropdown :trigger="['contextmenu']">
@@ -44,6 +44,12 @@
                 <div :class="`${prefixCls}__card-title`">
                   <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="'#161616'" />
                   <span style="color: #161616;">{{ item.title }}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  项目简介：<span>{{ item.content ?? '暂无' }}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  甲方：<span>{{ item.partyA ?? '暂无' }}</span>
                 </div>
                 <div :class="`${prefixCls}__card-num`">
                   项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
@@ -488,14 +494,14 @@ export default defineComponent({
 
     // 进入所有的表单
     function enterAllPath(item) {
-      const params = {
-        contractId: item['id'],
-      };
-      userStore.setProjectTemplates(params).then((res) => {
-        const result = flattenByDFS(res[0]['children']);
-        console.log(result, 'result');
-      });
-      return
+      // const params = {
+      //   contractId: item['id'],
+      // };
+      // userStore.setProjectTemplates(params).then((res) => {
+      //   const result = flattenByDFS(res[0]['children']);
+      //   console.log(result, 'result');
+      // });
+      // return
       state.formHistoryList.forEach((i) => {
         if (i['records'].length) {
           // i['records'].map((item) => Object.assign(item, { confirmFlag: i['confirmFlag'] }))
@@ -583,6 +589,8 @@ export default defineComponent({
     }
 
     &-title {
+      overflow: hidden;
+      height: 50px;
       margin-bottom: 5px;
       font-size: 16px;
       font-weight: 500;
@@ -590,6 +598,15 @@ export default defineComponent({
       .icon {
         margin-top: -5px;
         font-size: 22px;
+      }
+    }
+
+    &-des {
+      line-height: 36px;
+      color: @text-color-secondary;
+
+      span {
+        font-size: 14px;
       }
     }
 

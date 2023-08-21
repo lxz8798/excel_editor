@@ -26,36 +26,36 @@
     <!--  全选&删除  -->
     <div class="fun_wrap">
       <div class="select_all">
-        <Icon icon="tabler:folder-up" style="margin-right: 8px; cursor: pointer;" @click="uppageHandler"></Icon>
+        <!--<Icon icon="tabler:folder-up" style="margin-right: 8px; cursor: pointer;" @click="uppageHandler"></Icon>-->
         <a-checkbox v-model:checked="allSelectFlag" class="checked_box" @change="selectAll"></a-checkbox>
         <label style="margin-left: 10px;">全选</label>
       </div>
       <p class="delete_but" @click="delMultiple">删除</p>
     </div>
-    <!--  文件列表  -->
-    <a-list item-layout="vertical" :data-source="isDirFlag ? dirLists : fileDatas" :grid="{ gutter: 8, column: 8 }">
+    <!--  文件列表 item-layout="vertical"  -->
+    <a-list :data-source="isDirFlag ? dirLists : fileDatas" :grid="{ gutter: 2, column: 2 }">
       <template #renderItem="{ item }">
         <a-list-item>
           <a-list-item-meta :description="`上传时间：${uploadTime(item['createTime'])}`">
             <template #title>
-              <span class="isDirFlag" :title="getFileName(item['fileName'])" v-if="isDirFlag">{{ getFileName(item['fileName']) }}</span>
-              <span :title="getFileName(item['fileOriginalName'])" v-else>{{ getFileName(item['fileOriginalName']) }}</span>
+              <span class="isDirFlag" :title="getFileName2(item['fileName'])" v-if="isDirFlag">{{ getFileName2(item['fileName']) }}</span>
+              <span :title="getFileName2(item['fileOriginalName'])" v-else>{{ getFileName2(item['fileOriginalName']) }}</span>
             </template>
             <template #avatar>
-              <Icon :icon="isWhatType(item['fileName'])" @dblclick="dblclickEnterDir(item)" v-if="isDirFlag"></Icon>
-              <Icon :icon="isWhatType(item['fileName'])" v-else></Icon>
-              <Icon icon="typcn:delete-outline" class="del_icon" @click="deleteUserFile(item)" v-if="item.type == '2'"></Icon>
               <a-checkbox v-model:checked="item['checked']" class="checked_box" v-if="!isDirFlag"></a-checkbox>
+              <!--<Icon :icon="isWhatType(item['fileName'])" @dblclick="dblclickEnterDir(item)" v-if="isDirFlag"></Icon>
+              <Icon :icon="isWhatType(item['fileName'])"></Icon>-->
+              <Icon icon="typcn:delete-outline" class="del_icon" @click="deleteUserFile(item)"></Icon>
             </template>
           </a-list-item-meta>
-          <template #actions>
+          <!--<template #actions>
             <a-button class="down" type="primary" shape="round" size="small" @click="downloadHandler(item)">下载</a-button>
-          </template>
+          </template>-->
         </a-list-item>
       </template>
     </a-list>
     <!--  分页器  -->
-    <a-pagination v-model:current="pages.curr" :total="pages.total" size="small" show-less-items show-total @change="turnThePage" />
+    <a-pagination v-model:current="pages.curr" :total="pages.total" pageSize="24" size="small" show-less-items show-total @change="turnThePage" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -84,6 +84,7 @@
   const APagination = Pagination;
 
   export default defineComponent({
+    name: 'fileUpload',
     components: {
       InboxOutlined,
       AUploadDragger,
@@ -165,19 +166,16 @@
           size: state.pages.size,
         },
       };
-      userStore['setUserFilesList'](paramsColl['getFileListParams']).then(() => {
+      userStore['setUserFilesList'](paramsColl['getFileListParams']).then((res) => {
+        state.pages.curr = res['current'];
+        state.pages.total = res['total'];
         state.pages = computed(() => userStore.getUserFilesPage['userFiles']);
       });
 
-      const uploadSuccess = () => {
-        console.log('成功');
-      };
-      const uploadFail = () => {
-        console.log('失败');
-      };
+      const isSelf = computed(() => userStore.getUserInfo['userId']);
 
       const handleChange = (info) => {
-        const reg = /^[0-9]+_.+_([\u4e00-\u9fa5]+|[a-zA-Z]+)_[\u4e00-\u9fa5]{2,4}$/g;
+        const reg = /([0-9]+_)?.+_([\u4e00-\u9fa5]+|[a-zA-Z]+)_[\u4e00-\u9fa5]{2,4}$/g;
         const status = info.file.status;
         if (!reg.test(info.file.name.split('.')[0])) {
           message.warning(`${info.file.name} 文件名称不规范，请参考："20230819_项目名称_完井_管理员"`);
@@ -188,7 +186,7 @@
         }
         if (status === 'done') {
           message.success(`${info.file.name} 上传成功.`);
-          userStore['setUserFilesList'](paramsColl['getFileListParams']);
+          userStore['setUserFilesList'](paramsColl['getFileListParams'])
         } else if (status === 'error') {
           message.error(`${info.file.name} 上传失败.`);
         }
@@ -204,12 +202,21 @@
         return name.split('.')[0];
       };
 
+      const getFileName2 = (name) => {
+        if (!name) return;
+        return `${name.split('_')[1]}_${name.split('_')[2]}`;
+      };
+
       const uploadTime = (time) => {
         if (!time) return;
         return time.split(' ')[0];
       };
 
       const deleteUserFile = (file) => {
+        if (isSelf.value != file.userId) {
+          createMessage.warning('请注意，不是自己上传的文件不能删除!');
+          return;
+        }
         createConfirm({
           iconType: 'warning',
           okButtonProps: {
@@ -251,8 +258,12 @@
         userStore['setUserFilesList'](params)
       };
 
-      const turnThePage = () => {
-        userStore['setUserFilesList'](paramsColl['getFileListParams']);
+      const turnThePage = (page) => {
+        paramsColl['getFileListParams'].page = page;
+        userStore['setUserFilesList'](paramsColl['getFileListParams']).then((res) => {
+          state.pages.curr = res['current'];
+          state.pages.total = res['total'];
+        });
       };
 
       const delMultiple = () => {
@@ -354,6 +365,7 @@
         handleChange,
         isWhatType,
         getFileName,
+        getFileName2,
         uploadTime,
         deleteUserFile,
         searchFile,
@@ -391,77 +403,84 @@
       }
     }
   }
-  ::v-deep(.ant-list-item-meta) {
-    position: relative;
-    padding: 5px;
-    margin: 5px;
+  ::v-deep(.ant-list-item) {
+    margin-bottom: 5px !important;
+    .ant-list-item-meta {
+      position: relative;
+      padding: 5px;
+      margin: 5px;
 
-    display: flex;
-    flex-direction: column;
-
-    width: 160px;
-
-    border: 1px dashed rgba(229, 231, 235, 1);
-    border-radius: 5px;
-    transition: 1s;
-    cursor: pointer;
-
-    .ant-list-item-meta-avatar,
-    .ant-list-item-meta-content {
-      width: 100%;
-    }
-
-    .ant-list-item-meta-avatar {
-      padding: 10px 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      .app-iconify {
-        font-size: 50px !important;
-      }
-      .del_icon,
-      .checked_box {
-        transition: .6s;
-      }
-      .del_icon {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        font-size: 15px !important;
-        color: rgba(255, 255, 255, 0);
-      }
-      .checked_box {
-        position: absolute;
-        left: 5px;
-        top: 5px;
-      }
-    }
+      flex-direction: row;
 
-    .ant-list-item-meta-content {
-      .ant-list-item-meta-title {
-        height: 45px;
-        overflow: hidden;
-        > span {
-          word-wrap: break-word;
-        }
-        > .isDirFlag {
-          width: 100%;
-          display: inline-block;
-          text-align: center;
-        }
-      }
-    }
+      //width: 160px;
 
-    &:hover {
-      border: 1px dashed dodgerblue;
-      background: rgba(42, 125, 201, .1);
+      border: 1px dashed rgba(229, 231, 235, 1);
+      border-radius: 5px;
+      transition: 1s;
+      cursor: pointer;
+
+      .ant-list-item-meta-avatar,
+      .ant-list-item-meta-content {
+        width: 100%;
+      }
 
       .ant-list-item-meta-avatar {
-        .del_icon {
-          color: rgba(255, 0, 0, 1);
+        margin-right: unset;
+        width: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .app-iconify {
+          font-size: 25px !important;
         }
+        .del_icon,
         .checked_box {
-          opacity: 1;
+          transition: .6s;
+        }
+        .del_icon {
+          position: absolute;
+          right: 5px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 25px !important;
+          color: rgba(0, 0, 0, .3);
+        }
+      }
+
+      .ant-list-item-meta-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .ant-list-item-meta-title {
+          overflow: hidden;
+          > span {
+            word-wrap: break-word;
+          }
+          > .isDirFlag {
+            width: 100%;
+            display: inline-block;
+            text-align: center;
+          }
+        }
+      }
+
+      .ant-list-item-meta-description {
+        padding-right: 28px;
+      }
+
+      &:hover {
+        border: 1px dashed dodgerblue;
+        background: rgba(42, 125, 201, .1);
+
+        .ant-list-item-meta-avatar {
+          .del_icon {
+            color: rgba(255, 0, 0, 1);
+          }
+          .checked_box {
+            opacity: 1;
+          }
         }
       }
     }

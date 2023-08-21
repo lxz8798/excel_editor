@@ -23,7 +23,7 @@
                 </ul>
               </template>
               <template #title>
-                <span>更新内容</span>
+                <span>最近更新</span>
               </template>
               <Card :hoverable="true" :class="`${prefixCls}__card`" @mouseover="formHandlerHistoryList(item)" @click="enterAllPath(item)">
               <a-dropdown :trigger="['contextmenu']">
@@ -543,6 +543,8 @@
       }
 
       &-title {
+        overflow: hidden;
+        height: 50px;
         margin-bottom: 5px;
         font-size: 16px;
         font-weight: 500;

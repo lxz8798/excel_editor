@@ -33,9 +33,8 @@
 
     <!-- action  -->
     <div :class="`${prefixCls}-action`">
-      <!--<AppSearch :class="`${prefixCls}-action__item `" v-if="getShowSearch" />-->
-      <!-- 新手教程弹窗 -->
-      <GuidModal @register="guidModalRegister" />
+      <!--<AppSearch v-if="getShowSearch" :class="`${prefixCls}-action__item `" />-->
+      <Icon icon="material-symbols:play-lesson" style="cursor: pointer; padding: 0 10px;" @click="openGuid" :class="`${prefixCls}-action__item`" title="操作教程"></Icon>
 
       <ErrorAction v-if="getUseErrorHandle" :class="`${prefixCls}-action__item error-action`" />
 
@@ -53,6 +52,8 @@
       <UserDropDown :theme="getHeaderTheme" />
       <!--系统设置按钮-->
       <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />
+      <!-- 新手教程弹窗 -->
+      <GuidModal @register="guidModalRegister" />
     </div>
   </Header>
 </template>
@@ -60,6 +61,7 @@
   import { defineComponent, unref, computed, onMounted } from 'vue';
 
   import { propTypes } from '/@/utils/propTypes';
+  import { Icon } from '/@/components/Icon';
 
   import { Layout } from 'ant-design-vue';
   import { AppLogo } from '/@/components/Application';
@@ -101,6 +103,7 @@
       AppSearch,
       ErrorAction,
       GuidModal,
+      Icon,
       SettingDrawer: createAsyncComponent(() => import('/@/layouts/default/setting/index.vue'), {
         loading: true,
       }),
@@ -130,6 +133,7 @@
         getShowHeaderLogo,
         getShowHeader,
         getShowSearch,
+        getShowGuidIcont,
       } = useHeaderSetting();
 
       const { getShowLocalePicker } = useLocale();
@@ -186,6 +190,10 @@
         return unref(getSplit) ? MenuModeEnum.HORIZONTAL : null;
       });
 
+      const openGuid = () => {
+        openModal(true);
+      };
+
       return {
         prefixCls,
         getHeaderClass,
@@ -208,6 +216,8 @@
         getShowSettingButton,
         getShowSetting,
         getShowSearch,
+        getShowGuidIcont,
+        openGuid,
         guidModalRegister,
       };
     },

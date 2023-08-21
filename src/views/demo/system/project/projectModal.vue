@@ -87,7 +87,7 @@
       async function handleSubmit() {
         try {
           const values = await validate();
-          const { name, daysLeft, projectAdminId, parentMenu } = values;
+          const { name, createUserId, parentMenu, content, partyA, targetTime } = values;
           if (name.includes('-')) {
             createMessage.info('名称当中不能包含"-"，请检查后在输入!');
             return;
@@ -95,10 +95,13 @@
           const params = {
             name: name,
             // createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
+            content: content,
+            partyA: partyA,
             createUserId: leaderId.value,
             parentMenu: parentMenu,
             menuIds: getMenuIds.value,
-            targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,
+            // targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,
+            targetTime: new Date(targetTime.toJSON()).getTime(),
             userId: userStore.getUserInfo.userId,
             id: rowId.value,
           };

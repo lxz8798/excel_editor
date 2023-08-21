@@ -1,6 +1,5 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" title="操作教程" :height="600" :showCancelBtn="false" :showOkBtn="false" :closeFunc="closeHandler">
-    <Icon icon="material-symbols:play-lesson" style="width: 50px; height: 50px; background: red;"></Icon>
     <div class="guid_modal">
       <!-- <div class="left">
         <img src="/src/assets/guid/guid.png" />

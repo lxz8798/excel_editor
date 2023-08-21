@@ -61,13 +61,13 @@
           },
         ]"
       >
-        <!-- <span class="text"> {{ title }}</span>-->
-        <span class="text">封堵项目实施系统</span>
+        <span class="text" v-if="getMixSideFixed">封堵项目实施系统</span>
         <Icon
           :size="16"
           :icon="getMixSideFixed ? 'ri:pushpin-2-fill' : 'ri:pushpin-2-line'"
           class="pushpin"
           @click="handleFixedMenu"
+          v-if="getMixSideFixed"
         />
       </div>
       <ScrollContainer :class="`${prefixCls}-menu-list__content`">
@@ -114,6 +114,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { Dropdown, Input, Menu as Menuu } from 'ant-design-vue';
   import { useProjectStore } from '/@/store/modules/project';
+  import { useAppStore } from '/@/store/modules/app';
   const ADropdown = Dropdown;
   const AMenu = Menuu;
   const AMenuItem = Menuu.Item;
@@ -167,6 +168,8 @@
       const { title } = useGlobSetting();
       const permissionStore = usePermissionStore();
       const { createMessage, createConfirm } = useMessage();
+      const appStore = useAppStore();
+
       useDragLine(sideRef, dragBarRef, true);
 
       userStore.setUserList({ page: 1, size: 9999 });
@@ -220,6 +223,7 @@
       const getShowDragBar = computed(() => unref(getCanDrag));
       const currTemp = computed(() => JSON.parse(localStorage.getItem('currTemp')));
       const isNormal = computed(() => userStore.getUserInfo['roles'].some((i) => i['roleCode'] === 'common_user'));
+
       onMounted(async () => {
         menuModules.value = await getShallowMenus();
       });
