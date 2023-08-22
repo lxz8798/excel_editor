@@ -101,7 +101,7 @@
             parentMenu: parentMenu,
             menuIds: getMenuIds.value,
             // targetTime: daysLeft ? new Date(daysLeft).toLocaleString().replace(/\/+/g, '-') : null,
-            targetTime: new Date(targetTime.toJSON()).getTime(),
+            targetTime: targetTime ? new Date(targetTime.toJSON()).getTime() : '',
             userId: userStore.getUserInfo.userId,
             id: rowId.value,
           };

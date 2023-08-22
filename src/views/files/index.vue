@@ -161,7 +161,7 @@
       let paramsColl: Record<string, IGetFileParams> = {
         getFileListParams: {
           menuId: state['uploadParams']['menuId'],
-          userId: userStore['getUserInfo']['userId'],
+          // userId: userStore['getUserInfo']['userId'],
           page: state.pages.curr,
           size: state.pages.size,
         },
@@ -175,7 +175,7 @@
       const isSelf = computed(() => userStore.getUserInfo['userId']);
 
       const handleChange = (info) => {
-        const reg = /([0-9]+_)?.+_([\u4e00-\u9fa5]+|[a-zA-Z]+)_[\u4e00-\u9fa5]{2,4}$/g;
+        const reg = /^([0-9]+_)?.+_[\u4e00-\u9fa5]{2,4}$/g;
         const status = info.file.status;
         if (!reg.test(info.file.name.split('.')[0])) {
           message.warning(`${info.file.name} 文件名称不规范，请参考："20230819_项目名称_完井_管理员"`);
@@ -204,7 +204,7 @@
 
       const getFileName2 = (name) => {
         if (!name) return;
-        return `${name.split('_')[1]}_${name.split('_')[2]}`;
+        return `${name.split('_')[1]}_${name.split('_')[2]}_${name.split('_')[3]}`;
       };
 
       const uploadTime = (time) => {
@@ -251,7 +251,7 @@
         const params = {
           page: state.pages.curr,
           size: state.pages.size,
-          userId: userStore['getUserInfo']['userId'],
+          // userId: userStore['getUserInfo']['userId'],
           menuId: paramsColl['getFileListParams']['menuId'],
           fileName: txt,
         };
@@ -454,6 +454,7 @@
         justify-content: space-between;
         align-items: center;
         .ant-list-item-meta-title {
+          max-height: 40px;
           overflow: hidden;
           > span {
             word-wrap: break-word;
