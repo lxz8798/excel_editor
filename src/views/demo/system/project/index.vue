@@ -190,7 +190,11 @@
       }
 
       function handleEdit(record: Recordable) {
-        if ((!isActive.value || (record['leaderId'] !== userStore.getUserInfo.userId) && !isAdmin.value)) {
+        const { leaderName, teamUsers } = record;
+        const _username: String = computed(() => userStore.getUserInfo.realName);
+        const _temas = [leaderName, ...teamUsers.map((i) => i.realName)];
+
+        if ((!isActive.value || !_temas.includes(_username.value)) && !isAdmin.value) {
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }
@@ -201,7 +205,11 @@
       }
 
       function handleDelete(record: Recordable) {
-        if ((!isActive.value || (record['leaderId'] !== userStore.getUserInfo.userId) && !isAdmin.value)) {
+        const { leaderName, teamUsers } = record;
+        const _username: String = computed(() => userStore.getUserInfo.realName);
+        const _temas = [leaderName, ...teamUsers.map((i) => i.realName)];
+
+        if ((!isActive.value || !_temas.includes(_username.value)) && !isAdmin.value) {
           createMessage.info('当前账户末激活或者没有权限!');
           return;
         }

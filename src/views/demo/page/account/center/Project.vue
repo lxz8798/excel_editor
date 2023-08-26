@@ -390,6 +390,8 @@ export default defineComponent({
         state.formList<ProjectCarModel>.push({
           id: t['id'],
           title: t['name'],
+          content: t['content'],
+          partyA: t['partyA'],
           leaderName: t['leaderName'],
           teams: t['teamUsers'].map((i) => i['realName']).toString(),
           icon: 'gg:loadbar-doc',
