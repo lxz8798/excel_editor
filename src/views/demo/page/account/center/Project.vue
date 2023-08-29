@@ -46,20 +46,26 @@
                   <span style="color: #161616;">{{ item.title }}</span>
                 </div>
                 <div :class="`${prefixCls}__card-num`">
-                  项目简介：<span>{{ item.content ?? '暂无' }}</span>
+                  <span style="text-align: left; ">{{`${item.leaderName ?? '暂无'} / ${item.teams ?? '暂无'}`}}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  <span class="des">简介：{{ item.content ? item.content : '暂无简介' }}</span>
                 </div>
                 <div :class="`${prefixCls}__card-num`">
                   甲方：<span>{{ item.partyA ?? '暂无' }}</span>
                 </div>
-                <div :class="`${prefixCls}__card-num`">
+                <!--<div :class="`${prefixCls}__card-num`">
                   项目长：<span>{{ item.leaderName ?? '暂无' }}</span>
                 </div>
                 <div :class="`${prefixCls}__card-num`">
                   参与人员：<span>{{ item.teams ?? '暂无' }}</span>
-                </div>
+                </div>-->
                 <div :class="`${prefixCls}__card-num`">
                   <!-- 0-待审核 1-审核通过 2-审核不通过 -->
-                  审批状态：<span :style="{ color: item.status == '0' ? 'blue' : item.status == '3' ? 'red' : 'green' }">{{ item.status == '0' ? '待审核' : item.status == '1' ? '审批通过' : item.status == '2' ? '审核不通过' : '项目已结束' }}</span>
+                  项目状态：<span :style="{ color: item.status == '0' ? 'blue' : item.status == '3' ? 'red' : 'green' }">{{ item.status == '0' ? '待审核' : item.status == '1' ? '正在工作中...' : item.status == '2' ? '审核不通过' : '项目已结束' }}</span>
+                </div>
+                <div :class="`${prefixCls}__card-num`">
+                  到期时间：<span>{{ item.targetTime ?? '还末设置' }}</span>
                 </div>
               <!--<div :class="`${prefixCls}__card-num`">
                 <span>总体完成进度：还有<span :style="{ color: item.day < 3 ? 'red' : 'blue'  }">&nbsp;{{ item.day <= 0 ? '0' : item.day }}&nbsp;</span>天到期</span>
@@ -400,6 +406,7 @@ export default defineComponent({
           color: Color(),
           status: t['status'],
           confirmFlag: t['confirmFlag'],
+          targetTime: t['targetTime'] && t['targetTime'].split(' ')[0],
           day: Math.floor((new Date(t['targetTime']).getTime() - new Date().getTime()) / (1000 * 3600 * 24)),
           // des: t.templateDesc,
           // download: 'bx:bx-download',
@@ -562,13 +569,29 @@ export default defineComponent({
               left: 0;
             }
             .account-center-application__card-num {
+              line-height: 28px;
               margin-left: 0;
 
               display: flex;
               justify-content: space-between;
               align-items: center;
+              
+              > span {
+                width: calc(100% - 75px);
+                text-align: right;
+              }
+              
+              > span.des {
+                width: 100%;
+                overflow-x: hidden;
+                overflow-y: auto;
+                height: 60px;
+                line-height: 20px;
+                text-align: left !important;
+              }
 
               .app-iconify {
+                text-align: left;
                 transition: .3s;
                 &:hover {
                   color: #0960bd;

@@ -22,16 +22,15 @@
           </a-col>-->
         </a-row>
       </a-col>
-      <a-col :span="8" :class="`${prefixCls}-col`">
+      <!--<a-col :span="8" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team affiliation_wrap`" title="隶属" :canExpan="false">
           <div v-for="(team, index) in affiliationProjects" :key="index" :class="`${prefixCls}-top__team-item`">
-            <!-- <Icon :icon="team.icon" :color="team.color" /> -->
-            <span :style="{ color: team.status == '3' ? 'red' : 'green' }">{{ team.name }}-{{team.status == '3' ? '项目已结束' : '正在进行中'}}</span>
+            <span :style="{ color: team.status == '3' ? 'red' : 'green' }">{{ team.name }}-{{team.status == '3' ? '项目已结束' : '正在工作中'}}</span>
           </div>
           <a-pagination v-model:current="pages.topProjects.curr" :total="pages.topProjects.total" show-less-items @change="turnThePage" size="small" />
         </CollapseContainer>
-      </a-col>
-      <a-col :span="8" :class="`${prefixCls}-col`">
+      </a-col>-->
+      <a-col :span="16" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team`" title="技能" :canExpan="false">
           <div v-for="(team, index) in skills" :key="index" :class="`${prefixCls}-top__team-item`">
             <Icon :icon="team.icon" :color="team.color" />
