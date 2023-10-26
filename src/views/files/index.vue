@@ -38,8 +38,10 @@
         <a-list-item>
           <a-list-item-meta :description="`上传时间：${uploadTime(item['createTime'])}`">
             <template #title>
-              <span class="isDirFlag" :title="getFileName2(item['fileName'])" v-if="isDirFlag">{{ getFileName2(item['fileName']) }}</span>
-              <span :title="getFileName2(item['fileOriginalName'])" v-else>{{ getFileName2(item['fileOriginalName']) }}</span>
+              <a-button class="down" type="text" shape="round" size="small" @click="downloadHandler(item)">
+                <span class="isDirFlag" :title="getFileName2(item['fileName'])" v-if="isDirFlag">{{ getFileName2(item['fileName']) }}</span>
+                <span :title="getFileName2(item['fileOriginalName'])" v-else>{{ getFileName2(item['fileOriginalName']) }}</span>
+              </a-button>
             </template>
             <template #avatar>
               <a-checkbox v-model:checked="item['checked']" class="checked_box" v-if="!isDirFlag"></a-checkbox>
@@ -56,6 +58,8 @@
     </a-list>
     <!--  分页器  -->
     <a-pagination v-model:current="pages.curr" :total="pages.total" pageSize="24" size="small" show-less-items show-total @change="turnThePage" />
+    <!--弹窗-->
+    <Modal1 @register="registerModal" :options="modalOptions" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -73,7 +77,8 @@
   import { useUserStore } from '/@/store/modules/user';
   import { Icon } from '/@/components/Icon';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { defHttp } from '/@/utils/http/axios';
+  import { useModal } from '/@/components/Modal';
+  import Modal1 from './Modal1.vue';
 
   const AUploadDragger = Upload.Dragger;
   const AList = List;
@@ -95,8 +100,10 @@
       ACheckbox,
       AInputSearch,
       APagination,
+      Modal1,
     },
     setup() {
+      const [registerModal, { openModal: openModal1 }] = useModal();
       const { userFileUpload } = useGlobSetting();
       const userStore = useUserStore();
       const { createMessage, createConfirm } = useMessage();
@@ -156,6 +163,7 @@
         dirLists: [],
         isDirFlag: false,
         dirZIndex: 2,
+        modalOptions: {},
       });
       // created
       let paramsColl: Record<string, IGetFileParams> = {
@@ -175,7 +183,11 @@
       const isSelf = computed(() => userStore.getUserInfo['userId']);
 
       const handleChange = (info) => {
-        const reg = /^([0-9]+_)?.+_[\u4e00-\u9fa5]{2,4}$/g;
+        if (info.file.size / 1024 > 102400) {
+          message.error('超出100m的最大限制，下个版本将做调整!');
+          return;
+        }
+        const reg = /(^[0-9]{0,8})_.+_(.{2,4})/g;
         const status = info.file.status;
         if (!reg.test(info.file.name.split('.')[0])) {
           message.warning(`${info.file.name} 文件名称不规范，请参考："20230819_项目名称_完井_管理员"`);
@@ -185,8 +197,13 @@
           console.log(info.file, info.fileList);
         }
         if (status === 'done') {
-          message.success(`${info.file.name} 上传成功.`);
-          userStore['setUserFilesList'](paramsColl['getFileListParams'])
+          // message.success(`${info.file.name} 上传成功.`);
+          if (info.file.response.code == 1) {
+            message.info(info.file.response.message);
+          } else {
+            message.success(info.file.response.message);
+          }
+          userStore['setUserFilesList'](paramsColl['getFileListParams']);
         } else if (status === 'error') {
           message.error(`${info.file.name} 上传失败.`);
         }
@@ -352,12 +369,22 @@
       };
 
       const downloadHandler = (item) => {
-        const link = document.createElement('a');
-        link.href = item.filePath;
-        link.download = item.filePath;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        openModal1(true, { project: item });
+        // const { fileName, viewPath, filePath } = item;
+        // const _range = ['doc','docx','xls','xlsx'];
+        // const _type = fileName.split('.')[1];
+        // const link = document.createElement('a');
+        // // viewPath
+        // if (!_range.includes(_type)) {
+        //   link.href = filePath;
+        //   link.download = filePath;
+        // } else {
+        //   link.href = viewPath;
+        //   link.download = viewPath;
+        // }
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
       };
 
       return {
@@ -375,6 +402,7 @@
         uppageHandler,
         dblclickEnterDir,
         downloadHandler,
+        registerModal,
         fileList: ref([]),
         userFileUpload,
       };
@@ -454,15 +482,20 @@
         justify-content: space-between;
         align-items: center;
         .ant-list-item-meta-title {
+          flex: 1;
           max-height: 40px;
           overflow: hidden;
-          > span {
-            word-wrap: break-word;
-          }
-          > .isDirFlag {
+          .ant-btn {
+            text-align: left;
             width: 100%;
-            display: inline-block;
-            text-align: center;
+            > span {
+              word-wrap: break-word;
+            }
+            > .isDirFlag {
+              width: 100%;
+              display: inline-block;
+              text-align: center;
+            }
           }
         }
       }
