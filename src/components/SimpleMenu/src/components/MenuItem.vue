@@ -21,7 +21,7 @@
       <div class="drop_box"></div>
       <template #overlay>
         <a-menu>
-          <a-menu-item @click="addMenu(item)">创建项目</a-menu-item>
+          <!--<a-menu-item @click="addMenu(item)">创建项目</a-menu-item>-->
           <a-menu-item @click="editName(item)">修改名称</a-menu-item>
           <!--<a-menu-item @click="transformThchnologyMenu(item)">开始工作</a-menu-item>-->
           <a-menu-item @click="invitationMember(item)">邀请成员</a-menu-item>

@@ -126,6 +126,17 @@ export const projectFormSchema: FormSchema[] = [
     ],
   },
   {
+    field: 'ruleReg',
+    label: '项目规则',
+    component: 'Input',
+    rules: [
+      {
+        required: true,
+        message: '请输入项目规则',
+      },
+    ],
+  },
+  {
     field: 'partyA',
     label: '甲方',
     component: 'Input',

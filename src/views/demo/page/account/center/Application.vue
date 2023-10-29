@@ -110,6 +110,7 @@
   const AMenuItem = Menu.Item;
   const APopover = Popover;
   const APagination = Pagination;
+  const AInput = Input;
 
   interface ProjectCarModel {
     id?: number | string;
@@ -130,6 +131,7 @@
       APopover,
       APagination,
       AddProjectMebersModal,
+      AInput,
       [Row.name]: Row,
       [Col.name]: Col,
       ProjectDetailDrawer,
@@ -171,7 +173,7 @@
             return h('div', [
               h('label', '请输入名称!'),
               h(
-                Input,
+                AInput,
                 {
                   // value: inputValue.value.split('-')[inputValue.value.split('-').length - 1],
                   value: inputValue.value,
@@ -212,7 +214,7 @@
             return h('div', [
               h('label', '请输入名称!'),
               h(
-                Input,
+                AInput,
                 {
                   value: inputValue.value,
                   onChange: (e) => {

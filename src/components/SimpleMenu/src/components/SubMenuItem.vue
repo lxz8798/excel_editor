@@ -103,7 +103,7 @@
   import { useSimpleRootMenuContext } from './useSimpleMenuContext';
   import { CollapseTransition } from '/@/components/Transition';
   import Icon from '/@/components/Icon';
-  import { Popover, Dropdown, Input, Menu as Menuu, Checkbox } from 'ant-design-vue';
+  import { Popover, Dropdown, Input, Menu as Menuu, Checkbox, DatePicker, AutoComplete } from 'ant-design-vue';
   import { isBoolean, isObject } from '/@/utils/is';
   import mitt from '/@/utils/mitt';
   import ProjectDetailDrawer from './ProjectDetailDrawer.vue';
@@ -221,7 +221,7 @@
       const getCollapse = computed(() => rootProps.collapse);
       const getTheme = computed(() => rootProps.theme);
       const isActive = computed(() => userStore.getUserInfo.activeFlag);
-      const openRightButton = computed(() => !props.item.name.includes('个人') && !props.item.name.includes('原始数据录入') && !props.item.name.includes('数据处理过程') && !props.item.name.includes('计算结果展示') && !props.item.name.includes('结果现象图形化'))
+      const openRightButton = computed(() => !props.item.name.includes('个人') && !props.item.name.includes('原始数据录入') && !props.item.name.includes('归一数据录入') && !props.item.name.includes('方程结果录入') && !props.item.name.includes('主控因素结果录入'))
       const getOverlayStyle = computed((): CSSProperties => {
         return {
           minWidth: '200px',
@@ -397,22 +397,120 @@
           width: '35vw',
           title: () => h('div', '创建项目!'),
           content: () => {
-            return h('div', { style: { display: 'flex', alignItems: 'center' } }, [
-              h('label', { style: { width: '72px' } },'内容名称：'),
-              h(
-                Input,
-                {
-                  style: {
-                    width: '335px'
+            return h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } }, [
+              h('div', {
+                style: {
+                  width: '100%'
+                }
+              }, [
+                h('label', { style: { width: '72px' } },'内容名称：'),
+                h(
+                  Input,
+                  {
+                    style: {
+                      width: '335px'
+                    },
+                    onChange: (e) => inputValue.value = e.target.value,
                   },
-                  onChange: (e) => inputValue.value = e.target.value,
-                },
-                inputValue,
-              ),
-              h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, checked: _checked, onChange: (e) => {
-                  _checked.value = e.target.checked;
-                  return e.target.checked ? contentType.value = '1' : contentType.value = '0';
-                }},'生成项目')
+                  inputValue,
+                ),
+                h(ACheckbox, { style: { marginLeft: '8px', marginRight: '8px' }, checked: _checked, onChange: (e) => {
+                    _checked.value = e.target.checked;
+                    return e.target.checked ? contentType.value = '1' : contentType.value = '0';
+                  }},'生成项目'),
+              ]),
+              // h('div', {
+              //   style: {
+              //     width: '100%',
+              //     marginTop: '10px',
+              //   }
+              // },[
+              //   h('label', { style: { width: '72px' } },'项目描述：'),
+              //   h(
+              //     Input,
+              //     {
+              //       style: {
+              //         width: '335px'
+              //       },
+              //       onChange: (e) => inputValue.value = e.target.value,
+              //     },
+              //     inputValue,
+              //   ),
+              // ]),
+
+              // h('div', {
+              //   style: {
+              //     width: '100%',
+              //     marginTop: '10px',
+              //   }
+              // },[
+              //   h('label', { style: { width: '72px' } },'项目规则：'),
+              //   h(
+              //     Input,
+              //     {
+              //       style: {
+              //         width: '335px'
+              //       },
+              //       onChange: (e) => inputValue.value = e.target.value,
+              //     },
+              //     inputValue,
+              //   ),
+              // ]),
+
+              // h('div', {
+              //   style: {
+              //     width: '100%',
+              //     marginTop: '10px',
+              //   }
+              // },[
+              //   h('label', { style: { width: '72px', display: "inline-block", textAlign: 'center' } },'甲方：'),
+              //   h(
+              //     Input,
+              //     {
+              //       style: {
+              //         width: '335px'
+              //       },
+              //       onChange: (e) => inputValue.value = e.target.value,
+              //     },
+              //     inputValue,
+              //   ),
+              // ]),
+              // h('div', {
+              //   style: {
+              //     width: '100%',
+              //     marginTop: '10px',
+              //   }
+              // },[
+              //   h('label', { style: { width: '72px', display: "inline-block", textAlign: 'center' } },'项目长：'),
+              //   h(
+              //     AutoComplete,
+              //     {
+              //       style: {
+              //         width: '335px'
+              //       },
+              //       onChange: (e) => inputValue.value = e.target.value,
+              //     },
+              //     inputValue,
+              //   ),
+              // ]),
+              // h('div', {
+              //   style: {
+              //     width: '100%',
+              //     marginTop: '10px',
+              //   }
+              // },[
+              //   h('label', { style: { width: '72px' } },'到期时间：'),
+              //   h(
+              //     DatePicker,
+              //     {
+              //       style: {
+              //         width: '335px'
+              //       },
+              //       onChange: (e) => inputValue.value = e.target.value,
+              //     },
+              //     inputValue,
+              //   ),
+              // ]),
             ]);
           },
           onOk: () => {

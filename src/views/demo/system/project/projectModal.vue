@@ -87,7 +87,7 @@
       async function handleSubmit() {
         try {
           const values = await validate();
-          const { name, createUserId, parentMenu, content, partyA, targetTime } = values;
+          const { name, createUserId, parentMenu, content, partyA, targetTime, ruleReg } = values;
           if (name.includes('-')) {
             createMessage.info('名称当中不能包含"-"，请检查后在输入!');
             return;
@@ -96,6 +96,7 @@
             name: name,
             // createUserId: isAdmin.value ? toRaw(projectStore.getProjectUserList).filter((i) => i['name'] === projectAdminId)[0]['id'] : null,
             content: content,
+            ruleReg: `/${ruleReg}/`,
             partyA: partyA,
             createUserId: leaderId.value,
             parentMenu: parentMenu,

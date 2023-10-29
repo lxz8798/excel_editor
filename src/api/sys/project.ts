@@ -14,7 +14,7 @@ enum Api {
   REMOVE_PROJECT_MEMBERS = '/removeTeamUser',
   CHANGE_AUDIT_STATUS = '/examContract/auditContract',
   GET_PROJECT_TEMPLATES = '/examContract/listTemplates',
-  GET_PROJECT__TREE_LIST = '/sysMenu/treeProjects',
+  GET_PROJECT_TREE_LIST = '/sysMenu/treeProjects',
 }
 
 export function addProject(params) {
@@ -128,7 +128,7 @@ export function getProjectTemplates(params) {
 export function getProjectTreeList(params) {
   return defHttp.get(
     {
-      url: Api.GET_PROJECT__TREE_LIST,
+      url: Api.GET_PROJECT_TREE_LIST,
       params,
     },
     {},

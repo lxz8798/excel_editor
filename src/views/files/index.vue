@@ -42,6 +42,7 @@
                 <span class="isDirFlag" :title="getFileName2(item['fileName'])" v-if="isDirFlag">{{ getFileName2(item['fileName']) }}</span>
                 <span :title="getFileName2(item['fileOriginalName'])" v-else>{{ getFileName2(item['fileOriginalName']) }}</span>
               </a-button>
+              <Icon class="download_icon" icon="material-symbols:download" size="20" @click="downloadFile(item)"></Icon>
             </template>
             <template #avatar>
               <a-checkbox v-model:checked="item['checked']" class="checked_box" v-if="!isDirFlag"></a-checkbox>
@@ -59,7 +60,7 @@
     <!--  分页器  -->
     <a-pagination v-model:current="pages.curr" :total="pages.total" pageSize="24" size="small" show-less-items show-total @change="turnThePage" />
     <!--弹窗-->
-    <Modal1 @register="registerModal" :options="modalOptions" />
+    <Modal1 @register="registerModal" width="65%" :minHeight="450" :options="modalOptions" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -370,22 +371,19 @@
 
       const downloadHandler = (item) => {
         openModal1(true, { project: item });
-        // const { fileName, viewPath, filePath } = item;
-        // const _range = ['doc','docx','xls','xlsx'];
-        // const _type = fileName.split('.')[1];
-        // const link = document.createElement('a');
-        // // viewPath
-        // if (!_range.includes(_type)) {
-        //   link.href = filePath;
-        //   link.download = filePath;
-        // } else {
-        //   link.href = viewPath;
-        //   link.download = viewPath;
-        // }
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
+
       };
+
+      const downloadFile = (item) => {
+        const { filePath } = item;
+        const link = document.createElement('a');
+        // viewPath
+        link.href = filePath;
+        link.download = filePath;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
 
       return {
         ...toRefs(state),
@@ -403,6 +401,7 @@
         dblclickEnterDir,
         downloadHandler,
         registerModal,
+        downloadFile,
         fileList: ref([]),
         userFileUpload,
       };
@@ -483,19 +482,39 @@
         align-items: center;
         .ant-list-item-meta-title {
           flex: 1;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
           max-height: 40px;
           overflow: hidden;
           .ant-btn {
+            width: calc(100% - 25px);
             text-align: left;
-            width: 100%;
             > span {
-              word-wrap: break-word;
+              width: 100%;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
             }
+
             > .isDirFlag {
               width: 100%;
               display: inline-block;
               text-align: center;
             }
+          }
+          > span.download_icon {
+            width: 20px;
+            height: 20px;
+            transition: .3s;
+
+            &:hover {
+              color: #3c9ae8;
+            }
+          }
+          .ant-btn.ant-btn-round {
+            padding: 0;
           }
         }
       }

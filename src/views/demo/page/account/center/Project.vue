@@ -575,12 +575,12 @@ export default defineComponent({
               display: flex;
               justify-content: space-between;
               align-items: center;
-              
+
               > span {
                 width: calc(100% - 75px);
                 text-align: right;
               }
-              
+
               > span.des {
                 width: 100%;
                 overflow-x: hidden;
